@@ -1,0 +1,170 @@
+{
+  "root": true,
+  "env": { "browser": true, "es2020": true },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:boundaries/recommended"
+  ],
+  "ignorePatterns": ["dist", ".eslintrc.json"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "react-hooks",
+    "react-refresh",
+    "boundaries",
+    "simple-import-sort"
+  ],
+  "settings": {
+    "react": { "version": "detect" },
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": "tsconfig.json"
+      }
+    },
+    "boundaries/include": ["src/**/*"],
+    "boundaries/elements": [
+      {
+        "mode": "full",
+        "type": "shared",
+        "pattern": [
+          "src/components/**/*",
+          "src/constants/**/*",
+          "src/assets/**/*",
+          "src/hooks/**/*",
+          "src/lib/**/*",
+          "src/utils/**/*",
+          "src/types/**/*",
+          "src/validators/**/*"
+        ]
+      },
+      {
+        "mode": "full",
+        "type": "feature",
+        "capture": ["featureName"],
+        "pattern": ["src/features/*/**/*"]
+      },
+      {
+        "mode": "full",
+        "type": "app",
+        "capture": ["_", "fileName"],
+        "pattern": ["src/app/**/*"]
+      },
+      {
+        "mode": "full",
+        "type": "pages",
+        "pattern": ["src/pages/**/*"]
+      },
+      {
+        "mode": "full",
+        "type": "router",
+        "pattern": ["src/router/**/*"]
+      },
+      {
+        "mode": "full",
+        "type": "vite",
+        "pattern": ["src/vite-env.d.ts"]
+      }
+    ]
+  },
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/ban-ts-comment": "warn",
+
+    "react/jsx-uses-react": "error",
+    "react/jsx-uses-vars": "error",
+    "react-hooks/exhaustive-deps": ["warn"],
+    "react/jsx-filename-extension": [1, { "extensions": [".ts", ".tsx"] }],
+    "react-refresh/only-export-components": [
+      "warn",
+      { "allowConstantExport": true }
+    ],
+
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+
+    "boundaries/no-unknown": "error",
+    "boundaries/no-unknown-files": "error",
+    "boundaries/element-types": [
+      "error",
+      {
+        "default": "disallow",
+        "rules": [
+          {
+            "from": ["shared"],
+            "allow": ["shared"]
+          },
+          {
+            "from": ["feature"],
+            "allow": [
+              "shared",
+              ["feature", { "featureName": "${from.featureName}" }]
+            ]
+          },
+          {
+            "from": ["app"],
+            "allow": [
+              "shared",
+              "feature",
+              "router",
+              ["app", { "fileName": "*.css" }]
+            ]
+          },
+          {
+            "from": ["pages"],
+            "allow": ["shared", "feature"]
+          },
+          {
+            "from": ["router"],
+            "allow": ["shared", "pages"]
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.js", "**/*.ts"],
+      "rules": {
+        "simple-import-sort/imports": [
+          "error",
+          {
+            "groups": [
+              // `react` first, then packages starting with a character
+              ["^react", "^[a-z]"],
+              // Packages starting with `@/`
+              ["^@/"],
+              // Imports starting with `../` as `./`
+              [
+                "^\\.\\.(?!/?$)",
+                "^\\.\\./?$",
+                "^\\./(?=.*/)(?!/?$)",
+                "^\\.(?!/?$)",
+                "^\\./?$"
+              ],
+              // Side effect imports
+              ["^\\u0000"]
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

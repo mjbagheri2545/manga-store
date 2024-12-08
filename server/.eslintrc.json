@@ -1,0 +1,155 @@
+{
+  "root": true,
+  "env": { "node": true, "es2022": true },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:node/recommended",
+    "plugin:boundaries/recommended"
+  ],
+  "ignorePatterns": ["dist", ".eslintrc.json"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "boundaries",
+    "import",
+    "simple-import-sort",
+    "node"
+  ],
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts"]
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": "./tsconfig.json"
+      }
+    },
+
+    "boundaries/include": ["src/**/*"],
+    "boundaries/elements": [
+      {
+        "mode": "full",
+        "type": "shared",
+        "pattern": [
+          "src/constants/**/*",
+          "src/lib/**/*",
+          "src/utils/**/*",
+          "src/types/**/*",
+          "src/templates/**/*",
+          "src/db/**/*",
+          "src/validators/**/*"
+        ]
+      },
+      {
+        "mode": "full",
+        "type": "router",
+        "capture": ["routerName"],
+        "pattern": ["src/router/*/**/*"]
+      },
+      {
+        "mode": "full",
+        "type": "app",
+        "pattern": ["src/app/**/*"]
+      },
+      {
+        "mode": "full",
+        "type": "helpers",
+        "pattern": ["src/helpers/**/*"]
+      },
+      {
+        "mode": "full",
+        "type": "controllers",
+        "pattern": ["src/controllers/**/*"]
+      },
+      {
+        "mode": "file",
+        "type": "entryPoint",
+        "pattern": ["src/server.ts"]
+      }
+    ]
+  },
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/ban-ts-comment": "warn",
+
+    "node/no-missing-import": "off",
+    "import/no-unresolved": "error",
+    "import/no-duplicates": "error",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+
+    "boundaries/no-unknown": "error",
+    "boundaries/no-unknown-files": "error",
+    "boundaries/element-types": [
+      2,
+      {
+        "default": "disallow",
+        "rules": [
+          {
+            "from": ["shared"],
+            "allow": ["shared"]
+          },
+          {
+            "from": ["helpers"],
+            "allow": ["shared", "helpers"]
+          },
+          {
+            "from": ["controllers"],
+            "allow": ["shared", "controllers", "helpers"]
+          },
+          {
+            "from": ["router"],
+            "allow": [
+              "shared",
+              "controllers",
+              ["router", { "routerName": "${from.routerName}" }]
+            ]
+          },
+          {
+            "from": ["app"],
+            "allow": ["shared", "router"]
+          },
+          {
+            "from": ["entryPoint"],
+            "allow": ["app", "shared"]
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.js", "**/*.ts"],
+      "rules": {
+        "simple-import-sort/imports": [
+          "error",
+          {
+            "groups": [
+              // `express` first, then packages starting with a character
+              ["express", "^[a-z]"],
+              // Packages starting with `@`
+              ["^@/"],
+              // Imports starting with `../` as `./`
+              [
+                "^\\.\\.(?!/?$)",
+                "^\\.\\./?$",
+                "^\\./(?=.*/)(?!/?$)",
+                "^\\.(?!/?$)",
+                "^\\./?$"
+              ],
+              // Side effect imports
+              ["^\\u0000"]
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
