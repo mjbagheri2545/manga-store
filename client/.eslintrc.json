@@ -78,6 +78,11 @@
       },
       {
         "mode": "full",
+        "type": "entryPoint",
+        "pattern": ["src/index.tsx"]
+      },
+      {
+        "mode": "full",
         "type": "vite",
         "pattern": ["src/vite-env.d.ts"]
       }
@@ -97,7 +102,6 @@
       { "allowConstantExport": true }
     ],
 
-    "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
 
     "boundaries/no-unknown": "error",
@@ -134,37 +138,36 @@
           {
             "from": ["router"],
             "allow": ["shared", "pages"]
+          },
+          {
+            "from": ["entryPoint"],
+            "allow": ["app"]
           }
+        ]
+      }
+    ],
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          // React and related libraries first
+          ["^react", "^react-dom$", "^react-router-dom$"],
+          // Packages starting with a character and @ (external packages)
+          ["^[a-z]", "^@[^\/]"],
+          // Packages starting with `@/` (aliases)
+          ["^@/"],
+          // Aliases and relative imports
+          [
+            "^\\.\\.(?!/?$)",
+            "^\\.\\./?$",
+            "^\\./(?=.*/)(?!/?$)",
+            "^\\.(?!/?$)",
+            "^\\./?$"
+          ],
+          // Side effect imports (e.g., CSS)
+          ["^\\u0000"]
         ]
       }
     ]
-  },
-  "overrides": [
-    {
-      "files": ["**/*.js", "**/*.ts"],
-      "rules": {
-        "simple-import-sort/imports": [
-          "error",
-          {
-            "groups": [
-              // `react` first, then packages starting with a character
-              ["^react", "^[a-z]"],
-              // Packages starting with `@/`
-              ["^@/"],
-              // Imports starting with `../` as `./`
-              [
-                "^\\.\\.(?!/?$)",
-                "^\\.\\./?$",
-                "^\\./(?=.*/)(?!/?$)",
-                "^\\.(?!/?$)",
-                "^\\./?$"
-              ],
-              // Side effect imports
-              ["^\\u0000"]
-            ]
-          }
-        ]
-      }
-    }
-  ]
+  }
 }

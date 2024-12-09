@@ -1,0 +1,9 @@
+dist
+.prettierrc.json
+.eslintrc.json
+package.json
+package-lock.json
+tsconfig.json
+README.md
+.husky
+*.local

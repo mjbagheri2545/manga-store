@@ -1,0 +1,15 @@
+dist
+.prettierrc.json
+.eslintrc.json
+package.json
+package-lock.json
+tsconfig.app.json
+tsconfig.node.json
+tsconfig.json
+README.md
+.husky
+*.local
+vite-env.d.ts
+
+*.html
+*.css

@@ -1,14 +1,14 @@
-/** @type {import('tailwindcss').Config} */
 import daisyui from "daisyui";
 import daisyuiThemes from "daisyui/src/theming/themes";
 import colors from "tailwindcss/colors";
-
+import { Config } from "tailwindcss/types/config";
 import forms from "@tailwindcss/forms";
 
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      transitionDuration: { DEFAULT: "300ms" },
       colors: {
         primary: colors.violet,
         dark: {
@@ -39,4 +39,4 @@ export default {
       },
     ],
   },
-};
+} satisfies Config;

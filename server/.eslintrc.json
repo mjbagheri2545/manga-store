@@ -82,7 +82,6 @@
     "node/no-missing-import": "off",
     "import/no-unresolved": "error",
     "import/no-duplicates": "error",
-    "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
 
     "boundaries/no-unknown": "error",
@@ -122,34 +121,30 @@
           }
         ]
       }
-    ]
-  },
-  "overrides": [
-    {
-      "files": ["**/*.js", "**/*.ts"],
-      "rules": {
-        "simple-import-sort/imports": [
-          "error",
-          {
-            "groups": [
-              // `express` first, then packages starting with a character
-              ["express", "^[a-z]"],
-              // Packages starting with `@`
-              ["^@/"],
-              // Imports starting with `../` as `./`
-              [
-                "^\\.\\.(?!/?$)",
-                "^\\.\\./?$",
-                "^\\./(?=.*/)(?!/?$)",
-                "^\\.(?!/?$)",
-                "^\\./?$"
-              ],
-              // Side effect imports
-              ["^\\u0000"]
-            ]
-          }
+    ],
+
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          // express
+          ["^express"],
+          // Packages starting with a character and @ (external packages)
+          ["^[a-z]", "^@[^\/]"],
+          // Packages starting with `@/` (aliases)
+          ["^@/"],
+          // Imports starting with `../` as `./`
+          [
+            "^\\.\\.(?!/?$)",
+            "^\\.\\./?$",
+            "^\\./(?=.*/)(?!/?$)",
+            "^\\.(?!/?$)",
+            "^\\./?$"
+          ],
+          // Side effect imports
+          ["^\\u0000"]
         ]
       }
-    }
-  ]
+    ]
+  }
 }
