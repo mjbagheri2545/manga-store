@@ -6,11 +6,21 @@
   "scripts": {
     "dev": "tsx watch --env-file=.env.development.local ./src/server.ts",
     "build": "tsc --watch",
-    "lint": "npx eslint .",
-    "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "pre:commit": "lint-staged",
+    "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
+    "prepare": "cd .. && husky server/.husky"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -34,6 +44,8 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
     "madge": "^8.0.0",
     "prettier": "^3.4.2",
     "prisma": "^5.22.0",

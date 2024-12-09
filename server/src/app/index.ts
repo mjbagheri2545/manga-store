@@ -1,0 +1,4 @@
+import express from "express";
+
+import { Prisma } from "@prisma/client";
+const ali = "bagheri";
