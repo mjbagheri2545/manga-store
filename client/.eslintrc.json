@@ -7,8 +7,7 @@
     "plugin:react/recommended",
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
-    "plugin:jsx-a11y/recommended",
-    "plugin:boundaries/recommended"
+    "plugin:jsx-a11y/recommended"
   ],
   "ignorePatterns": ["dist", ".eslintrc.json"],
   "parserOptions": {
@@ -35,7 +34,7 @@
     "import/resolver": {
       "typescript": {
         "alwaysTryTypes": true,
-        "project": "tsconfig.json"
+        "project": ["./tsconfig.app.json", "./tsconfig.node.json"]
       }
     },
     "boundaries/include": ["src/**/*"],
@@ -44,6 +43,7 @@
         "mode": "full",
         "type": "shared",
         "pattern": [
+          "src/api/**/*",
           "src/components/**/*",
           "src/constants/**/*",
           "src/assets/**/*",
@@ -68,8 +68,9 @@
       },
       {
         "mode": "full",
-        "type": "pages",
-        "pattern": ["src/pages/**/*"]
+        "type": "page",
+        "capture": ["pageName"],
+        "pattern": ["src/pages/*/**/*"]
       },
       {
         "mode": "full",
@@ -132,12 +133,16 @@
             ]
           },
           {
-            "from": ["pages"],
-            "allow": ["shared", "feature"]
+            "from": ["page"],
+            "allow": [
+              "shared",
+              "feature",
+              ["page", { "pageName": "${from.pageName}" }]
+            ]
           },
           {
             "from": ["router"],
-            "allow": ["shared", "pages"]
+            "allow": ["shared", "router", "page"]
           },
           {
             "from": ["entryPoint"],
@@ -146,6 +151,7 @@
         ]
       }
     ],
+
     "simple-import-sort/imports": [
       "error",
       {

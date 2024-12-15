@@ -10,16 +10,18 @@ export default {
     extend: {
       transitionDuration: { DEFAULT: "300ms" },
       colors: {
-        primary: colors.violet,
-        dark: {
-          body: "#1a1a1a",
-          DEFAULT: "#242424",
-          pure: "#101010",
+        primary: {
+          ...colors.fuchsia,
+          DEFAULT: colors.fuchsia[600],
         },
-        error: "#B00020",
-        success: "#008B00",
-        info: "#0ea5e9",
-        warning: "#ffd600",
+        dark: {
+          body: colors.gray[900],
+          DEFAULT: colors.gray[800],
+        },
+        error: "var(--color-error)",
+        success: "var(--color-success)",
+        info: "var(--color-info)",
+        warning: "var(--color-warning)",
       },
     },
   },
@@ -28,8 +30,8 @@ export default {
     themes: [
       {
         dark: {
-          ...daisyuiThemes["[data-theme=dark]"],
-          primary: colors.violet[600],
+          ...daisyuiThemes["dark"],
+          primary: colors.fuchsia[600],
           "primary-content": "fff",
           error: "#B00020",
           success: "#008B00",
