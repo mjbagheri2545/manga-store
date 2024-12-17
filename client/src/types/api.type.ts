@@ -1,11 +1,13 @@
-import { TypeOrTypeArray } from "./common.type";
+import { EmptyObject, TypeOrTypeArray } from "./common.type";
 
 export type ApiMethodsWithBody = "POST" | "PUT" | "DELETE";
 export type ApiMethodsWithoutBody = "GET";
 
-export type ApiResponse<T> = ApiSuccessfulResponse<T> | ApiFailedResponse;
+export type ApiResponse<T = unknown> =
+  | ApiSuccessfulResponse<T>
+  | ApiFailedResponse;
 
-export type ApiSuccessfulResponse<T> = {
+export type ApiSuccessfulResponse<T = unknown> = {
   isSuccessful: true;
   result: {
     data: T;

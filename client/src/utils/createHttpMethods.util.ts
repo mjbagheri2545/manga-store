@@ -11,11 +11,8 @@ import {
 
 function getFailedResponseError(error: Error): ApiFailedResponse["error"] {
   return isAxiosError(error)
-    ? (error.response?.data ?? { message: error.message, data: undefined })
-    : {
-        data: undefined,
-        message: `An unexpected error happened with message: ${error.message}`,
-      };
+    ? (error.response?.data?.message ?? error.message)
+    : `An unexpected error happened with message: ${error.message}`;
 }
 
 type MethodsWithoutBodyAxiosOptions = AxiosRequestConfig & {
@@ -24,7 +21,7 @@ type MethodsWithoutBodyAxiosOptions = AxiosRequestConfig & {
 };
 
 export function createHttpMethodWithBody(method: ApiMethodsWithBody) {
-  return async function <T = any, V = any>(
+  return async function <T = unknown, V = unknown>(
     url: string,
     options?: AxiosRequestConfig<T>
   ): Promise<ApiResponse<V>> {
@@ -47,7 +44,7 @@ export function createHttpMethodWithBody(method: ApiMethodsWithBody) {
 }
 
 export function createHttpMethodWithoutBody(method: ApiMethodsWithoutBody) {
-  return async function <V = any>(
+  return async function <V = unknown>(
     url: string,
     options?: MethodsWithoutBodyAxiosOptions
   ): Promise<ApiResponse<V>> {

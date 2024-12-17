@@ -24,7 +24,7 @@ function useAuthMethods({ user, setUser, setToken }: UseAuthMethods) {
 
   async function login(data: LoginData) {
     if (user?.email === data.email) {
-      toast.info(MESSAGES.auth.alreadyLoggedIn);
+      toast.info(MESSAGES.auth_user.auth.alreadyLoggedIn);
       return;
     }
 
@@ -36,11 +36,11 @@ function useAuthMethods({ user, setUser, setToken }: UseAuthMethods) {
   }
 
   async function logout() {
-    parseResponse(await api.logout(), () => {
-      setToken(undefined);
-      setUser(undefined);
-      navigate(PATH.auth.login);
-    });
+    setToken(undefined);
+    setUser(undefined);
+    navigate(PATH.auth.login);
+
+    toast.success(MESSAGES.auth_user.auth.logout);
   }
 
   return { register, login, logout };

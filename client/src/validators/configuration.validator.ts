@@ -8,19 +8,19 @@ type RequiredOptions = { label: string } | { message: string };
 type MinLengthOptions = RequiredOptions & { minLength?: number };
 
 class ValidatorConfiguration {
-  protected readonly messages;
-  protected readonly config;
+  protected readonly MESSAGES;
+  protected readonly CONFIG;
 
   constructor() {
     autoBind(this);
-    this.messages = MESSAGES.validation;
-    this.config = CONFIG.validation;
+    this.MESSAGES = MESSAGES.validation;
+    this.CONFIG = CONFIG.validation;
   }
 
   string(label?: string) {
     return z
       .string({
-        invalid_type_error: this.messages.invalidType(label),
+        invalid_type_error: this.MESSAGES.invalidType(label),
       })
       .trim();
   }
@@ -28,7 +28,7 @@ class ValidatorConfiguration {
   required(options: RequiredOptions) {
     const isLabelProvided = "label" in options;
     const message = isLabelProvided
-      ? this.messages.required(options.label)
+      ? this.MESSAGES.required(options.label)
       : options.message;
 
     return this.string(isLabelProvided ? options.label : undefined).min(1, {
@@ -37,10 +37,10 @@ class ValidatorConfiguration {
   }
 
   minLength(options: MinLengthOptions) {
-    const minLength = options.minLength ?? this.config.stringMinLength;
+    const minLength = options.minLength ?? this.CONFIG.stringMinLength;
     const isLabelProvided = "label" in options;
     const message = isLabelProvided
-      ? this.messages.minLength(options.label, minLength)
+      ? this.MESSAGES.minLength(options.label, minLength)
       : options.message;
 
     return this.string(isLabelProvided ? options.label : undefined).min(

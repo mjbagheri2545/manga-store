@@ -15,23 +15,19 @@ type LoginResponse = {
 
 class AuthApi extends ApiConfiguration {
   register(data: RegistrationData) {
-    return this.http.post(this.path.auth.registration, {
+    return this.HTTP.post(this.PATH.auth.registration, {
       data,
     });
   }
 
   login(data: LoginData) {
-    return this.http.post<LoginData, LoginResponse>(this.path.auth.login, {
+    return this.HTTP.post<LoginData, LoginResponse>(this.PATH.auth.login, {
       data,
     });
   }
 
-  logout() {
-    return this.http.delete(this.path.auth.logout);
-  }
-
   getUser() {
-    return this.http.get<{user: User}>(this.path.user.getUser);
+    return this.HTTP.get<{ user: User }>(this.PATH.user.getUser);
   }
 }
 

@@ -1,8 +1,8 @@
-import { createAuthValidationMessages } from "./auth.message";
+import { createAuthUserValidationMessages } from "./auth_user.message";
 
 function createValidationMessages() {
   return {
-    auth: createAuthValidationMessages(),
+    auth_user: createAuthUserValidationMessages(),
     required: (label: string) => `${label} الزامی است`,
     minLength: (label: string, minLength: number) =>
       `طول ${label} باید حداقل ${minLength} باشد`,

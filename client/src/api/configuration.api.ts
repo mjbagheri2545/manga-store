@@ -4,13 +4,13 @@ import PATH from "@/constants/path";
 import { HTTP } from "@/lib/axios";
 
 abstract class ApiConfiguration {
-  protected readonly path;
-  protected readonly http;
+  protected readonly PATH;
+  protected readonly HTTP;
 
   constructor() {
     autoBind(this);
-    this.path = PATH;
-    this.http = HTTP;
+    this.PATH = PATH;
+    this.HTTP = HTTP;
   }
 }
 

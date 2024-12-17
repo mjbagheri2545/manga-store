@@ -1,8 +1,8 @@
-import { createAuthMessages } from "./auth.message";
+import { createAuthUserMessages } from "./auth_user.message";
 import createValidationMessages from "./validation.message";
 
 const MESSAGES = {
-  auth: createAuthMessages(),
+  auth_user: createAuthUserMessages(),
   validation: createValidationMessages(),
 } as const;
 

@@ -2,23 +2,25 @@ import ValidatorConfiguration from "@/validators/configuration.validator";
 
 class AuthUserValidator extends ValidatorConfiguration {
   email() {
-    return this.required({ label: "ایمیل" }).email(this.messages.auth.email);
+    return this.required({ label: "ایمیل" }).email(
+      this.MESSAGES.auth_user.common.email
+    );
   }
 
-  newPassword() {
-    return this.string("رمز عبور").regex(this.config.password.pattern, {
-      message: this.messages.auth.password.new,
+  newPassword(label = "رمز عبور") {
+    return this.string(label).regex(this.CONFIG.password.pattern, {
+      message: this.MESSAGES.auth_user.common.password.new(label),
     });
   }
 
-  newPasswordConfirmation() {
-    return this.required({ label: "تایید رمز عبور" });
+  newPasswordConfirmation(label = "رمز عبور") {
+    return this.required({ label: `تایید ${label}` });
   }
 
-  currentPassword() {
+  currentPassword(label = "رمز عبور") {
     return this.minLength({
-      label: "رمز عبور",
-      minLength: this.config.password.minLength,
+      label,
+      minLength: this.CONFIG.password.minLength,
     });
   }
 }

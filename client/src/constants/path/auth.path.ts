@@ -10,7 +10,6 @@ function createAuthPath() {
   return {
     registration: createPath("register"),
     login: createPath("login"),
-    logout: createPath("logout"),
   } as const;
 }
 

@@ -1,12 +1,7 @@
 {
   "root": true,
   "env": { "node": true, "es2022": true },
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:node/recommended",
-    "plugin:boundaries/recommended"
-  ],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "ignorePatterns": ["dist", ".eslintrc.json"],
   "parserOptions": {
     "ecmaVersion": "latest",
@@ -17,8 +12,7 @@
     "@typescript-eslint",
     "boundaries",
     "import",
-    "simple-import-sort",
-    "node"
+    "simple-import-sort"
   ],
   "settings": {
     "import/parsers": {
@@ -79,7 +73,6 @@
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/ban-ts-comment": "warn",
 
-    "node/no-missing-import": "off",
     "import/no-unresolved": "error",
     "import/no-duplicates": "error",
     "simple-import-sort/exports": "error",
@@ -113,7 +106,7 @@
           },
           {
             "from": ["app"],
-            "allow": ["shared", "router"]
+            "allow": ["shared", "router", "app"]
           },
           {
             "from": ["entryPoint"],
@@ -127,6 +120,8 @@
       "error",
       {
         "groups": [
+          // module-alias and express async errors
+          ["module-alias/register", "express-async-errors"],
           // express
           ["^express"],
           // Packages starting with a character and @ (external packages)
