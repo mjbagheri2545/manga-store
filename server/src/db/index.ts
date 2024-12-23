@@ -1,7 +1,9 @@
-import UserDb from "./user";
+import SharedTokenDb from "./token.db";
+import SharedUserDb from "./user.db";
 
-const DB = {
-  user: new UserDb(),
+const SHARED_DB = {
+  user: new SharedUserDb(),
+  token: new SharedTokenDb(),
 } as const;
 
-export default DB;
+export default SHARED_DB;

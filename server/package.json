@@ -2,23 +2,23 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "dev": "tsx watch --env-file=.env.development.local ./src/server.ts",
     "build": "tsc --watch",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint . --config .eslintrc.json --config .eslintrc.pre-commit.json",
+    "lint:fix": "eslint . --fix --config .eslintrc.json --config .eslintrc.pre-commit.json",
     "format": "prettier . --write",
     "pre:commit": "lint-staged",
     "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
-    "prepare": "cd .. && husky server/.husky"
+    "prepare": "cd .. && husky server/.husky",
+    "postinstall": "npm run prepare"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "lint-staged": {
     "*.ts": [
-      "eslint --fix",
+      "eslint --fix --config .eslintrc.json --config .eslintrc.pre-commit.json",
       "prettier --write"
     ]
   },
@@ -32,7 +32,6 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
-    "@types/lodash": "^4.17.13",
     "@types/module-alias": "^2.0.4",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.10.2",
@@ -46,6 +45,7 @@
     "eslint-plugin-boundaries": "^4.2.2",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
     "madge": "^8.0.0",

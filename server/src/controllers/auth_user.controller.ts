@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 
-import HelperConfiguration from "@/helpers/configuration.helper";
+import ControllerConfiguration from "./configuration.controller";
 
-abstract class AuthUserController extends HelperConfiguration {
+abstract class AuthUserController extends ControllerConfiguration {
   async emailAuthorization(req: Request, res: Response, next: NextFunction) {
-    const user = await this.DB.user.getByEmail(req.body.email);
+    const user = await this.SHARED_DB.user.getByEmail(req.body.email);
 
     if (user == null) {
       return this.badRequest(res, {
         isFullMessage: true,
-        message: this.MESSAGES.auth_user.common.emailAuthorization,
+        message: this.SHARED_MESSAGES.common.auth_user.emailAuthorization,
       });
     }
 

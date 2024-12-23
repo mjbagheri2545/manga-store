@@ -1,18 +1,25 @@
 import { Response } from "express";
 
 import bcrypt from "bcrypt";
+import { User } from "@prisma/client";
 
 import { registrationLogger } from "@/constants/loggers";
 import AuthUserController from "@/controllers/auth_user.controller";
-import { Req, UserAuthorizedReq } from "@/types/req.type";
-import { pick } from "@/utils";
-import { hashPassword } from "@/utils/auth_user";
-import { generateJwtToken } from "@/utils/auth_user/auth.util";
+import { Req, UserAuthorizedReq } from "@/types";
+import {
+  generateJwtToken,
+  hashPassword,
+  pickUserData,
+  withCatch,
+} from "@/utils";
+
+import MESSAGES from "../constants/messages";
 
 type RegistrationReq = Req<{
   fullName: string;
   email: string;
   password: string;
+  user: User;
 }>;
 
 type LoginReq = UserAuthorizedReq<{ password: string }>;
@@ -20,21 +27,33 @@ type LoginReq = UserAuthorizedReq<{ password: string }>;
 class Controller extends AuthUserController {
   async register(req: RegistrationReq, res: Response) {
     const { created } = this.STATUS_CODES;
-    const { registration } = this.MESSAGES.auth_user.auth;
+    const { registration } = MESSAGES;
     const { email, password, fullName } = req.body;
 
     const hashedPassword = await hashPassword(password);
 
-    await this.DB.user.create({
+    const user = await this.SHARED_DB.user.create({
       email,
       fullName,
       password: hashedPassword,
     });
+    req.body.user = user;
 
     registrationLogger.log(
       "info",
       `user with email: ${email}, fullName: ${fullName} successfully registered`
     );
+
+    const sendEmailPromise = this.sendEmail({
+      subject: "Successful Registration",
+      templateOptions: { featureName: "auth", name: "registration" },
+      templateVariables: {
+        name: fullName,
+      },
+      isSendResponseNeed: false,
+    })(req, res);
+
+    await withCatch(sendEmailPromise);
 
     this.successfulResponse({
       res,
@@ -44,7 +63,7 @@ class Controller extends AuthUserController {
   }
 
   async login(req: LoginReq, res: Response) {
-    const { login } = this.MESSAGES.auth_user.auth;
+    const { login } = MESSAGES;
     const { user, password } = req.body;
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -54,12 +73,10 @@ class Controller extends AuthUserController {
 
     const token = await generateJwtToken(user.id);
 
-    const userData = pick(user, ["email", "id", "fullName", "roles"]);
-
     this.successfulResponse({
       res,
       message: login,
-      data: { token, user: userData },
+      data: { token, user: pickUserData(user) },
     });
   }
 }

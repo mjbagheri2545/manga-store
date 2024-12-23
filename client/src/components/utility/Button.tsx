@@ -3,9 +3,9 @@ import { ComponentProps } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
-import Spinner from "./Spinner";
+import Spinner, { SpinnerProps } from "./Spinner";
 
-const buttonStyles = cva("btn", {
+const buttonStyles = cva("btn disabled:bg-slate-500/15", {
   variants: {
     variant: {
       default: "text-[1rem] px-6 rounded-sm btn-primary",
@@ -18,7 +18,10 @@ const buttonStyles = cva("btn", {
 });
 
 type ButtonProps = VariantProps<typeof buttonStyles> &
-  ComponentProps<"button"> & { isLoading?: boolean };
+  ComponentProps<"button"> & {
+    isLoading?: boolean;
+    spinnerProps?: SpinnerProps;
+  };
 
 function Button({
   children,
@@ -26,6 +29,7 @@ function Button({
   className,
   isLoading,
   disabled,
+  spinnerProps,
   ...restProps
 }: ButtonProps) {
   return (
@@ -34,7 +38,14 @@ function Button({
       disabled={disabled || isLoading}
       className={twMerge(buttonStyles({ variant }), className)}
     >
-      {isLoading ? <Spinner /> : children}
+      {isLoading ? (
+        <Spinner
+          {...spinnerProps}
+          className={twMerge("size-8", spinnerProps?.className)}
+        />
+      ) : (
+        children
+      )}
     </button>
   );
 }

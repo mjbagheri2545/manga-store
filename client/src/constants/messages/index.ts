@@ -1,9 +1,8 @@
-import { createAuthUserMessages } from "./auth_user.message";
-import createValidationMessages from "./validation.message";
+import createValidationMessages from "./validation";
 
-const MESSAGES = {
-  auth_user: createAuthUserMessages(),
+const SHARED_MESSAGES = {
   validation: createValidationMessages(),
+  unexpectedError: "متأسفیم، خطایی غیرمنتظره رخ داده است.",
 } as const;
 
-export default MESSAGES;
+export default SHARED_MESSAGES;

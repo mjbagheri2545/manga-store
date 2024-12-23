@@ -1,13 +1,11 @@
-import CONTENT from "@/constants/content";
+import Auth_UserFormLayout from "@/components/ui/auth_user/Auth_UserFormLayout";
 import LoginForm from "@/features/auth/components/forms/LoginForm";
-
-import AuthPage from "./AuthPage";
 
 function LoginPage() {
   return (
-    <AuthPage content={CONTENT.auth.login.mainContent}>
+    <Auth_UserFormLayout>
       <LoginForm />
-    </AuthPage>
+    </Auth_UserFormLayout>
   );
 }
 

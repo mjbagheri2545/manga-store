@@ -24,6 +24,7 @@
     "react-hooks",
     "react-refresh",
     "boundaries",
+    "import",
     "simple-import-sort"
   ],
   "settings": {
@@ -91,7 +92,6 @@
   },
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/ban-ts-comment": "warn",
 
     "react/jsx-uses-react": "error",
@@ -103,7 +103,22 @@
       { "allowConstantExport": true }
     ],
 
+    "import/no-unresolved": "error",
+    "import/no-duplicates": "error",
     "simple-import-sort/exports": "error",
+
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "args": "all",
+        "argsIgnorePattern": "^_",
+        "caughtErrors": "all",
+        "caughtErrorsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ],
 
     "boundaries/no-unknown": "error",
     "boundaries/no-unknown-files": "error",

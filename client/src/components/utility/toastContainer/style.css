@@ -17,6 +17,7 @@
 .Toastify__toast {
   max-width: 23.5rem;
   margin: 1rem auto;
+  direction: rtl;
 }
 .Toastify__progress-bar,
 .Toastify__toast {

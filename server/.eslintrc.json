@@ -53,12 +53,12 @@
       },
       {
         "mode": "full",
-        "type": "helpers",
+        "type": "helper",
         "pattern": ["src/helpers/**/*"]
       },
       {
         "mode": "full",
-        "type": "controllers",
+        "type": "controller",
         "pattern": ["src/controllers/**/*"]
       },
       {
@@ -70,12 +70,24 @@
   },
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/ban-ts-comment": "warn",
 
     "import/no-unresolved": "error",
     "import/no-duplicates": "error",
     "simple-import-sort/exports": "error",
+
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "args": "all",
+        "argsIgnorePattern": "^_",
+        "caughtErrors": "all",
+        "caughtErrorsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ],
 
     "boundaries/no-unknown": "error",
     "boundaries/no-unknown-files": "error",
@@ -89,24 +101,24 @@
             "allow": ["shared"]
           },
           {
-            "from": ["helpers"],
-            "allow": ["shared", "helpers"]
+            "from": ["helper"],
+            "allow": ["shared", "helper"]
           },
           {
-            "from": ["controllers"],
-            "allow": ["shared", "controllers", "helpers"]
+            "from": ["controller"],
+            "allow": ["shared", "controller", "helper"]
           },
           {
             "from": ["router"],
             "allow": [
               "shared",
-              "controllers",
+              "controller",
               ["router", { "routerName": "${from.routerName}" }]
             ]
           },
           {
             "from": ["app"],
-            "allow": ["shared", "router", "app"]
+            "allow": ["shared", "router", "app", "controller"]
           },
           {
             "from": ["entryPoint"],

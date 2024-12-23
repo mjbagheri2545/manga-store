@@ -3,15 +3,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import InputField from "@/components/form/inputField";
-import CONTENT from "@/constants/content";
+import Auth_UserForm from "@/components/ui/auth_user/Auth_UserForm";
 
 import { RegistrationData } from "../../api";
+import CONTENT from "../../constants/content";
 import { useAuth } from "../../contexts";
-import schema from "../../schema";
-import AuthForm from "../AuthForm";
+import SCHEMA from "../../schema";
 
 function RegistrationForm() {
-  const formMethods = useForm({ resolver: zodResolver(schema.registration) });
+  const formMethods = useForm({ resolver: zodResolver(SCHEMA.registration) });
   const { register } = useAuth();
 
   function handleOnSubmit(data: RegistrationData) {
@@ -19,10 +19,11 @@ function RegistrationForm() {
   }
 
   return (
-    <AuthForm
+    <Auth_UserForm
       formMethods={formMethods}
       handleOnSubmit={handleOnSubmit}
-      submitButtonText={CONTENT.auth.registration.submitButtonText}
+      submitButtonText={CONTENT.registration.submitButtonText}
+      content={CONTENT.registration.mainContent}
     >
       <InputField controllerName="fullName" label="نام و نام خانوادگی" />
       <InputField
@@ -40,7 +41,7 @@ function RegistrationForm() {
         inputProps={{ type: "password" }}
         label="تایید رمز عبور"
       />
-    </AuthForm>
+    </Auth_UserForm>
   );
 }
 

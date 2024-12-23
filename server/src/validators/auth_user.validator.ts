@@ -1,29 +1,34 @@
 import ValidatorConfiguration from "./configuration.validator";
 
 class AuthUserValidator extends ValidatorConfiguration {
-  email() {
+  protected email() {
     return this.string("email")
       .isEmail()
-      .withMessage(this.MESSAGES.auth_user.common.email);
+      .withMessage(this.SHARED_MESSAGES.common.auth_user.email);
   }
 
-  currentPassword(field = "password", label = "رمز عبور") {
+  protected currentPassword(field = "password", label = "رمز عبور") {
     return this.minLength(field, {
-      minLength: this.CONFIG.password.minLength,
+      minLength: this.SHARED_CONFIG.password.minLength,
       label,
     });
   }
 
-  newPassword(field = "password", label = "رمز عبور") {
+  protected newPassword(field = "password", label = "رمز عبور") {
     return this.string(field)
-      .matches(new RegExp(this.CONFIG.password.pattern))
-      .withMessage(this.MESSAGES.auth_user.common.password.new(label));
+      .matches(this.SHARED_CONFIG.password.pattern)
+      .withMessage(this.SHARED_MESSAGES.common.auth_user.password.new(label));
   }
 
-  newPasswordConfirmation(field = "password", label = "تایید رمز عبور") {
+  protected newPasswordConfirmation(
+    field = "password",
+    label = "تایید رمز عبور"
+  ) {
     return this.string(`${field}Confirmation`)
       .custom((value, { req }) => value === req.body[field])
-      .withMessage(this.MESSAGES.auth_user.common.password.confirmation(label));
+      .withMessage(
+        this.SHARED_MESSAGES.common.auth_user.password.confirmation(label)
+      );
   }
 }
 

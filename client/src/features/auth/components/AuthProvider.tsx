@@ -2,8 +2,8 @@ import { PropsWithChildren } from "react";
 
 import { AuthContext } from "../contexts";
 import useAuthMethods from "../hooks/useAuthMethods";
+import useUser from "../hooks/useGetUser";
 import useToken from "../hooks/useToken";
-import useUser from "../hooks/useUser";
 
 function AuthProvider({ children: App }: PropsWithChildren) {
   const { isLoggedIn, setToken } = useToken();

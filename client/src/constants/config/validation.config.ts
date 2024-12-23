@@ -1,16 +1,13 @@
-function createValidationConfig() {
+function createSharedValidationConfig() {
   const passwordMinLength = 8;
 
   return {
     stringMinLength: 2,
-    verificationCodeLength: 4,
     password: {
       minLength: passwordMinLength,
-      pattern: new RegExp(
-        `((?=.*\\d)(?=.*/[a-zA-Z]/).{${passwordMinLength},})`
-      ),
+      pattern: new RegExp(`^(?=.*[A-Za-z])(?=.*\\d).{${passwordMinLength},}$`),
     },
   } as const;
 }
 
-export default createValidationConfig;
+export default createSharedValidationConfig;

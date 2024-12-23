@@ -1,13 +1,14 @@
-import { createAuthUserMessages } from "./auth_user.message";
+import { createCommonMessages } from "./common";
 import createStatusCodeMessages from "./statusCode.message";
-import createValidationMessages from "./validation.message";
+import createValidationMessages from "./validation";
 
-const MESSAGES = {
-  auth_user: createAuthUserMessages(),
-  statusCode: createStatusCodeMessages(),
+const SHARED_MESSAGES = {
   validation: createValidationMessages(),
+  common: createCommonMessages(),
+  statusCode: createStatusCodeMessages(),
+  unexpectedError: "متأسفیم، خطایی غیرمنتظره رخ داده است.",
   failed: (message: string) =>
     `عملیات ${message} با شکست مواجه شد. لطفاً دوباره تلاش کنید.`,
 } as const;
 
-export default MESSAGES;
+export default SHARED_MESSAGES;

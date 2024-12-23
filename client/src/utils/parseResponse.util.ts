@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 
 import { ApiFailedResponse, ApiResponse, ApiSuccessfulResponse } from "@/types";
 
-import { parseTypeOrTypeArray } from "./common.util";
+import { parseTypeOrTypeArray } from "./general.util";
 
 function toastResponseError(error: ApiFailedResponse["error"]) {
   const DELAY_FACTOR = 500;
@@ -11,12 +11,16 @@ function toastResponseError(error: ApiFailedResponse["error"]) {
   });
 }
 
+type ParseResponseOptions = {
+  isToastSuccessfulMessageNeed?: boolean;
+};
+
 export function parseResponse<T = any>(
   response: ApiResponse<T>,
   successfulCallback?: (
     successfulResult: ApiSuccessfulResponse<T>["result"]
   ) => void,
-  isToastSuccessfulMessageNeed = true
+  { isToastSuccessfulMessageNeed = true }: ParseResponseOptions = {}
 ) {
   if (response.isSuccessful) {
     if (isToastSuccessfulMessageNeed) {

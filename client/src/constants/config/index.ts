@@ -1,7 +1,7 @@
 import createValidationConfig from "./validation.config";
 
-const CONFIG = {
+const SHARED_CONFIG = {
   validation: createValidationConfig(),
 } as const;
 
-export default CONFIG;
+export default SHARED_CONFIG;

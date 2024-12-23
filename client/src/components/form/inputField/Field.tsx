@@ -79,7 +79,7 @@ const InputField_Field = forwardRef<HTMLDivElement, InputField_FieldProps>(
           required={false}
           id={id}
           className={twMerge(
-            `input input-bordered input-${isError ? "error" : "primary"} rounded-sm bg-[#FFFFFF17] placeholder-white/40 pb-[0.7rem] border-none`,
+            `input input-bordered ${isError ? "input-error" : "input-primary"} rounded-sm bg-[#FFFFFF17] placeholder-white/40 pb-[0.7rem] border-none`,
             inputProps?.className
           )}
           ref={inputRef}

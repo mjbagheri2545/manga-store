@@ -11,11 +11,11 @@ import {
 
 import autoBind from "auto-bind";
 
-import CONFIG from "@/constants/config";
-import MESSAGES from "@/constants/messages";
+import SHARED_CONFIG from "@/constants/config";
+import SHARED_MESSAGES from "@/constants/messages";
 import STATUS_CODES from "@/constants/statusCodes";
 import { MiddlewareParams, TypeOrTypeArray } from "@/types";
-import { parseTypeOrTypeArray } from "@/utils";
+import { failedResponse, parseTypeOrTypeArray } from "@/utils";
 
 type CustomLocation = Exclude<Location, "cookies" | "headers">;
 
@@ -28,16 +28,16 @@ type MinLengthOptions = RequiredOptions & {
 };
 
 abstract class ValidatorConfiguration {
-  protected readonly MESSAGES;
-  protected readonly CONFIG;
+  protected readonly SHARED_MESSAGES;
+  protected readonly SHARED_CONFIG;
   protected readonly body;
   protected readonly query;
   protected readonly params;
 
   constructor() {
     autoBind(this);
-    this.MESSAGES = MESSAGES.validation;
-    this.CONFIG = CONFIG.validation;
+    this.SHARED_MESSAGES = SHARED_MESSAGES.validation;
+    this.SHARED_CONFIG = SHARED_CONFIG.validation;
 
     this.body = body;
     this.query = query;
@@ -55,7 +55,7 @@ abstract class ValidatorConfiguration {
     const finalMessage =
       "message" in restOptions
         ? restOptions.message
-        : this.MESSAGES.required(restOptions.label);
+        : this.SHARED_MESSAGES.required(restOptions.label);
 
     return this.string(field, location)
       .notEmpty({ ignore_whitespace: true })
@@ -66,14 +66,14 @@ abstract class ValidatorConfiguration {
     field: string,
     { location = "body", minLength, ...restOptions }: MinLengthOptions
   ) {
-    const finalMinLength = minLength ?? this.CONFIG.stringMinLength;
+    const finalMinLength = minLength ?? this.SHARED_CONFIG.stringMinLength;
     const finalMessage =
       "message" in restOptions
         ? restOptions.message
-        : this.MESSAGES.minLength(restOptions.label, finalMinLength);
+        : this.SHARED_MESSAGES.minLength(restOptions.label, finalMinLength);
 
     return this.string(field, location)
-      .isLength({ min: minLength })
+      .isLength({ min: finalMinLength })
       .withMessage(finalMessage);
   }
 
@@ -83,15 +83,17 @@ abstract class ValidatorConfiguration {
 
       const checkExactResult = await checkExact(schema, {
         message: (fields) =>
-          this.MESSAGES.unknownFields(
+          this.SHARED_MESSAGES.unknownFields(
             fields.map((field) => field.path).join(", ")
           ),
       }).run(req);
 
       if (!checkExactResult.isEmpty()) {
-        return res
-          .status(STATUS_CODES.unprocessableEntity)
-          .json({ message: checkExactResult.context.errors[0].msg });
+        return failedResponse({
+          res,
+          code: STATUS_CODES.unprocessableEntity,
+          message: checkExactResult.context.errors[0].msg,
+        });
       }
       return [
         ...parseTypeOrTypeArray(this.createSafeValidations(schema)),
@@ -113,7 +115,11 @@ abstract class ValidatorConfiguration {
         .array({ onlyFirstError: true })
         .map((error) => error.msg);
 
-      return res.status(STATUS_CODES.badRequest).json({ message: messages });
+      return failedResponse({
+        res,
+        code: STATUS_CODES.badRequest,
+        message: messages,
+      });
     }
     next();
   }

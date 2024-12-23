@@ -19,6 +19,7 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "noEmitOnError": true,
     "jsx": "react-jsx",
 
     /* Linting */
@@ -27,7 +28,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
   },
   "include": ["src"],
   "exclude": ["node-modules", "dist"]

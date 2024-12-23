@@ -8,14 +8,14 @@ function createUserAccountPath() {
   }
 
   return {
-    verify: {
+    verification: {
       getEmail: createPath("verification/get-email"),
-      action: createPath("verification/verify"),
+      verify: createPath("verification"),
     },
     password: {
       recovery: {
         getEmail: createPath("password/recovery/get-email"),
-        action: createPath("password/recovery"),
+        recover: createPath("password/recovery"),
       },
       reset: createPath("password/reset"),
     },

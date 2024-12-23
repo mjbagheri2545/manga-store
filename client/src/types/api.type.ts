@@ -1,4 +1,4 @@
-import { EmptyObject, TypeOrTypeArray } from "./common.type";
+import { TypeOrTypeArray } from "./common.type";
 
 export type ApiMethodsWithBody = "POST" | "PUT" | "DELETE";
 export type ApiMethodsWithoutBody = "GET";

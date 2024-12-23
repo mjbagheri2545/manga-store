@@ -14,14 +14,16 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid()) @db.VarChar(255)
-  fullName     String   @db.VarChar(255)
-  email        String   @unique @db.VarChar(255)
-  password     String   @db.VarChar(255)
-  oldPasswords String[] @default([]) @db.VarChar(255)
-  avatarImage  String?  @db.VarChar(255)
-  createdAt    DateTime @default(now())
-  roles        Role[]   @default([basic])
+  id                 String    @id @default(uuid()) @db.VarChar(255)
+  fullName           String    @db.VarChar(255)
+  email              String    @unique @db.VarChar(255)
+  password           String    @db.VarChar(255)
+  oldPasswords       String[]  @default([]) @db.VarChar(255)
+  avatarImage        String?   @db.VarChar(255)
+  createdAt          DateTime  @default(now())
+  roles              Role[]    @default([basic])
+  emailRemainingTime DateTime?
+  Token              Token?
 
   @@index([email])
 }
@@ -32,4 +34,12 @@ enum Role {
   writer
   manager
   admin
+}
+
+model Token {
+  id               String   @id @default(uuid()) @db.VarChar(255)
+  verificationCode String   @db.Char(6)
+  expirationTime   DateTime
+  userId           String   @unique @db.VarChar(255)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

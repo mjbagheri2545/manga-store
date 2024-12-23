@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --color-error: #b00020;
+  --color-error: #d00026;
   --color-success: #008b00;
   --color-info: #0ea5e9;
   --color-warning: #ffd600;

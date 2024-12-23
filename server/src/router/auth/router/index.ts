@@ -1,23 +1,20 @@
 import { Router } from "express";
 
+import PATH from "../constants/path";
 import Controller from "../controllers";
 import Validator from "../validators";
 
 function createAuthRouter() {
-  const authRouter = Router();
+  const router = Router();
 
-  const {
-    PATH: { auth },
-    register,
-    login,
-  } = new Controller();
+  const { register, login, emailAuthorization } = new Controller();
 
   const { registrationValidation, loginValidation } = new Validator();
 
-  authRouter.post(auth.registration, registrationValidation(), register);
-  authRouter.post(auth.login, loginValidation(), login);
+  router.post(PATH.registration, registrationValidation(), register);
+  router.post(PATH.login, loginValidation(), emailAuthorization, login);
 
-  return authRouter;
+  return router;
 }
 
 export default createAuthRouter;

@@ -3,13 +3,13 @@ import ValidatorConfiguration from "@/validators/configuration.validator";
 class AuthUserValidator extends ValidatorConfiguration {
   email() {
     return this.required({ label: "ایمیل" }).email(
-      this.MESSAGES.auth_user.common.email
+      this.SHARED_MESSAGES.common.auth_user.email
     );
   }
 
   newPassword(label = "رمز عبور") {
-    return this.string(label).regex(this.CONFIG.password.pattern, {
-      message: this.MESSAGES.auth_user.common.password.new(label),
+    return this.string(label).regex(this.SHARED_CONFIG.password.pattern, {
+      message: this.SHARED_MESSAGES.common.auth_user.password.new(label),
     });
   }
 
@@ -20,7 +20,7 @@ class AuthUserValidator extends ValidatorConfiguration {
   currentPassword(label = "رمز عبور") {
     return this.minLength({
       label,
-      minLength: this.CONFIG.password.minLength,
+      minLength: this.SHARED_CONFIG.password.minLength,
     });
   }
 }

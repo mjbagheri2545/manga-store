@@ -2,12 +2,11 @@ function createValidationConfig() {
   const passwordMinLength = 8;
   return {
     password: {
-      bcryptSaltLength: 10,
+      bcryptSaltRounds: 10,
       minLength: passwordMinLength,
-      pattern: `((?=.*\\d)(?=.*/[a-zA-Z]/).{${passwordMinLength},})`,
+      pattern: new RegExp(`^(?=.*[A-Za-z])(?=.*\\d).{${passwordMinLength},}$`),
     },
     stringMinLength: 2,
-    verificationCodeLength: 6,
   } as const;
 }
 

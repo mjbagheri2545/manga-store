@@ -11,6 +11,7 @@ function ToastContainer() {
       position="top-center"
       theme="dark"
       closeButton={CloseButton}
+      limit={4}
       newestOnTop
     />
   );

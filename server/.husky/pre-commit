@@ -1,2 +1,7 @@
 cd server || exit 1
-npm run pre:commit
+
+npm run pre:commit || exit 1
+
+cd ../client || exit 1
+
+npm run pre:commit || exit 1

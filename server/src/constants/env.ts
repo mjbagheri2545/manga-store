@@ -3,7 +3,6 @@ import { z } from "zod";
 function createEnv() {
   const STRING_ENV_KEYS = [
     "APP_NAME",
-    "DOMAIN",
     "CLIENT_END_POINT",
     "HOST",
     "JWT_PRIVATE_TOKEN_KEY",

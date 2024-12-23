@@ -1,0 +1,22 @@
+{
+  "ignorePatterns": ["dist", ".eslintrc.json", ".eslintrc.pre-commit.json"],
+  "parser": "@typescript-eslint/parser",
+
+  "plugins": ["unused-imports"],
+
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": ["./tsconfig.app.json", "./tsconfig.node.json"]
+      }
+    }
+  },
+
+  "rules": {
+    "unused-imports/no-unused-imports": "error"
+  }
+}

@@ -1,1 +1,2 @@
-export * from "./common.type";
+export * from "./general.type";
+export * from "./req.type";

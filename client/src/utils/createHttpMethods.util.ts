@@ -9,6 +9,8 @@ import {
   ApiSuccessfulResponse,
 } from "@/types";
 
+import { withCatch } from "./general.util";
+
 function getFailedResponseError(error: Error): ApiFailedResponse["error"] {
   return isAxiosError(error)
     ? (error.response?.data?.message ?? error.message)
@@ -25,21 +27,23 @@ export function createHttpMethodWithBody(method: ApiMethodsWithBody) {
     url: string,
     options?: AxiosRequestConfig<T>
   ): Promise<ApiResponse<V>> {
-    try {
-      const response = await http<ApiSuccessfulResponse<V>["result"]>({
-        url,
-        method,
-        withCredentials: true,
-        ...options,
-      });
+    const request = http<ApiSuccessfulResponse<V>["result"]>({
+      url,
+      method,
+      withCredentials: true,
+      ...options,
+    });
 
-      return { isSuccessful: true, result: response.data };
-    } catch (error) {
+    const [error, response] = await withCatch(request);
+
+    if (error != null) {
       return {
         isSuccessful: false,
-        error: getFailedResponseError(error as Error),
+        error: getFailedResponseError(error),
       };
     }
+
+    return { isSuccessful: true, result: response.data };
   };
 }
 
@@ -48,20 +52,22 @@ export function createHttpMethodWithoutBody(method: ApiMethodsWithoutBody) {
     url: string,
     options?: MethodsWithoutBodyAxiosOptions
   ): Promise<ApiResponse<V>> {
-    try {
-      const response = await http<ApiSuccessfulResponse<V>["result"]>({
-        url,
-        method,
-        withCredentials: true,
-        ...options,
-      });
+    const request = http<ApiSuccessfulResponse<V>["result"]>({
+      url,
+      method,
+      withCredentials: true,
+      ...options,
+    });
 
-      return { isSuccessful: true, result: response.data };
-    } catch (error) {
+    const [error, response] = await withCatch(request);
+
+    if (error != null) {
       return {
         isSuccessful: false,
-        error: getFailedResponseError(error as Error),
+        error: getFailedResponseError(error),
       };
     }
+
+    return { isSuccessful: true, result: response.data };
   };
 }
