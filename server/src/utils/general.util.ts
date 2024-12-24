@@ -58,7 +58,7 @@ export function withCatch<T>(
       errorLogger.log("error", error.message);
       const finalError = isError(error)
         ? error
-        : new Error(SHARED_MESSAGES.unexpectedError);
+        : new Error(SHARED_MESSAGES.general.unexpectedError);
       return [finalError];
     });
 }

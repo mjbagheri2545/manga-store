@@ -1,5 +1,6 @@
 function createGeneralMessages() {
   return {
+    unexpectedError: "متأسفیم، خطایی غیرمنتظره رخ داده است.",
     jwtAuthorization:
       "شما از حساب کاربری خود خارج شده‌اید. لطفاً دوباره وارد شوید.",
     sendEmail: {

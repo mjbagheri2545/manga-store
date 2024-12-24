@@ -54,7 +54,7 @@ abstract class ControllerConfiguration {
     const token = authorization && authorization.split(" ")[1];
 
     const unauthorizedMessage = {
-      message: this.SHARED_MESSAGES.common.general.jwtAuthorization,
+      message: this.SHARED_MESSAGES.general.jwtAuthorization,
       isFullMessage: true,
     };
 
@@ -85,7 +85,7 @@ abstract class ControllerConfiguration {
     return async (req: SendEmailReq, res: Response) => {
       const { internalServerError } = this.STATUS_CODES;
       const { failedMessage, successful } =
-        this.SHARED_MESSAGES.common.general.sendEmail;
+        this.SHARED_MESSAGES.general.sendEmail;
 
       const { user, email } = req.body;
       const finalEmail = email ?? user.email;

@@ -1,8 +1,9 @@
+import createGeneralMessages from "./general.message";
 import createValidationMessages from "./validation";
 
 const SHARED_MESSAGES = {
   validation: createValidationMessages(),
-  unexpectedError: "متأسفیم، خطایی غیرمنتظره رخ داده است.",
+  general: createGeneralMessages(),
 } as const;
 
 export default SHARED_MESSAGES;
