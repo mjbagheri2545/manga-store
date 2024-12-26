@@ -6,6 +6,7 @@ const SHARED_CONFIG = {
   logger: createLoggerConfig(),
   validation: createValidationConfig(),
   time: createTimeConfig(),
+  defaultQueryTake: 20,
 };
 
 export default SHARED_CONFIG;

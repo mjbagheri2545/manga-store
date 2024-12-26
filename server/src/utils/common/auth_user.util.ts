@@ -1,12 +1,12 @@
 import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 
-import CONFIG from "@/constants/config";
+import SHARED_CONFIG from "@/constants/config";
 
 import { pick } from "../general.util";
 
 export async function hashPassword(password: string) {
-  const saltRounds = CONFIG.validation.password.bcryptSaltRounds;
+  const saltRounds = SHARED_CONFIG.validation.password.bcryptSaltRounds;
   const salt = await bcrypt.genSalt(saltRounds);
   return bcrypt.hash(password, salt);
 }

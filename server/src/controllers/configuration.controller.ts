@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 
 import autoBind from "auto-bind";
+import { User } from "@prisma/client";
 
 import { errorLogger } from "@/constants/loggers";
 import SHARED_MESSAGES from "@/constants/messages";
 import STATUS_CODES from "@/constants/statusCodes";
 import SHARED_DB from "@/db";
-import { SendEmailReq } from "@/types";
+import { SendEmailReq, UserAuthorizedReq } from "@/types";
 import {
   badRequest,
   CompileHandlebarsTemplateOptions,
@@ -120,6 +121,22 @@ abstract class ControllerConfiguration {
           remainingTime,
         },
       });
+    };
+  }
+
+  permissionAuthorization(hasPermission: (user: User) => boolean) {
+    return (req: UserAuthorizedReq, res: Response, next: NextFunction) => {
+      const { user } = req.body;
+      const { general } = this.SHARED_MESSAGES;
+
+      if (!hasPermission(user)) {
+        return this.unauthorized(res, {
+          message: general.permissionAuthorization,
+          isFullMessage: true,
+        });
+      }
+
+      next();
     };
   }
 }

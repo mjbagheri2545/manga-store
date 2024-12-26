@@ -13,8 +13,8 @@ class AccountDb extends DbConfiguration {
       where: { id },
       data: {
         emailRemainingTime: null,
-        roles: { push: "verified" },
         Token: { delete: { userId: id } },
+        isVerified: true,
       },
     });
   }

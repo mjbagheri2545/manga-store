@@ -1,7 +1,14 @@
-import CONFIG from "@/constants/config";
+import { User } from "@prisma/client";
+
+import SHARED_CONFIG from "@/constants/config";
 import { errorLogger } from "@/constants/loggers";
 import SHARED_MESSAGES from "@/constants/messages";
-import { TypeOrTypeArray } from "@/types";
+import {
+  PaginateQuery,
+  Permissions,
+  PermissionsAction,
+  TypeOrTypeArray,
+} from "@/types";
 
 export function upperFirst(str: string) {
   return str.slice(1) + str[0].toUpperCase();
@@ -40,7 +47,7 @@ export function getExpirationTime(expirationMinutes: number) {
 }
 
 export function getEmailRemainingTime() {
-  return getExpirationTime(CONFIG.time.minutesUntilResendingEmail);
+  return getExpirationTime(SHARED_CONFIG.time.minutesUntilResendingEmail);
 }
 
 export function isExpired(time: Date | number) {
@@ -61,4 +68,30 @@ export function withCatch<T>(
         : new Error(SHARED_MESSAGES.general.unexpectedError);
       return [finalError];
     });
+}
+
+export function paginate(
+  query: PaginateQuery,
+  defaultTake: number = SHARED_CONFIG.defaultQueryTake
+) {
+  const { take, skip } = query;
+  return {
+    take: take != null ? parseInt(take) : defaultTake,
+    skip: skip != null ? parseInt(skip) : 0,
+  };
+}
+
+export function hasPermission<T, A extends PermissionsAction>(
+  user: User,
+  permissions: Permissions<T, A>,
+  action: A,
+  data?: T
+) {
+  return user.roles.some((role) => {
+    const permission = permissions[role][action];
+    if (permission == null) return false;
+
+    if (typeof permission === "boolean") return permission;
+    return data != null && permission(user, data);
+  });
 }

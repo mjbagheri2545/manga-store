@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 
-import CONFIG from "@/constants/config";
+import SHARED_CONFIG from "@/constants/config";
 import AuthUserController from "@/controllers/auth_user.controller";
 import { EmptyObject, SendEmailReq, UserAuthorizedReq } from "@/types";
 import { isExpired, pickUserData } from "@/utils";
@@ -27,7 +27,7 @@ class Controller extends AuthUserController {
       templateVariables: {
         name: user.fullName,
         verificationCode,
-        expirationMinutes: CONFIG.time.identificationExpirationMinutes,
+        expirationMinutes: SHARED_CONFIG.time.identificationExpirationMinutes,
       },
     })(req, res);
   }
@@ -41,7 +41,7 @@ class Controller extends AuthUserController {
       body: { user },
     } = req;
     const { tooEarly } = this.STATUS_CODES;
-    const { alreadySent } = this.SHARED_MESSAGES.common.general.sendEmail;
+    const { alreadySent } = this.SHARED_MESSAGES.general.sendEmail;
 
     if (
       user.emailRemainingTime != null &&

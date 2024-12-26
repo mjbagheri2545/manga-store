@@ -1,7 +1,7 @@
-import CONFIG from "@/constants/config";
+import SHARED_CONFIG from "@/constants/config";
 
 export function createAuthUserValidationMessages() {
-  const { password } = CONFIG.validation;
+  const { password } = SHARED_CONFIG.validation;
   return {
     password: {
       confirmation: (label: string) =>

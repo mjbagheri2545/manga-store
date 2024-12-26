@@ -16,7 +16,7 @@ class VerificationController extends Controller {
     const { alreadyVerified } = MESSAGES.account.verification;
     const { user } = req.body;
 
-    if (user.roles.includes("verified")) {
+    if (user.isVerified) {
       return this.badRequest(res, {
         message: alreadyVerified,
         isFullMessage: true,

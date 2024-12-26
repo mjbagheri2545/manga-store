@@ -1,6 +1,6 @@
 import { transports } from "winston";
 
-import CONFIG from "@/constants/config";
+import SHARED_CONFIG from "@/constants/config";
 import { createLogger } from "@/utils";
 
 import "winston-daily-rotate-file";
@@ -8,9 +8,9 @@ import "winston-daily-rotate-file";
 const getFileRotateTransport = (fileName: string) => [
   new transports.DailyRotateFile({
     filename: `logs/${fileName}/%DATE%.log`,
-    datePattern: CONFIG.logger.datePattern,
-    maxFiles: CONFIG.logger.maxFiles,
-    maxSize: CONFIG.logger.maxSize,
+    datePattern: SHARED_CONFIG.logger.datePattern,
+    maxFiles: SHARED_CONFIG.logger.maxFiles,
+    maxSize: SHARED_CONFIG.logger.maxSize,
   }),
 ];
 

@@ -3,6 +3,7 @@ function createGeneralMessages() {
     unexpectedError: "متأسفیم، خطایی غیرمنتظره رخ داده است.",
     jwtAuthorization:
       "شما از حساب کاربری خود خارج شده‌اید. لطفاً دوباره وارد شوید.",
+    permissionAuthorization: "متاسفیم، شما سطح دسترسی کافی را دارا نیستید.",
     sendEmail: {
       failedMessage: "ارسال ایمیل تایید",
       successful: (message?: string) =>

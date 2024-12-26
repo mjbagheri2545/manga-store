@@ -30,3 +30,8 @@ export type IdentityVerificationReq<Body = EmptyObject> = UserAuthorizedReq<
   EmptyObject,
   { verificationCode: string }
 >;
+
+export type PaginateQuery = {
+  take?: string;
+  skip?: string;
+};

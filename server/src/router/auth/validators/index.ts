@@ -1,6 +1,7 @@
-import MESSAGES from "@/constants/messages";
 import DB from "@/db";
 import AuthUserValidator from "@/validators/auth_user.validator";
+
+import MESSAGES from "../constants/messages";
 
 class Validator extends AuthUserValidator {
   registrationValidation() {
@@ -29,7 +30,7 @@ class Validator extends AuthUserValidator {
         }
         return;
       })
-      .withMessage(MESSAGES.statusCode.conflict);
+      .withMessage(MESSAGES.validation.emailInUse);
   }
 }
 
