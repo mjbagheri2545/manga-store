@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import PATH from "../constants/path";
 import GetProductsController from "../controllers/getProducts.controller";
-import GetProductsValidator from "../validators/getProducts.validator";
+import Validator from "../validators";
 
 // we can't use router.use for this routes because these routes
 // does not have a same parent path to group these routes like below path
@@ -19,33 +19,36 @@ function createGetProductsRoutes(router: Router) {
     getByStatus,
   } = new GetProductsController();
 
-  const { get: path, index } = PATH;
+  const { slugValidation } = new Validator();
 
-  const {
-    productSlugValidation,
-    categoryValidation,
-    statusValidation,
-    tagValidation,
-  } = new GetProductsValidator();
-
-  router.get(index, jwtAuthorization, getAll);
+  router.get("/", jwtAuthorization, getAll);
 
   router.get(
-    path.byProductSlug,
-    productSlugValidation(),
+    PATH.getByProductSlug,
+    slugValidation("productSlug", "محصول مورد نظر"),
     jwtAuthorization,
     getByProductSlug
   );
 
   router.get(
-    path.byCategory,
-    categoryValidation(),
+    PATH.getByCategory,
+    slugValidation("category", "دسته بندی مورد نظر"),
     jwtAuthorization,
     getByCategory
   );
 
-  router.get(path.byTag, tagValidation(), jwtAuthorization, getByTag);
-  router.get(path.byStatus, statusValidation(), jwtAuthorization, getByStatus);
+  router.get(
+    PATH.getByTag,
+    slugValidation("tag", "ژانر مورد نظر"),
+    jwtAuthorization,
+    getByTag
+  );
+  router.get(
+    PATH.getByStatus,
+    slugValidation("status", "وضعیت مورد نظر"),
+    jwtAuthorization,
+    getByStatus
+  );
 }
 
 export default createGetProductsRoutes;

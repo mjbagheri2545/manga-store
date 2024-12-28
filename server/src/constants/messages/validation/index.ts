@@ -11,6 +11,7 @@ function createValidationMessages() {
       `${label} باید حداقل ${minLength} کاراکتر باشد.`,
     unknownFields: (message: string) =>
       `${upperFirst(message)} نامعتبر هستند و شناخته نشدند. لطفاً دوباره با اطلاعات معتبر تلاش کنید.`,
+    slug: (label: string) => `متاسفیم، ${label} یافت نشد.`,
   } as const;
 }
 

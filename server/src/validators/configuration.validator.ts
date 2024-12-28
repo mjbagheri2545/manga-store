@@ -77,6 +77,17 @@ abstract class ValidatorConfiguration {
       .withMessage(finalMessage);
   }
 
+  protected slug(field = "id", label = "با آیدی مورد نظر") {
+    return this.required(field, {
+      location: "params",
+      message: this.SHARED_MESSAGES.slug(label),
+    });
+  }
+
+  slugValidation(field = "id", label = "با آیدی مورد نظر") {
+    return this.createValidation([this.slug(field, label)]);
+  }
+
   protected createValidation(schema: TypeOrTypeArray<ValidationChain>) {
     return async (...params: MiddlewareParams) => {
       const [req, res] = params;
@@ -101,6 +112,7 @@ abstract class ValidatorConfiguration {
       ];
     };
   }
+
   private createSafeValidations(validations: TypeOrTypeArray<ValidationChain>) {
     return parseTypeOrTypeArray(validations).map((validation) =>
       validation.escape()

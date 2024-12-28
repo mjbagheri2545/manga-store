@@ -1,9 +1,10 @@
 import { Prisma } from "@prisma/client";
 
 import SharedTokenDb from "@/db/token.db";
+import { StrictOmit } from "@/types";
 
 class TokenDb extends SharedTokenDb {
-  create(userId: string, data: Omit<Prisma.TokenCreateInput, "user">) {
+  create(userId: string, data: StrictOmit<Prisma.TokenCreateInput, "user">) {
     return this.prisma.token.upsert({
       where: {
         userId,

@@ -1,29 +1,25 @@
 import { Response } from "express";
 
+import fs from "fs/promises";
 import { Prisma } from "@prisma/client";
 
 import ControllerConfiguration from "@/controllers/configuration.controller";
-import slugify from "@/lib/slugify";
 import { EmptyObject, UserAuthorizedReq } from "@/types";
+import { newModelConnectionWithId } from "@/utils";
 
 import MESSAGES from "../constants/messages";
 import DB from "../db";
 import { hasProductPermission } from "../lib/permissions";
+import { getTagsData, pickProductData } from "../utils";
 
 type DeleteReq = UserAuthorizedReq<EmptyObject, EmptyObject, { id: string }>;
 
-type CreateReqBody = Omit<
+type CreateReqBody = Pick<
   Prisma.ProductCreateInput,
-  | "manager"
-  | "category"
-  | "tags"
-  | "status"
-  | "chapters"
-  | "averageRate"
-  | "id"
-  | "priceInRials"
+  "name" | "persianName" | "writer" | "designer" | "summary" | "slug"
 > & {
-  priceInRials: string;
+  priceInRials: number;
+  releaseYear: number;
   tagsId: string[];
   statusId: string;
   categoryId: string;
@@ -45,34 +41,16 @@ type UpdateRatingReq = UserAuthorizedReq<
   { productId: string }
 >;
 
-function connectNewId(id: string | undefined, key: string) {
-  if (id == null) return {};
-  return { [key]: { connect: { id } } };
-}
-
 class ProductsMutationController extends ControllerConfiguration {
   async createProduct(req: CreateReq, res: Response) {
-    const {
-      user: _,
-      categoryId,
-      tagsId,
-      statusId,
-      managerId,
-      priceInRials,
-      releaseYear,
-      slug,
-      ...restData
-    } = req.body;
+    const { categoryId, tagsId, statusId, managerId } = req.body;
 
-    const data = {
-      ...restData,
-      releaseYear: new Date(releaseYear),
-      priceInRials: parseInt(priceInRials),
-      slug: slugify(slug),
-    };
+    const data = pickProductData(req);
+
+    const finalData = { ...data, productImage: req.file?.path as string };
 
     const createOptions = {
-      data,
+      data: finalData,
       categoryId,
       tagsId,
       statusId,
@@ -93,57 +71,34 @@ class ProductsMutationController extends ControllerConfiguration {
     const { user } = req.body;
 
     if (!hasProductPermission(user, "update", product)) {
-      const message = this.SHARED_MESSAGES.general.permissionAuthorization;
-      const { forbidden } = this.STATUS_CODES;
-
-      this.failedResponse({ res, code: forbidden, message });
+      return this.forbidden(res);
     }
 
-    const {
-      user: _,
-      categoryId,
-      tagsId = [],
-      statusId,
-      managerId,
-      priceInRials,
-      releaseYear,
-      slug,
-      ...restData
-    } = req.body;
+    const { user: _, categoryId, tagsId = [], statusId, managerId } = req.body;
 
-    const tagsData = tagsId.sort().map((id) => ({ id }));
+    const tagsConnection = getTagsData(tagsId, product.tags);
 
-    const managerData = connectNewId(managerId, "manager");
-    const categoryData = connectNewId(categoryId, "category");
-    const statusData = connectNewId(statusId, "status");
+    const managerConnection = newModelConnectionWithId(managerId, "manager");
+    const categoryConnection = newModelConnectionWithId(categoryId, "category");
+    const statusConnection = newModelConnectionWithId(statusId, "status");
 
-    const data: Prisma.ProductUpdateInput = {
-      ...restData,
-      ...(releaseYear != null ? { releaseYear: new Date(releaseYear) } : {}),
-      ...managerData,
-      ...categoryData,
-      ...statusData,
-      tags: { set: tagsData },
+    const data = pickProductData(req);
+
+    const finalData: Prisma.ProductUpdateInput = {
+      ...data,
+      ...managerConnection,
+      ...categoryConnection,
+      ...statusConnection,
+      ...tagsConnection,
     };
 
-    if (priceInRials != null) {
-      const newPriceInRials = parseInt(priceInRials);
-      if (product.priceInRials !== newPriceInRials)
-        data.priceInRials = newPriceInRials;
+    if (req.file != null) {
+      finalData.productImage = req.file.path;
     }
 
-    if (releaseYear != null) {
-      const newReleaseYear = new Date(releaseYear);
-      if (product.releaseYear !== newReleaseYear)
-        data.releaseYear = newReleaseYear;
-    }
-
-    if (slug != null) {
-      const newSlug = slugify(slug);
-      if (product.slug !== newSlug) data.slug = newSlug;
-    }
-
-    await DB.update({ id: product.id, data });
+    await DB.update(product.id, finalData);
+    await fs.access(product.productImage);
+    await fs.unlink(product.productImage);
 
     this.successfulResponse({ res, message: MESSAGES.update(product.name) });
   }
@@ -170,10 +125,7 @@ class ProductsMutationController extends ControllerConfiguration {
     if (product == null) return;
 
     if (!hasProductPermission(user, "delete", product)) {
-      const message = this.SHARED_MESSAGES.general.permissionAuthorization;
-      const { forbidden } = this.STATUS_CODES;
-
-      return this.failedResponse({ res, code: forbidden, message });
+      return this.forbidden(res);
     }
 
     const deletedProduct = await DB.delete(id);

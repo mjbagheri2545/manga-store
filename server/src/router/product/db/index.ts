@@ -1,21 +1,17 @@
 import { Prisma } from "@prisma/client";
 
 import DbConfiguration from "@/db/configuration.db";
+import { StrictOmit } from "@/types";
 
 import { ProductQuery } from "../types";
 import { parseQuery } from "../utils";
 
 type CreateProductOptions = {
-  data: Omit<Prisma.ProductCreateInput, "manager" | "category" | "tags">;
+  data: StrictOmit<Prisma.ProductCreateInput, "manager" | "category" | "tags">;
   managerId: string;
   categoryId: string;
   statusId: string;
   tagsId: string[];
-};
-
-type UpdateProductOptions = {
-  id: string;
-  data: Prisma.ProductUpdateInput;
 };
 
 type UpdateRatingOptions = {
@@ -45,6 +41,16 @@ class ProductDb extends DbConfiguration {
     });
   }
 
+  private getSelectProducts() {
+    return {
+      _count: { select: { chapters: true } },
+      status: { select: { name: true, slug: true } },
+      name: true,
+      productImage: true,
+      slug: true,
+    };
+  }
+
   getAll(query: ProductQuery) {
     return this.prisma.product.findMany(parseQuery(query));
   }
@@ -52,17 +58,30 @@ class ProductDb extends DbConfiguration {
   getById(id: string) {
     return this.prisma.product.findUnique({
       where: { id },
+      include: {
+        tags: { select: { id: true } },
+      },
     });
   }
 
   getByProductSlug(productSlug: string) {
-    return this.prisma.product.findUnique({ where: { slug: productSlug } });
+    return this.prisma.product.findUnique({
+      where: { slug: productSlug },
+      include: {
+        averageRating: { select: { rating: true } },
+        category: { select: { name: true, slug: true } },
+        status: { select: { name: true, slug: true } },
+        tags: { select: { name: true, slug: true } },
+        chapters: { select: { translator: true, episode: true } },
+      },
+    });
   }
 
   getByCategory(categorySlug: string, query: ProductQuery) {
     return this.prisma.product.findMany({
       where: { category: { slug: categorySlug } },
       ...parseQuery(query),
+      select: this.getSelectProducts(),
     });
   }
 
@@ -70,6 +89,7 @@ class ProductDb extends DbConfiguration {
     return this.prisma.product.findMany({
       where: { tags: { every: { slug: tagSlug } } },
       ...parseQuery(query),
+      select: this.getSelectProducts(),
     });
   }
 
@@ -77,10 +97,11 @@ class ProductDb extends DbConfiguration {
     return this.prisma.product.findMany({
       where: { status: { slug: statusSlug } },
       ...parseQuery(query),
+      select: this.getSelectProducts(),
     });
   }
 
-  update({ id, data = {} }: UpdateProductOptions) {
+  update(id: string, data: Prisma.ProductUpdateInput = {}) {
     return this.prisma.product.update({
       where: { id },
       data,

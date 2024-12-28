@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 
 import autoBind from "auto-bind";
+import { fileTypeFromBuffer } from "file-type";
+import fs from "fs/promises";
 import { User } from "@prisma/client";
 
 import { errorLogger } from "@/constants/loggers";
@@ -13,6 +15,7 @@ import {
   CompileHandlebarsTemplateOptions,
   Email,
   failedResponse,
+  forbidden,
   getEmailRemainingTime,
   successfulResponse,
   unauthorized,
@@ -36,6 +39,7 @@ abstract class ControllerConfiguration {
   protected readonly failedResponse;
   protected readonly badRequest;
   protected readonly unauthorized;
+  protected readonly forbidden;
 
   constructor() {
     autoBind(this);
@@ -48,6 +52,7 @@ abstract class ControllerConfiguration {
     this.failedResponse = failedResponse;
     this.badRequest = badRequest;
     this.unauthorized = unauthorized;
+    this.forbidden = forbidden;
   }
 
   async jwtAuthorization(req: Request, res: Response, next: NextFunction) {
@@ -127,14 +132,24 @@ abstract class ControllerConfiguration {
   permissionAuthorization(hasPermission: (user: User) => boolean) {
     return (req: UserAuthorizedReq, res: Response, next: NextFunction) => {
       const { user } = req.body;
-      const { general } = this.SHARED_MESSAGES;
 
       if (!hasPermission(user)) {
-        return this.unauthorized(res, {
-          message: general.permissionAuthorization,
-          isFullMessage: true,
-        });
+        return this.forbidden(res);
       }
+
+      next();
+    };
+  }
+
+  fileAuthorization(allowedTypes: string[], message: string) {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      if (req.file == null) return next();
+
+      const buffer = await fs.readFile(req.file.path);
+      const type = await fileTypeFromBuffer(buffer);
+
+      if (!type || !allowedTypes.includes(type.mime))
+        return this.badRequest(res, { isFullMessage: true, message });
 
       next();
     };

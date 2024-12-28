@@ -1,3 +1,6 @@
+import fs from "fs/promises";
+import multer from "multer";
+import path from "path";
 import { User } from "@prisma/client";
 
 import SHARED_CONFIG from "@/constants/config";
@@ -94,4 +97,35 @@ export function hasPermission<T, A extends PermissionsAction>(
     if (typeof permission === "boolean") return permission;
     return data != null && permission(user, data);
   });
+}
+
+export function createUploader(uploadPath: string) {
+  const storage = multer.diskStorage({
+    destination: async (_req, _file, cb) => {
+      const finalUploadPath = path.join(__dirname, uploadPath);
+
+      const [error] = await withCatch(fs.access(finalUploadPath));
+      if (error) {
+        await fs.mkdir(finalUploadPath, { recursive: true });
+      }
+
+      cb(null, finalUploadPath);
+    },
+    filename: (_, file, cb) => {
+      const fileName = `${Date.now()}-${file.originalname}`;
+
+      cb(null, fileName);
+    },
+  });
+
+  const uploader = multer({
+    storage,
+  });
+
+  return uploader;
+}
+
+export function newModelConnectionWithId(id: string | undefined, key: string) {
+  if (id == null) return {};
+  return { [key]: { connect: { id } } };
 }

@@ -1,11 +1,11 @@
 import { Router } from "express";
 
-import BASE_PATH from "@/constants/basePath";
+import { createUploader } from "@/utils";
 
-import PATH from "../constants/path";
+import MESSAGES from "../constants/messages";
 import ProductsMutationController from "../controllers/productsMutation.controller";
 import { hasProductPermission } from "../lib/permissions";
-import ProductsMutationValidator from "../validators/productsMutation.validator";
+import Validator from "../validators";
 import createGetProductsRoutes from "./getProducts.routes";
 
 function createProductRouter() {
@@ -13,41 +13,50 @@ function createProductRouter() {
 
   createGetProductsRoutes(router);
 
+  const productImageUploader = createUploader(
+    "../../../../uploads/productImage/"
+  );
+
   const {
     permissionAuthorization,
+    fileAuthorization,
     jwtAuthorization,
     deleteProduct,
     createProduct,
     updateProduct,
   } = new ProductsMutationController();
 
-  const {
-    deleteProductValidation,
-    createProductValidation,
-    updateProductValidation,
-  } = new ProductsMutationValidator();
+  const { slugValidation, createProductValidation, updateProductValidation } =
+    new Validator();
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/svg+xml",
+    "image/webp",
+    "image/gif",
+  ];
 
   router.post(
-    PATH.index,
+    "/",
+    createProductValidation(),
     jwtAuthorization,
     permissionAuthorization((user) => hasProductPermission(user, "create")),
-    createProductValidation(),
+    productImageUploader.single("productImage"),
+    fileAuthorization(allowedTypes, MESSAGES.invalidProductImage),
     createProduct
   );
 
   router.put(
-    BASE_PATH.id,
-    jwtAuthorization,
+    "/:id",
     updateProductValidation(),
+    jwtAuthorization,
+    productImageUploader.single("productImage"),
+    fileAuthorization(allowedTypes, MESSAGES.invalidProductImage),
     updateProduct
   );
 
-  router.delete(
-    BASE_PATH.id,
-    jwtAuthorization,
-    deleteProductValidation(),
-    deleteProduct
-  );
+  router.delete("/:id", slugValidation(), jwtAuthorization, deleteProduct);
 
   return router;
 }

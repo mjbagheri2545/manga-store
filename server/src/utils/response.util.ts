@@ -30,6 +30,14 @@ export const unauthorized = createSpecificFailedResponse(
   SHARED_MESSAGES.statusCode.unauthorized
 );
 
+export function forbidden(res: Response) {
+  return failedResponse({
+    res,
+    code: STATUS_CODES.forbidden,
+    message: SHARED_MESSAGES.statusCode.forbidden,
+  });
+}
+
 export function successfulResponse<T = unknown>({
   res,
   code = STATUS_CODES.ok,
