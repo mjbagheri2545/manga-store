@@ -4,7 +4,7 @@ import fs from "fs/promises";
 import { Prisma } from "@prisma/client";
 
 import ControllerConfiguration from "@/controllers/configuration.controller";
-import { EmptyObject, PaginateQuery, UserAuthorizedReq } from "@/types";
+import { EmptyObject, IdReq, PaginateQuery, UserAuthorizedReq } from "@/types";
 import { newModelConnectionWithId } from "@/utils";
 
 import MESSAGES from "../constants/messages";
@@ -16,8 +16,6 @@ type GetAllReq = UserAuthorizedReq<
   PaginateQuery,
   { productId: string }
 >;
-
-type GetReq = UserAuthorizedReq<EmptyObject, EmptyObject, { id: string }>;
 
 type CreateReqBody = {
   episode: number;
@@ -33,9 +31,6 @@ type UpdateReq = UserAuthorizedReq<
   EmptyObject,
   { id: string }
 >;
-
-type DeleteReq = UserAuthorizedReq<EmptyObject, EmptyObject, { id: string }>;
-
 class Controller extends ControllerConfiguration {
   async getAllChaptersOfProduct(req: GetAllReq, res: Response) {
     const {
@@ -48,7 +43,7 @@ class Controller extends ControllerConfiguration {
     this.successfulResponse({ res, data: { chapters } });
   }
 
-  async getById(req: GetReq, res: Response) {
+  async getById(req: IdReq, res: Response) {
     const { id } = req.params;
 
     const chapter = await DB.getById(id);
@@ -99,8 +94,6 @@ class Controller extends ControllerConfiguration {
     }
 
     const updatedChapter = await DB.update(chapter.id, data);
-
-    await DB.update(chapter.id, data);
     await fs.access(chapter.chapterFile);
     await fs.unlink(chapter.chapterFile);
 
@@ -110,7 +103,7 @@ class Controller extends ControllerConfiguration {
     });
   }
 
-  async deleteChapter(req: DeleteReq, res: Response) {
+  async deleteChapter(req: IdReq, res: Response) {
     const {
       body: { user },
       params: { id },

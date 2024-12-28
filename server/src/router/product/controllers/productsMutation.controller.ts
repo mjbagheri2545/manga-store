@@ -4,15 +4,13 @@ import fs from "fs/promises";
 import { Prisma } from "@prisma/client";
 
 import ControllerConfiguration from "@/controllers/configuration.controller";
-import { EmptyObject, UserAuthorizedReq } from "@/types";
+import { EmptyObject, IdReq, UserAuthorizedReq } from "@/types";
 import { newModelConnectionWithId } from "@/utils";
 
 import MESSAGES from "../constants/messages";
 import DB from "../db";
 import { hasProductPermission } from "../lib/permissions";
 import { getTagsData, pickProductData } from "../utils";
-
-type DeleteReq = UserAuthorizedReq<EmptyObject, EmptyObject, { id: string }>;
 
 type CreateReqBody = Pick<
   Prisma.ProductCreateInput,
@@ -114,7 +112,7 @@ class ProductsMutationController extends ControllerConfiguration {
     this.successfulResponse({ res, message: MESSAGES.updateRating });
   }
 
-  async deleteProduct(req: DeleteReq, res: Response) {
+  async deleteProduct(req: IdReq, res: Response) {
     const {
       body: { user },
       params: { id },

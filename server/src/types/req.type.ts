@@ -35,3 +35,5 @@ export type PaginateQuery = {
   take?: string;
   skip?: string;
 };
+
+export type IdReq = UserAuthorizedReq<EmptyObject, EmptyObject, { id: string }>;

@@ -1,12 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import {
-  body,
-  checkExact,
+  CustomValidationChain as ExpressValidatorCustomValidationChain,
+  ExpressValidator,
   Location,
-  param,
-  query,
-  ValidationChain,
-  validationResult,
 } from "express-validator";
 
 import autoBind from "auto-bind";
@@ -26,6 +22,19 @@ type RequiredOptions = {
 type MinLengthOptions = RequiredOptions & {
   minLength?: number;
 };
+
+const customExpressValidator = new ExpressValidator({
+  ifExists(value: unknown) {
+    return value != null;
+  },
+});
+
+const { body, checkExact, param, query, validationResult } =
+  customExpressValidator;
+
+export type CustomValidationChain = ExpressValidatorCustomValidationChain<
+  typeof customExpressValidator
+>;
 
 abstract class ValidatorConfiguration {
   protected readonly SHARED_MESSAGES;
@@ -88,7 +97,7 @@ abstract class ValidatorConfiguration {
     return this.createValidation([this.slug(field, label)]);
   }
 
-  protected createValidation(schema: TypeOrTypeArray<ValidationChain>) {
+  protected createValidation(schema: TypeOrTypeArray<CustomValidationChain>) {
     return async (...params: MiddlewareParams) => {
       const [req, res] = params;
 
@@ -113,7 +122,9 @@ abstract class ValidatorConfiguration {
     };
   }
 
-  private createSafeValidations(validations: TypeOrTypeArray<ValidationChain>) {
+  private createSafeValidations(
+    validations: TypeOrTypeArray<CustomValidationChain>
+  ) {
     return parseTypeOrTypeArray(validations).map((validation) =>
       validation.escape()
     );

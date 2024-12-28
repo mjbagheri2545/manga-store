@@ -23,7 +23,7 @@ class Validator extends ValidatorConfiguration {
 
     const episode = this.required("episode", { label: "قسمت فصل" })
       .optional()
-      .if((value) => typeof value === "string" && value.length > 0)
+      .ifExists()
       .toInt();
 
     return this.createValidation([...optionalFields, episode, this.slug()]);

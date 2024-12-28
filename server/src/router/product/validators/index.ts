@@ -6,10 +6,6 @@ class ProductsMutationValidator extends ValidatorConfiguration {
     return `${label} محصول`;
   }
 
-  private ifExists(value: any) {
-    return typeof value === "string" && value.length > 0;
-  }
-
   private getCreateProductValidation() {
     return [
       this.minLength("name", { label: this.getLabel("نام") }),
@@ -53,19 +49,19 @@ class ProductsMutationValidator extends ValidatorConfiguration {
       label: this.getLabel("قیمت"),
     })
       .optional()
-      .if(this.ifExists)
+      .ifExists()
       .toInt();
     const releaseYear = this.required("releaseYear", {
       label: this.getLabel("قیمت"),
     })
       .optional()
-      .if(this.ifExists)
+      .ifExists()
       .toDate();
     const slug = this.required("slug", {
       label: this.getLabel("آدرس اینترنتی"),
     })
       .optional()
-      .if(this.ifExists)
+      .ifExists()
       .customSanitizer((slug) => slugify(slug));
 
     return this.createValidation([
