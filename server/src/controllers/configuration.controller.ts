@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import autoBind from "auto-bind";
 import { fileTypeFromBuffer } from "file-type";
 import fs from "fs/promises";
-import { User } from "@prisma/client";
+import { PrismaPromise, User } from "@prisma/client";
 
 import { errorLogger } from "@/constants/loggers";
 import SHARED_MESSAGES from "@/constants/messages";
@@ -17,6 +17,7 @@ import {
   failedResponse,
   forbidden,
   getEmailRemainingTime,
+  notFound,
   successfulResponse,
   unauthorized,
   verifyJwtToken,
@@ -29,6 +30,16 @@ type SendEmailOptions<T> = {
   isSendResponseNeed?: boolean;
 };
 
+type AllowedType = {
+  name: string;
+  mime: string;
+};
+
+type GetByIdOptions<T> = {
+  entityName: string;
+  entityKey: string;
+  getByIdQuery: (id: string) => PrismaPromise<T | null>;
+};
 abstract class ControllerConfiguration {
   protected readonly SHARED_MESSAGES;
   protected readonly SHARED_DB;
@@ -40,6 +51,7 @@ abstract class ControllerConfiguration {
   protected readonly badRequest;
   protected readonly unauthorized;
   protected readonly forbidden;
+  protected readonly notFound;
 
   constructor() {
     autoBind(this);
@@ -53,14 +65,18 @@ abstract class ControllerConfiguration {
     this.badRequest = badRequest;
     this.unauthorized = unauthorized;
     this.forbidden = forbidden;
+    this.notFound = notFound;
   }
 
   async jwtAuthorization(req: Request, res: Response, next: NextFunction) {
     const authorization = req.headers["authorization"];
     const token = authorization && authorization.split(" ")[1];
 
+    const { jwtAuthorization: jwtAuthorizationMessage } =
+      this.SHARED_MESSAGES.general;
+
     const unauthorizedMessage = {
-      message: this.SHARED_MESSAGES.general.jwtAuthorization,
+      message: jwtAuthorizationMessage,
       isFullMessage: true,
     };
 
@@ -89,10 +105,6 @@ abstract class ControllerConfiguration {
     ...restOptions
   }: SendEmailOptions<T>) {
     return async (req: SendEmailReq, res: Response) => {
-      const { internalServerError } = this.STATUS_CODES;
-      const { failedMessage, successful } =
-        this.SHARED_MESSAGES.general.sendEmail;
-
       const { user, email } = req.body;
       const finalEmail = email ?? user.email;
 
@@ -104,10 +116,13 @@ abstract class ControllerConfiguration {
       const { isSuccessful } = await verificationEmail.send();
 
       if (!isSuccessful) {
+        const { failed: failedMessage } =
+          this.SHARED_MESSAGES.general.sendEmail;
+
         return this.failedResponse({
           res,
-          code: internalServerError,
-          message: this.SHARED_MESSAGES.failed(failedMessage),
+          code: this.STATUS_CODES.internalServerError,
+          message: failedMessage,
         });
       }
 
@@ -119,9 +134,12 @@ abstract class ControllerConfiguration {
 
       if (!isSendResponseNeed) return;
 
+      const { successful: successfulMessage } =
+        this.SHARED_MESSAGES.general.sendEmail;
+
       this.successfulResponse({
         res,
-        message: successful(email),
+        message: successfulMessage(email),
         data: {
           remainingTime,
         },
@@ -141,17 +159,41 @@ abstract class ControllerConfiguration {
     };
   }
 
-  fileAuthorization(allowedTypes: string[], message: string) {
+  fileAuthorization(allowedTypes: AllowedType[] | readonly AllowedType[]) {
     return async (req: Request, res: Response, next: NextFunction) => {
       if (req.file == null) return next();
 
       const buffer = await fs.readFile(req.file.path);
       const type = await fileTypeFromBuffer(buffer);
 
-      if (!type || !allowedTypes.includes(type.mime))
+      const isAllowed =
+        type != null &&
+        allowedTypes.map((item) => item.mime).includes(type.mime);
+
+      if (!isAllowed) {
+        const typesName = allowedTypes.map((item) => item.name);
+        const message = this.SHARED_MESSAGES.general.invalidFile(
+          typesName.join(", ")
+        );
+
         return this.badRequest(res, { isFullMessage: true, message });
+      }
 
       next();
+    };
+  }
+
+  getById<T>({ entityName, entityKey, getByIdQuery }: GetByIdOptions<T>) {
+    return async (req: Request, res: Response) => {
+      const { id } = req.params;
+
+      const entity = await getByIdQuery(id);
+
+      if (entity == null) {
+        return this.notFound({ res, entityName, entityInfo: "آیدی" });
+      }
+
+      req.body[entityKey] = entity;
     };
   }
 }

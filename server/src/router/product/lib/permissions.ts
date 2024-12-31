@@ -1,8 +1,7 @@
 import { Product, User } from "@prisma/client";
 
+import { Permissions, PermissionsAction } from "@/types";
 import { hasPermission } from "@/utils";
-
-import { ProductPermissions, ProductPermissionsAction } from "../types";
 
 const PERMISSIONS = {
   admin: { view: true, create: true, update: true, delete: true },
@@ -24,11 +23,11 @@ const PERMISSIONS = {
     update: false,
     delete: false,
   },
-} as const satisfies ProductPermissions;
+} as const satisfies Permissions<Product>;
 
 export function hasProductPermission(
   user: User,
-  action: ProductPermissionsAction,
+  action: PermissionsAction,
   data?: Product
 ) {
   return hasPermission(user, PERMISSIONS, action, data);

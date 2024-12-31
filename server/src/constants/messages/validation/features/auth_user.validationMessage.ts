@@ -10,5 +10,7 @@ export function createAuthUserValidationMessages() {
         `طول ${label} باید حداقل ${password.minLength} کاراکتر باشد و متشکل از عدد و حروف باشد.`,
     },
     email: "لطفاً یک ایمیل معتبر وارد کنید.",
+    emailInUse:
+      "این ایمیل قبلاً استفاده شده است. لطفاً با یک ایمیل دیگر دوباره تلاش کنید.",
   } as const;
 }

@@ -84,10 +84,10 @@ export function paginate(
   };
 }
 
-export function hasPermission<T, A extends PermissionsAction>(
+export function hasPermission<T>(
   user: User,
-  permissions: Permissions<T, A>,
-  action: A,
+  permissions: Permissions<T>,
+  action: PermissionsAction,
   data?: T
 ) {
   return user.roles.some((role) => {
@@ -128,4 +128,9 @@ export function createUploader(uploadPath: string) {
 export function newModelConnectionWithId(id: string | undefined, key: string) {
   if (id == null) return {};
   return { [key]: { connect: { id } } };
+}
+
+export async function removeFile(path: string) {
+  await fs.access(path);
+  await fs.unlink(path);
 }

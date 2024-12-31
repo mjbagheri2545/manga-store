@@ -1,8 +1,8 @@
-import { Tag, User } from "@prisma/client";
+import { User } from "@prisma/client";
 
 import { hasPermission } from "@/utils";
 
-import { TagPermissions, TagPermissionsAction } from "../types";
+import { GroupingModels, Permissions, PermissionsAction } from "../types";
 
 const PERMISSIONS = {
   admin: { view: true, create: true, update: true, delete: true },
@@ -24,12 +24,12 @@ const PERMISSIONS = {
     update: false,
     delete: false,
   },
-} as const satisfies TagPermissions;
+} as const satisfies Permissions<GroupingModels>;
 
-export function hasTagPermission(
+export function hasGroupingModelPermission<T extends GroupingModels>(
   user: User,
-  action: TagPermissionsAction,
-  data?: Tag
+  action: PermissionsAction,
+  data?: T
 ) {
   return hasPermission(user, PERMISSIONS, action, data);
 }

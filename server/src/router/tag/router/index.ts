@@ -1,37 +1,13 @@
-import { Router } from "express";
+import { createGroupingModelsRouter } from "@/utils";
 
-import Controller from "../controllers";
-import { hasTagPermission } from "../lib/permissions";
-import Validator from "../validators";
+import DB from "../db";
 
 function createTagRouter() {
-  const router = Router();
-
-  const {
-    jwtAuthorization,
-    permissionAuthorization,
-    getAll,
-    createTag,
-    updateTag,
-    deleteTag,
-  } = new Controller();
-
-  const { slugValidation, createTagValidation, updateTagValidation } =
-    new Validator();
-
-  router.get("/", jwtAuthorization, getAll);
-
-  router.post(
-    "/",
-    createTagValidation(),
-    jwtAuthorization,
-    permissionAuthorization((user) => hasTagPermission(user, "create")),
-    createTag
-  );
-
-  router.put("/:id", updateTagValidation(), jwtAuthorization, updateTag);
-
-  router.delete("/:id", slugValidation(), jwtAuthorization, deleteTag);
+  const router = createGroupingModelsRouter({
+    entityName: "ژانر",
+    DB,
+    entitiesKey: "tags",
+  });
 
   return router;
 }

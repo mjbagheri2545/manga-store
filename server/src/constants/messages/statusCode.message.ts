@@ -11,6 +11,8 @@ function createStatusCodeMessages() {
       `برای دسترسی احراز هویت لازم است.${
         message != null && message.length > 0 ? ` ${message}` : ""
       } لطفاً دوباره تلاش کنید.`,
+    notFound: (entityName: string, entityInfo = "آیدی") =>
+      `متاسفیم، ${entityName} با این ${entityInfo} پیدا نشد.`,
   } as const;
 }
 

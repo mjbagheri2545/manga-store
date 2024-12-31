@@ -1,8 +1,9 @@
 import slugify from "@/lib/slugify";
-import ValidatorConfiguration from "@/validators/configuration.validator";
 
-class Validator extends ValidatorConfiguration {
-  createTagValidation() {
+import ValidatorConfiguration from "./configuration.validator";
+
+class GroupingModelsValidator extends ValidatorConfiguration {
+  createGroupModelValidation() {
     const slug = this.required("episode", {
       label: "آدرس اینترنتی ژانر",
     }).custom((slug) => slugify(slug));
@@ -13,7 +14,7 @@ class Validator extends ValidatorConfiguration {
     ]);
   }
 
-  updateTagValidation() {
+  updateGroupModelValidation() {
     const slug = this.required("episode", {
       label: "آدرس اینترنتی ژانر",
     })
@@ -28,4 +29,4 @@ class Validator extends ValidatorConfiguration {
   }
 }
 
-export default Validator;
+export default GroupingModelsValidator;

@@ -31,10 +31,32 @@ export const unauthorized = createSpecificFailedResponse(
 );
 
 export function forbidden(res: Response) {
+  const { forbidden: forbiddenMessage } = SHARED_MESSAGES.statusCode;
+
   return failedResponse({
     res,
     code: STATUS_CODES.forbidden,
-    message: SHARED_MESSAGES.statusCode.forbidden,
+    message: forbiddenMessage,
+  });
+}
+
+type NotFoundOptions = {
+  res: Response;
+  entityName: string;
+  entityInfo?: string;
+};
+
+export function notFound({
+  res,
+  entityName,
+  entityInfo = "آیدی",
+}: NotFoundOptions) {
+  const { notFound: notFoundMessage } = SHARED_MESSAGES.statusCode;
+
+  return failedResponse({
+    res,
+    code: STATUS_CODES.notFound,
+    message: notFoundMessage(entityName, entityInfo),
   });
 }
 

@@ -65,13 +65,15 @@ class ProductDb extends DbConfiguration {
   }
 
   getByProductSlug(productSlug: string) {
+    const groupingModelSelect = { select: { name: true, slug: true } };
+
     return this.prisma.product.findUnique({
       where: { slug: productSlug },
       include: {
         averageRating: { select: { rating: true } },
-        category: { select: { name: true, slug: true } },
-        status: { select: { name: true, slug: true } },
-        tags: { select: { name: true, slug: true } },
+        category: groupingModelSelect,
+        status: groupingModelSelect,
+        tags: groupingModelSelect,
         chapters: { select: { translator: true, episode: true } },
       },
     });
@@ -114,7 +116,7 @@ class ProductDb extends DbConfiguration {
       data: {
         averageRating: {
           connectOrCreate: {
-            where: { productId },
+            where: { productId_ratedById: { productId, ratedById } },
             create: { ratedById, rating },
           },
         },

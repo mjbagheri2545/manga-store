@@ -1,6 +1,6 @@
-import Validator from ".";
+import AccountValidator from "./account.validator";
 
-class PasswordValidator extends Validator {
+class PasswordValidator extends AccountValidator {
   private getChangePasswordValidation() {
     return [
       this.newPassword("newPassword", "رمز عبور جدید"),

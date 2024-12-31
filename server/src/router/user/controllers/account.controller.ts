@@ -3,17 +3,11 @@ import { NextFunction, Response } from "express";
 import SHARED_CONFIG from "@/constants/config";
 import AuthUserController from "@/controllers/auth_user.controller";
 import { EmptyObject, SendEmailReq, UserAuthorizedReq } from "@/types";
-import { isExpired, pickUserData } from "@/utils";
+import { isExpired } from "@/utils";
 
 import { generateVerificationToken, getEmailRemainingSeconds } from "../utils";
 
-class Controller extends AuthUserController {
-  getUser(req: UserAuthorizedReq, res: Response) {
-    const { user } = req.body;
-
-    this.successfulResponse({ res, data: { user: pickUserData(user) } });
-  }
-
+abstract class AccountController extends AuthUserController {
   async sendIdentityVerificationEmail(req: SendEmailReq, res: Response) {
     const { user } = req.body;
     const verificationCode = await generateVerificationToken(user.id);
@@ -40,17 +34,20 @@ class Controller extends AuthUserController {
     const {
       body: { user },
     } = req;
-    const { tooEarly } = this.STATUS_CODES;
-    const { alreadySent } = this.SHARED_MESSAGES.general.sendEmail;
 
     if (
       user.emailRemainingTime != null &&
       !isExpired(user.emailRemainingTime)
     ) {
+      const { alreadySent: alreadySentMessage } =
+        this.SHARED_MESSAGES.general.sendEmail;
+
+      const remainingTime = getEmailRemainingSeconds(user.emailRemainingTime);
+
       this.failedResponse({
         res,
-        code: tooEarly,
-        message: alreadySent(getEmailRemainingSeconds(user.emailRemainingTime)),
+        code: this.STATUS_CODES.tooEarly,
+        message: alreadySentMessage(remainingTime),
       });
     }
 
@@ -58,4 +55,4 @@ class Controller extends AuthUserController {
   }
 }
 
-export default Controller;
+export default AccountController;

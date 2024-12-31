@@ -9,7 +9,7 @@ import { hashPassword } from "@/utils";
 import MESSAGES from "../constants/messages";
 import DB from "../db";
 import { identityVerification } from "../utils";
-import Controller from ".";
+import AccountController from "./account.controller";
 
 type ResetReq = UserAuthorizedReq<{
   currentPassword: string;
@@ -20,15 +20,13 @@ type RecoverReq = IdentityVerificationReq<{
   newPassword: string;
 }>;
 
-class PasswordController extends Controller {
+class PasswordController extends AccountController {
   private async changePassword(
     res: Response,
     user: User,
     newPassword: string,
     isRecoverPassword: boolean
   ) {
-    const { successful } = MESSAGES.account.password;
-
     const hashedNewPassword = await hashPassword(newPassword);
 
     await DB.user.account.updatePassword({
@@ -38,7 +36,9 @@ class PasswordController extends Controller {
       isRecoverPassword,
     });
 
-    this.successfulResponse({ res, message: successful });
+    const { successful: successfulMessage } = MESSAGES.account.password;
+
+    this.successfulResponse({ res, message: successfulMessage });
   }
 
   private async checkPasswordsWithNewPassword(

@@ -1,18 +1,17 @@
 import { Response } from "express";
 
-import fs from "fs/promises";
-import { Prisma } from "@prisma/client";
+import { Prisma, Product } from "@prisma/client";
 
 import ControllerConfiguration from "@/controllers/configuration.controller";
-import { EmptyObject, IdReq, UserAuthorizedReq } from "@/types";
-import { newModelConnectionWithId } from "@/utils";
+import { EmptyObject, UserAuthorizedReq } from "@/types";
+import { newModelConnectionWithId, removeFile } from "@/utils";
 
 import MESSAGES from "../constants/messages";
 import DB from "../db";
 import { hasProductPermission } from "../lib/permissions";
-import { getTagsData, pickProductData } from "../utils";
+import { getTagsData, pickProductCreateData } from "../utils";
 
-type CreateReqBody = Pick<
+type CreateProductReqBody = Pick<
   Prisma.ProductCreateInput,
   "name" | "persianName" | "writer" | "designer" | "summary" | "slug"
 > & {
@@ -24,12 +23,19 @@ type CreateReqBody = Pick<
   managerId: string;
 };
 
-type CreateReq = UserAuthorizedReq<CreateReqBody>;
-type UpdateReq = UserAuthorizedReq<
-  Partial<CreateReqBody>,
-  EmptyObject,
-  { id: string }
->;
+type CreateProductReq = UserAuthorizedReq<CreateProductReqBody>;
+
+type ProductResponse = Product & {
+  tags: {
+    id: string;
+  }[];
+};
+
+type UpdateProductReqBody = Partial<CreateProductReqBody> & {
+  product: ProductResponse;
+};
+
+type UpdateProductReq = UserAuthorizedReq<UpdateProductReqBody>;
 
 type UpdateRatingReq = UserAuthorizedReq<
   {
@@ -39,11 +45,12 @@ type UpdateRatingReq = UserAuthorizedReq<
   { productId: string }
 >;
 
+type DeleteReq = UserAuthorizedReq<{ product: ProductResponse }>;
 class ProductsMutationController extends ControllerConfiguration {
-  async createProduct(req: CreateReq, res: Response) {
+  async createProduct(req: CreateProductReq, res: Response) {
     const { categoryId, tagsId, statusId, managerId } = req.body;
 
-    const data = pickProductData(req);
+    const data = pickProductCreateData(req);
 
     const finalData = { ...data, productImage: req.file?.path as string };
 
@@ -57,16 +64,16 @@ class ProductsMutationController extends ControllerConfiguration {
 
     const product = await DB.create(createOptions);
 
-    this.successfulResponse({ res, message: MESSAGES.create(product.name) });
+    const { create: createMessage } = this.SHARED_MESSAGES.features.crud;
+
+    this.successfulResponse({
+      res,
+      message: createMessage(`محصول با ${product.name}`),
+    });
   }
 
-  async updateProduct(req: UpdateReq, res: Response) {
-    const { id } = req.params;
-    const product = await DB.getById(id);
-
-    if (product == null) return;
-
-    const { user } = req.body;
+  async updateProduct(req: UpdateProductReq, res: Response) {
+    const { user, product } = req.body;
 
     if (!hasProductPermission(user, "update", product)) {
       return this.forbidden(res);
@@ -80,7 +87,7 @@ class ProductsMutationController extends ControllerConfiguration {
     const categoryConnection = newModelConnectionWithId(categoryId, "category");
     const statusConnection = newModelConnectionWithId(statusId, "status");
 
-    const data = pickProductData(req);
+    const data = pickProductCreateData(req);
 
     const finalData: Prisma.ProductUpdateInput = {
       ...data,
@@ -94,11 +101,17 @@ class ProductsMutationController extends ControllerConfiguration {
       finalData.productImage = req.file.path;
     }
 
-    await DB.update(product.id, finalData);
-    await fs.access(product.productImage);
-    await fs.unlink(product.productImage);
+    const [updatedProduct] = await Promise.all([
+      DB.update(product.id, finalData),
+      removeFile(product.productImage),
+    ]);
 
-    this.successfulResponse({ res, message: MESSAGES.update(product.name) });
+    const { update: updateMessage } = this.SHARED_MESSAGES.features.crud;
+
+    this.successfulResponse({
+      res,
+      message: updateMessage(`محصول با ${updatedProduct.name}`),
+    });
   }
 
   async updateProductRating(req: UpdateRatingReq, res: Response) {
@@ -109,27 +122,25 @@ class ProductsMutationController extends ControllerConfiguration {
 
     await DB.updateRating({ productId, ratedById: user.id, rating });
 
-    this.successfulResponse({ res, message: MESSAGES.updateRating });
+    this.successfulResponse({
+      res,
+      message: MESSAGES.updateRating,
+    });
   }
 
-  async deleteProduct(req: IdReq, res: Response) {
-    const {
-      body: { user },
-      params: { id },
-    } = req;
-
-    const product = await DB.getById(id);
-
-    if (product == null) return;
+  async deleteProduct(req: DeleteReq, res: Response) {
+    const { user, product } = req.body;
 
     if (!hasProductPermission(user, "delete", product)) {
       return this.forbidden(res);
     }
 
-    const deletedProduct = await DB.delete(id);
+    const deletedProduct = await DB.delete(product.id);
+
+    const { delete: deleteMessage } = this.SHARED_MESSAGES.features.crud;
     this.successfulResponse({
       res,
-      message: MESSAGES.delete(deletedProduct.id),
+      message: deleteMessage(`محصول با ${deletedProduct.name}`),
     });
   }
 }

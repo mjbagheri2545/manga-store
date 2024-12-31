@@ -30,9 +30,17 @@ class GetProductsController extends ControllerConfiguration {
       params: { productSlug },
     } = req;
 
-    const products = await DB.getByProductSlug(productSlug);
+    const product = await DB.getByProductSlug(productSlug);
 
-    this.successfulResponse({ res, data: { products } });
+    if (product == null) {
+      return this.notFound({
+        res,
+        entityName: "محصولی",
+        entityInfo: "آدرس اینترنتی",
+      });
+    }
+
+    this.successfulResponse({ res, data: { product } });
   }
 
   async getByCategory(req: ProductGetReq<{ category: string }>, res: Response) {

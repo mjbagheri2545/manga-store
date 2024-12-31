@@ -33,6 +33,7 @@
         "pattern": [
           "src/constants/**/*",
           "src/lib/**/*",
+          "src/controllers/**/*",
           "src/utils/**/*",
           "src/types/**/*",
           "src/templates/**/*",
@@ -99,14 +100,6 @@
           {
             "from": ["shared"],
             "allow": ["shared"]
-          },
-          {
-            "from": ["helper"],
-            "allow": ["shared", "helper"]
-          },
-          {
-            "from": ["controller"],
-            "allow": ["shared", "controller", "helper"]
           },
           {
             "from": ["router"],

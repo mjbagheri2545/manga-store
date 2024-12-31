@@ -1,7 +1,4 @@
-import DB from "@/db";
 import AuthUserValidator from "@/validators/auth_user.validator";
-
-import MESSAGES from "../constants/messages";
 
 class Validator extends AuthUserValidator {
   registrationValidation() {
@@ -15,22 +12,6 @@ class Validator extends AuthUserValidator {
 
   loginValidation() {
     return this.createValidation([this.email(), this.currentPassword()]);
-  }
-
-  private fullName() {
-    return this.minLength("fullName", { label: "نام و نام خانوادگی" });
-  }
-
-  private emailNotInUse() {
-    return this.email()
-      .custom(async (value: string) => {
-        const user = await DB.user.getByEmail(value);
-        if (user != null) {
-          throw new Error();
-        }
-        return;
-      })
-      .withMessage(MESSAGES.validation.emailInUse);
   }
 }
 

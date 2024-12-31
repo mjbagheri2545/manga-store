@@ -1,6 +1,6 @@
-import Validator from ".";
+import AccountValidator from "./account.validator";
 
-class VerificationValidator extends Validator {
+class VerificationValidator extends AccountValidator {
   verifyValidation() {
     return this.createValidation([this.verificationCode()]);
   }

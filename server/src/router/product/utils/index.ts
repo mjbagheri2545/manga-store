@@ -47,7 +47,7 @@ export function createProductImageUploader() {
   return productImageUploader;
 }
 
-export function pickProductData(req: Request) {
+export function pickProductCreateData(req: Request) {
   return pick(req.body, [
     "name",
     "persianName",

@@ -4,13 +4,12 @@ import ControllerConfiguration from "./configuration.controller";
 
 abstract class AuthUserController extends ControllerConfiguration {
   async emailAuthorization(req: Request, res: Response, next: NextFunction) {
-    const user = await this.SHARED_DB.user.getByEmail(req.body.email);
+    const { email } = req.body;
+
+    const user = await this.SHARED_DB.user.getByEmail(email);
 
     if (user == null) {
-      return this.badRequest(res, {
-        isFullMessage: true,
-        message: this.SHARED_MESSAGES.common.auth_user.emailAuthorization,
-      });
+      return this.notFound({ res, entityName: "کاربری", entityInfo: "ایمیل" });
     }
 
     req.body.user = user;

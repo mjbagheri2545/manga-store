@@ -8,10 +8,10 @@ class ProductsMutationValidator extends ValidatorConfiguration {
 
   private getCreateProductValidation() {
     return [
-      this.minLength("name", { label: this.getLabel("نام") }),
-      this.minLength("persianName", { label: this.getLabel("نام فارسی") }),
-      this.minLength("designer", { label: this.getLabel("طراح") }),
-      this.minLength("writer", { label: this.getLabel("نویسنده") }),
+      this.isLength("name", { label: this.getLabel("نام") }),
+      this.isLength("persianName", { label: this.getLabel("نام فارسی") }),
+      this.isLength("designer", { label: this.getLabel("طراح") }),
+      this.isLength("writer", { label: this.getLabel("نویسنده") }),
       this.required("summary", { label: this.getLabel("خلاصه داستان") }),
       this.required("managerId", { label: this.getLabel("مدیر") }),
       this.required("categoryId", { label: this.getLabel("دسته بندی") }),

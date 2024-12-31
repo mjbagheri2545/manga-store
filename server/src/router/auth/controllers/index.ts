@@ -26,11 +26,11 @@ type LoginReq = UserAuthorizedReq<{ password: string }>;
 
 class Controller extends AuthUserController {
   async register(req: RegistrationReq, res: Response) {
-    const { created } = this.STATUS_CODES;
-    const { registration } = MESSAGES;
-    const { email, password, fullName } = req.body;
+    const { password } = req.body;
 
     const hashedPassword = await hashPassword(password);
+
+    const { email, fullName } = req.body;
 
     const user = await this.SHARED_DB.user.create({
       email,
@@ -53,17 +53,21 @@ class Controller extends AuthUserController {
       isSendResponseNeed: false,
     })(req, res);
 
+    // we don't need error, because i don't
+    // want to force response failed
+    // because of failed sending email
+    // i just catch the error to prevent
+    // internal server error
     await withCatch(sendEmailPromise);
 
     this.successfulResponse({
       res,
-      code: created,
-      message: registration(email),
+      code: this.STATUS_CODES.created,
+      message: MESSAGES.registration(email),
     });
   }
 
   async login(req: LoginReq, res: Response) {
-    const { login } = MESSAGES;
     const { user, password } = req.body;
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -75,7 +79,7 @@ class Controller extends AuthUserController {
 
     this.successfulResponse({
       res,
-      message: login,
+      message: MESSAGES.login,
       data: { token, user: pickUserData(user) },
     });
   }

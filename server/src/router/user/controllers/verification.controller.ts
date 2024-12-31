@@ -5,9 +5,9 @@ import { IdentityVerificationReq, UserAuthorizedReq } from "@/types";
 import MESSAGES from "../constants/messages";
 import DB from "../db";
 import { identityVerification } from "../utils";
-import Controller from ".";
+import AccountController from "./account.controller";
 
-class VerificationController extends Controller {
+class VerificationController extends AccountController {
   alreadyVerifiedChecker(
     req: UserAuthorizedReq,
     res: Response,
@@ -31,12 +31,12 @@ class VerificationController extends Controller {
 
     if (res.headersSent) return;
 
-    const { successful } = MESSAGES.account.verification;
-
     const { user } = req.body;
     await DB.user.account.verify(user.id);
 
-    this.successfulResponse({ res, message: successful });
+    const { successful: successfulMessage } = MESSAGES.account.verification;
+
+    this.successfulResponse({ res, message: successfulMessage });
   }
 }
 

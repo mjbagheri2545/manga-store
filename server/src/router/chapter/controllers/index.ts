@@ -1,38 +1,36 @@
 import { Response } from "express";
 
-import fs from "fs/promises";
 import { Prisma } from "@prisma/client";
 
 import ControllerConfiguration from "@/controllers/configuration.controller";
-import { EmptyObject, IdReq, PaginateQuery, UserAuthorizedReq } from "@/types";
-import { newModelConnectionWithId } from "@/utils";
+import { EmptyObject, PaginateQuery, UserAuthorizedReq } from "@/types";
+import { newModelConnectionWithId, removeFile } from "@/utils";
 
-import MESSAGES from "../constants/messages";
 import DB from "../db";
-import { hasChapterPermission } from "../lib/permissions";
+import { hasChapterPermission, PermissionChapter } from "../lib/permissions";
 
-type GetAllReq = UserAuthorizedReq<
+type GetAllChapterReq = UserAuthorizedReq<
   EmptyObject,
   PaginateQuery,
   { productId: string }
 >;
 
-type CreateReqBody = {
+type CreateChapterReqBody = {
   episode: number;
   chapterFile: string;
   productId: string;
   translatorId: string;
 };
 
-type CreateReq = UserAuthorizedReq<CreateReqBody>;
+type CreateChapterReq = UserAuthorizedReq<CreateChapterReqBody>;
 
-type UpdateReq = UserAuthorizedReq<
-  Partial<CreateReqBody>,
-  EmptyObject,
-  { id: string }
+type UpdateChapterReq = UserAuthorizedReq<
+  Partial<CreateChapterReqBody> & { chapter: PermissionChapter }
 >;
+
+type DeleteChapterReq = UserAuthorizedReq<{ chapter: PermissionChapter }>;
 class Controller extends ControllerConfiguration {
-  async getAllChaptersOfProduct(req: GetAllReq, res: Response) {
+  async getAllChaptersOfProduct(req: GetAllChapterReq, res: Response) {
     const {
       query,
       params: { productId },
@@ -43,15 +41,7 @@ class Controller extends ControllerConfiguration {
     this.successfulResponse({ res, data: { chapters } });
   }
 
-  async getById(req: IdReq, res: Response) {
-    const { id } = req.params;
-
-    const chapter = await DB.getById(id);
-
-    this.successfulResponse({ res, data: { chapter } });
-  }
-
-  async createChapter(req: CreateReq, res: Response) {
+  async createChapter(req: CreateChapterReq, res: Response) {
     const { productId, translatorId, episode } = req.body;
 
     await DB.create({
@@ -60,16 +50,16 @@ class Controller extends ControllerConfiguration {
       translatorId,
     });
 
-    this.successfulResponse({ res, message: MESSAGES.create(episode) });
+    const { create: createMessage } = this.SHARED_MESSAGES.features.crud;
+
+    this.successfulResponse({
+      res,
+      message: createMessage(`فصل ${episode}`),
+    });
   }
 
-  async updateChapter(req: UpdateReq, res: Response) {
-    const { id } = req.params;
-    const chapter = await DB.getById(id);
-
-    if (chapter == null) return;
-
-    const { user } = req.body;
+  async updateChapter(req: UpdateChapterReq, res: Response) {
+    const { user, chapter } = req.body;
 
     if (!hasChapterPermission(user, "update", chapter)) {
       return this.forbidden(res);
@@ -93,34 +83,32 @@ class Controller extends ControllerConfiguration {
       data.chapterFile = req.file.path;
     }
 
-    const updatedChapter = await DB.update(chapter.id, data);
-    await fs.access(chapter.chapterFile);
-    await fs.unlink(chapter.chapterFile);
+    const [updatedChapter] = await Promise.all([
+      DB.update(chapter.id, data),
+      removeFile(chapter.chapterFile),
+    ]);
+
+    const { update: updateMessage } = this.SHARED_MESSAGES.features.crud;
 
     this.successfulResponse({
       res,
-      message: MESSAGES.create(updatedChapter.episode),
+      message: updateMessage(`فصل ${updatedChapter.episode}`),
     });
   }
 
-  async deleteChapter(req: IdReq, res: Response) {
-    const {
-      body: { user },
-      params: { id },
-    } = req;
+  async deleteChapter(req: DeleteChapterReq, res: Response) {
+    const { user, chapter } = req.body;
 
-    const chapterWithProductManagerId = await DB.getById(id);
-
-    if (chapterWithProductManagerId == null) return;
-
-    if (hasChapterPermission(user, "delete", chapterWithProductManagerId)) {
+    if (hasChapterPermission(user, "delete", chapter)) {
       return this.forbidden(res);
     }
-    const deletedChapter = await DB.delete(id);
+    const deletedChapter = await DB.delete(chapter.id);
+
+    const { delete: deleteChapterMessage } = this.SHARED_MESSAGES.features.crud;
 
     this.successfulResponse({
       res,
-      message: MESSAGES.delete(deletedChapter.episode),
+      message: deleteChapterMessage(`فصل ${deletedChapter.episode}`),
     });
   }
 }

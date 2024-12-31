@@ -19,8 +19,9 @@ type RequiredOptions = {
   location?: CustomLocation;
 } & ({ label: string } | { message: string });
 
-type MinLengthOptions = RequiredOptions & {
-  minLength?: number;
+type IsLengthOptions = RequiredOptions & {
+  min?: number;
+  max?: number;
 };
 
 const customExpressValidator = new ExpressValidator({
@@ -71,25 +72,25 @@ abstract class ValidatorConfiguration {
       .withMessage(finalMessage);
   }
 
-  protected minLength(
+  protected isLength(
     field: string,
-    { location = "body", minLength, ...restOptions }: MinLengthOptions
+    { location = "body", min, max, ...restOptions }: IsLengthOptions
   ) {
-    const finalMinLength = minLength ?? this.SHARED_CONFIG.stringMinLength;
+    const finalMinLength = min ?? this.SHARED_CONFIG.stringMinLength;
     const finalMessage =
       "message" in restOptions
         ? restOptions.message
         : this.SHARED_MESSAGES.minLength(restOptions.label, finalMinLength);
 
     return this.string(field, location)
-      .isLength({ min: finalMinLength })
+      .isLength({ min: finalMinLength, max })
       .withMessage(finalMessage);
   }
 
-  protected slug(field = "id", label = "با آیدی مورد نظر") {
+  protected slug(field = "id", label = "آیدی مورد نظر") {
     return this.required(field, {
       location: "params",
-      message: this.SHARED_MESSAGES.slug(label),
+      label,
     });
   }
 
@@ -109,10 +110,16 @@ abstract class ValidatorConfiguration {
       }).run(req);
 
       if (!checkExactResult.isEmpty()) {
+        // log checkExactResult then you will see the error message
+        // in the checkExactResult.context.errors[0].msg
+        // not the checkExactResult.context.message
+
+        const { msg } = checkExactResult.context.errors[0];
+
         return failedResponse({
           res,
           code: STATUS_CODES.unprocessableEntity,
-          message: checkExactResult.context.errors[0].msg,
+          message: msg,
         });
       }
       return [

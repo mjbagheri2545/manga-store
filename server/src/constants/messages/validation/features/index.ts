@@ -1,7 +1,7 @@
 import { createAuthUserValidationMessages } from "./auth_user.validationMessage";
 
-function createCommonValidationMessages() {
+function createFeaturesValidationMessages() {
   return { auth_user: createAuthUserValidationMessages() } as const;
 }
 
-export default createCommonValidationMessages;
+export default createFeaturesValidationMessages;

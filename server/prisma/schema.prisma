@@ -24,6 +24,8 @@ model User {
   roles              Role[]    @default([user])
   isVerified         Boolean   @default(false)
   emailRemainingTime DateTime?
+  walletBalance      Int       @default(0) @db.Integer
+  bio                String?   @db.VarChar(600)
 
   Token              Token?
   averageRatings     ProductAverageRating[]
@@ -53,7 +55,7 @@ model Product {
   designer     String   @db.VarChar(65)
   writer       String   @db.VarChar(65)
   releaseYear  Int      @db.SmallInt
-  summary      String   @db.Text
+  summary      String   @db.VarChar(1000)
   priceInRials Int      @db.SmallInt
   productImage String   @db.VarChar(255)
   slug         String   @unique @db.VarChar(255)

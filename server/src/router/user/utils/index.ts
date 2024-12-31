@@ -1,10 +1,10 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 
 import { v4 as uuidV4 } from "uuid";
 
 import SHARED_CONFIG from "@/constants/config";
 import { EmptyObject, IdentityVerificationReq } from "@/types";
-import { badRequest, getExpirationTime, isExpired } from "@/utils";
+import { badRequest, getExpirationTime, isExpired, pick } from "@/utils";
 
 import CONFIG from "../constants/config";
 import MESSAGES from "../constants/messages";
@@ -64,4 +64,16 @@ export async function identityVerification<Body = EmptyObject>(
       isFullMessage: true,
     });
   }
+}
+
+export function pickUserCreateData(req: Request) {
+  return pick(req.body, [
+    "fullName",
+    "email",
+    "password",
+    "avatarImage",
+    "role",
+    "bio",
+    "walletBalance",
+  ]);
 }

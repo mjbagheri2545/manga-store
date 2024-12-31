@@ -1,10 +1,10 @@
 import { upperFirst } from "@/utils";
 
-import createCommonValidationMessages from "./common";
+import createFeaturesValidationMessages from "./features";
 
 function createValidationMessages() {
   return {
-    common: createCommonValidationMessages(),
+    features: createFeaturesValidationMessages(),
 
     required: (label: string) => `${label} الزامی است.`,
     minLength: (label: string, minLength: number) =>

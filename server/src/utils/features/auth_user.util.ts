@@ -19,5 +19,6 @@ export function pickUserData(user: User) {
     "roles",
     "createdAt",
     "avatarImage",
+    "isVerified",
   ]);
 }
