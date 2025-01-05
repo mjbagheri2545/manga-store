@@ -1,11 +1,16 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 
-import { Prisma } from "@prisma/client";
+import winston from "winston";
 
-import { hasGroupingModelPermission } from "@/lib/groupingModelPermissions";
-import { EmptyObject, GroupingModels, UserAuthorizedReq } from "@/types";
-
-import ControllerConfiguration from "./configuration.controller";
+import { ENTITY_NAMES } from "@/constants/entities";
+import SHARED_MESSAGES from "@/constants/messages";
+import {
+  GroupingModels,
+  GroupingModelsEntityKey,
+  GroupingModelsService,
+  UserAuthorizedReq,
+} from "@/types";
+import { successfulResponse } from "@/utils";
 
 type CreateEntityReqBody = {
   slug: string;
@@ -14,119 +19,82 @@ type CreateEntityReqBody = {
 
 type CreateEntityReq = UserAuthorizedReq<CreateEntityReqBody>;
 
-type UpdateEntityReq = UserAuthorizedReq<
-  Partial<CreateEntityReqBody>,
-  EmptyObject,
-  { id: string }
->;
+function getPluralName(key: GroupingModelsEntityKey) {
+  switch (key) {
+    case "category":
+      return "categories";
 
-type DeleteEntityReq = UserAuthorizedReq<
-  EmptyObject,
-  EmptyObject,
-  { id: string }
->;
+    case "productStatus":
+      return "productStatuses";
 
-type TDb<T extends GroupingModels> = {
-  getAll: () => Prisma.PrismaPromise<T[]>;
-  getById: (id: string) => Prisma.PrismaPromise<T | null>;
-  create: (data: Prisma.TagCreateInput) => Prisma.PrismaPromise<T>;
-  update: (id: string, data?: Prisma.TagUpdateInput) => Prisma.PrismaPromise<T>;
-  delete: (id: string) => Prisma.PrismaPromise<T>;
+    default:
+      return "tags";
+  }
+}
+
+export type GroupingModelsControllerOptions<T extends GroupingModels> = {
+  entityKey: GroupingModelsEntityKey;
+  service: GroupingModelsService<T>;
+  logger: winston.Logger;
 };
 
-type EntityName = "ژانر" | "دسته بندی" | "وضعیت محصول";
-
-export type GroupingModelsControllerProps<T extends GroupingModels> = {
-  entityName: EntityName;
-  entitiesKey: string;
-  DB: TDb<T>;
-};
-
-class GroupingModelsController<
-  T extends GroupingModels,
-> extends ControllerConfiguration {
+class GroupingModelsController<T extends GroupingModels> {
   private entityName;
-  private DB;
-  private entitiesKey;
+  private service;
+  private entityKey;
+  private logger;
 
   constructor({
-    entityName,
-    entitiesKey,
-    DB,
-  }: GroupingModelsControllerProps<T>) {
-    super();
-    this.entityName = entityName;
-    this.entitiesKey = entitiesKey;
-    this.DB = DB;
+    entityKey,
+    service,
+    logger,
+  }: GroupingModelsControllerOptions<T>) {
+    this.entityName = ENTITY_NAMES[entityKey];
+    this.entityKey = entityKey;
+    this.service = service;
+    this.logger = logger;
   }
 
   async getAll(_req: UserAuthorizedReq, res: Response) {
-    const entities = await this.DB.getAll();
+    const entities = await this.service.getAll();
 
-    this.successfulResponse({ res, data: { [this.entitiesKey]: entities } });
+    const entitiesKey = getPluralName(this.entityKey);
+
+    successfulResponse({ res, data: { [entitiesKey]: entities } });
   }
 
   async createEntity(req: CreateEntityReq, res: Response) {
     const { name, slug } = req.body;
 
-    await this.DB.create({ name, slug });
+    const entity = await this.service.create({ name, slug });
 
-    const { create: createMessage } = this.SHARED_MESSAGES.features.crud;
+    this.logger.info(`${this.entityKey} created.`, entity);
 
-    this.successfulResponse({
-      res,
-      message: createMessage(`${this.entityName} ${name}`),
-    });
+    const { crud: crudMessage, groupingModel: groupingModelMessage } =
+      SHARED_MESSAGES.features;
+
+    const message = crudMessage.create(
+      groupingModelMessage.crud(entity, this.entityName)
+    );
+
+    successfulResponse({ res, message });
   }
 
-  async updateEntity(req: UpdateEntityReq, res: Response) {
-    const { id } = req.params;
-    const tag = await this.DB.getById(id);
+  async updateEntity(req: Request, res: Response) {
+    const { name, slug, [this.entityKey]: entity } = req.body;
 
-    if (tag == null) return;
+    const updatedEntity = await this.service.update(entity.id, { name, slug });
 
-    const { user } = req.body;
+    this.logger.info(`${this.entityKey} updated.`, entity);
 
-    if (hasGroupingModelPermission(user, "update", tag)) {
-      return this.forbidden(res);
-    }
+    const { crud: crudMessage, groupingModel: groupingModelMessage } =
+      SHARED_MESSAGES.features;
 
-    const { name, slug } = req.body;
+    const message = crudMessage.update(
+      groupingModelMessage.crud(updatedEntity, this.entityName)
+    );
 
-    const updatedTag = await this.DB.update(tag.id, { name, slug });
-
-    const { update: updateMessage } = this.SHARED_MESSAGES.features.crud;
-
-    this.successfulResponse({
-      res,
-      message: updateMessage(`${this.entityName} ${updatedTag.name}`),
-    });
-  }
-
-  async deleteEntity(req: DeleteEntityReq, res: Response) {
-    const {
-      body: { user },
-      params: { id },
-    } = req;
-
-    const entity = await this.DB.getById(id);
-
-    if (entity == null) {
-      return this.notFound({ res, entityName: this.entityName });
-    }
-
-    if (hasGroupingModelPermission(user, "delete", entity)) {
-      return this.forbidden(res);
-    }
-
-    const deletedTag = await this.DB.delete(id);
-
-    const { delete: deleteMessage } = this.SHARED_MESSAGES.features.crud;
-
-    this.successfulResponse({
-      res,
-      message: deleteMessage(`${this.entityName} ${deletedTag.name}`),
-    });
+    successfulResponse({ res, message });
   }
 }
 

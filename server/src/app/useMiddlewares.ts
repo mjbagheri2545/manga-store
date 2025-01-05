@@ -1,16 +1,14 @@
 import express from "express";
 
-import ErrorController from "@/controllers/error.controller";
+import { errorMiddleware } from "@/middlewares";
 
-import createRouter from "./createRouter";
+import router from "./createRouter";
 import useGeneralMiddlewares from "./useGeneralMiddleware";
 
 function useMiddlewares(app: express.Express) {
-  const errorMiddleware = new ErrorController().error;
-
   useGeneralMiddlewares(app);
 
-  app.use("/api", createRouter());
+  app.use("/api", router);
 
   app.use(errorMiddleware);
 }

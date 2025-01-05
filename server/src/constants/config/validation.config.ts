@@ -1,13 +1,10 @@
-function createValidationConfig() {
-  const passwordMinLength = 8;
-  return {
-    password: {
-      bcryptSaltRounds: 10,
-      minLength: passwordMinLength,
-      pattern: new RegExp(`^(?=.*[A-Za-z])(?=.*\\d).{${passwordMinLength},}$`),
-    },
-    stringMinLength: 2,
-  } as const;
-}
+const validationConfig = {
+  password: {
+    bcryptSaltRounds: 10,
+    minLength: 8,
+    pattern: new RegExp(`^(?=.*[A-Za-z])(?=.*\\d).{${8},}$`),
+  },
+  stringMinLength: 2,
+} as const;
 
-export default createValidationConfig;
+export default validationConfig;

@@ -5,15 +5,15 @@ import {
   Location,
 } from "express-validator";
 
-import autoBind from "auto-bind";
-
 import SHARED_CONFIG from "@/constants/config";
 import SHARED_MESSAGES from "@/constants/messages";
 import STATUS_CODES from "@/constants/statusCodes";
 import { MiddlewareParams, TypeOrTypeArray } from "@/types";
 import { failedResponse, parseTypeOrTypeArray } from "@/utils";
 
-type CustomLocation = Exclude<Location, "cookies" | "headers">;
+type CustomLocation =
+  | Exclude<Location, "cookies" | "headers" | "params">
+  | "param";
 
 type RequiredOptions = {
   location?: CustomLocation;
@@ -30,129 +30,105 @@ const customExpressValidator = new ExpressValidator({
   },
 });
 
-const { body, checkExact, param, query, validationResult } =
-  customExpressValidator;
+const { checkExact, validationResult } = customExpressValidator;
 
 export type CustomValidationChain = ExpressValidatorCustomValidationChain<
   typeof customExpressValidator
 >;
 
-abstract class ValidatorConfiguration {
-  protected readonly SHARED_MESSAGES;
-  protected readonly SHARED_CONFIG;
-  protected readonly body;
-  protected readonly query;
-  protected readonly params;
+export function string(field: string, location: CustomLocation = "body") {
+  return customExpressValidator[location](field).isString().trim();
+}
 
-  constructor() {
-    autoBind(this);
-    this.SHARED_MESSAGES = SHARED_MESSAGES.validation;
-    this.SHARED_CONFIG = SHARED_CONFIG.validation;
+export function required(
+  field: string,
+  { location = "body", ...restOptions }: RequiredOptions
+) {
+  const finalMessage =
+    "message" in restOptions
+      ? restOptions.message
+      : SHARED_MESSAGES.validation.required(restOptions.label);
 
-    this.body = body;
-    this.query = query;
-    this.params = param;
-  }
+  return string(field, location)
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage(finalMessage);
+}
 
-  protected string(field: string, location: CustomLocation = "body") {
-    return this[location](field).isString().trim();
-  }
+export function isLength(
+  field: string,
+  { location = "body", min, max, ...restOptions }: IsLengthOptions
+) {
+  const finalMinLength = min ?? SHARED_CONFIG.validation.stringMinLength;
+  const finalMessage =
+    "message" in restOptions
+      ? restOptions.message
+      : SHARED_MESSAGES.validation.minLength(restOptions.label, finalMinLength);
 
-  protected required(
-    field: string,
-    { location = "body", ...restOptions }: RequiredOptions
-  ) {
-    const finalMessage =
-      "message" in restOptions
-        ? restOptions.message
-        : this.SHARED_MESSAGES.required(restOptions.label);
+  return string(field, location)
+    .isLength({ min: finalMinLength, max })
+    .withMessage(finalMessage);
+}
 
-    return this.string(field, location)
-      .notEmpty({ ignore_whitespace: true })
-      .withMessage(finalMessage);
-  }
+export function slugValidator(field = "id", label = "آیدی مورد نظر") {
+  return required(field, {
+    location: "param",
+    label,
+  });
+}
 
-  protected isLength(
-    field: string,
-    { location = "body", min, max, ...restOptions }: IsLengthOptions
-  ) {
-    const finalMinLength = min ?? this.SHARED_CONFIG.stringMinLength;
-    const finalMessage =
-      "message" in restOptions
-        ? restOptions.message
-        : this.SHARED_MESSAGES.minLength(restOptions.label, finalMinLength);
+export function slugValidation(field = "id", label = "با آیدی مورد نظر") {
+  return createValidation([slugValidator(field, label)]);
+}
 
-    return this.string(field, location)
-      .isLength({ min: finalMinLength, max })
-      .withMessage(finalMessage);
-  }
+export function createValidation(validationChains: CustomValidationChain[]) {
+  return async (...params: MiddlewareParams) => {
+    const [req, res] = params;
 
-  protected slug(field = "id", label = "آیدی مورد نظر") {
-    return this.required(field, {
-      location: "params",
-      label,
-    });
-  }
+    const checkExactResult = await checkExact(validationChains, {
+      message: (fields) =>
+        SHARED_MESSAGES.validation.unknownFields(
+          fields.map((field) => field.path).join(", ")
+        ),
+    }).run(req);
 
-  slugValidation(field = "id", label = "با آیدی مورد نظر") {
-    return this.createValidation([this.slug(field, label)]);
-  }
+    if (!checkExactResult.isEmpty()) {
+      // log checkExactResult then you will see the error message
+      // in the checkExactResult.context.errors[0].msg
+      // not the checkExactResult.context.message
 
-  protected createValidation(schema: TypeOrTypeArray<CustomValidationChain>) {
-    return async (...params: MiddlewareParams) => {
-      const [req, res] = params;
-
-      const checkExactResult = await checkExact(schema, {
-        message: (fields) =>
-          this.SHARED_MESSAGES.unknownFields(
-            fields.map((field) => field.path).join(", ")
-          ),
-      }).run(req);
-
-      if (!checkExactResult.isEmpty()) {
-        // log checkExactResult then you will see the error message
-        // in the checkExactResult.context.errors[0].msg
-        // not the checkExactResult.context.message
-
-        const { msg } = checkExactResult.context.errors[0];
-
-        return failedResponse({
-          res,
-          code: STATUS_CODES.unprocessableEntity,
-          message: msg,
-        });
-      }
-      return [
-        ...parseTypeOrTypeArray(this.createSafeValidations(schema)),
-        this.validate(...params),
-      ];
-    };
-  }
-
-  private createSafeValidations(
-    validations: TypeOrTypeArray<CustomValidationChain>
-  ) {
-    return parseTypeOrTypeArray(validations).map((validation) =>
-      validation.escape()
-    );
-  }
-
-  private async validate(req: Request, res: Response, next: NextFunction) {
-    const result = validationResult(req);
-
-    if (!result.isEmpty()) {
-      const messages = result
-        .array({ onlyFirstError: true })
-        .map((error) => error.msg);
+      const { msg } = checkExactResult.context.errors[0];
 
       return failedResponse({
         res,
-        code: STATUS_CODES.badRequest,
-        message: messages,
+        code: STATUS_CODES.unprocessableEntity,
+        message: msg,
       });
     }
-    next();
-  }
+    return [...createSafeValidations(validationChains), validate(...params)];
+  };
 }
 
-export default ValidatorConfiguration;
+function createSafeValidations(
+  validations: TypeOrTypeArray<CustomValidationChain>
+) {
+  return parseTypeOrTypeArray(validations).map((validation) =>
+    validation.escape()
+  );
+}
+
+function validate(req: Request, res: Response, next: NextFunction) {
+  const result = validationResult(req);
+
+  if (!result.isEmpty()) {
+    const messages = result
+      .array({ onlyFirstError: true })
+      .map((error) => error.msg);
+
+    return failedResponse({
+      res,
+      code: STATUS_CODES.badRequest,
+      message: messages,
+    });
+  }
+  next();
+}

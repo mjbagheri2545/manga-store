@@ -1,9 +1,9 @@
 import { Response } from "express";
 
-import ControllerConfiguration from "@/controllers/configuration.controller";
 import { EmptyObject, UserAuthorizedReq } from "@/types";
+import { notFound, successfulResponse } from "@/utils";
 
-import DB from "../db";
+import productService from "../services";
 import { ProductQuery } from "../types";
 
 type ProductGetReq<P = EmptyObject> = UserAuthorizedReq<
@@ -18,11 +18,11 @@ type GetByProductSlugReq = UserAuthorizedReq<
   { productSlug: string }
 >;
 
-class GetProductsController extends ControllerConfiguration {
+class GetProductsController {
   async getAll(req: ProductGetReq, res: Response) {
-    const products = await DB.getAll(req.query);
+    const products = await productService.getAll(req.query);
 
-    this.successfulResponse({ res, data: { products } });
+    successfulResponse({ res, data: { products } });
   }
 
   async getByProductSlug(req: GetByProductSlugReq, res: Response) {
@@ -30,17 +30,17 @@ class GetProductsController extends ControllerConfiguration {
       params: { productSlug },
     } = req;
 
-    const product = await DB.getByProductSlug(productSlug);
+    const product = await productService.getByProductSlug(productSlug);
 
     if (product == null) {
-      return this.notFound({
+      return notFound({
         res,
         entityName: "محصولی",
         entityInfo: "آدرس اینترنتی",
       });
     }
 
-    this.successfulResponse({ res, data: { product } });
+    successfulResponse({ res, data: { product } });
   }
 
   async getByCategory(req: ProductGetReq<{ category: string }>, res: Response) {
@@ -49,9 +49,9 @@ class GetProductsController extends ControllerConfiguration {
       params: { category },
     } = req;
 
-    const products = await DB.getByCategory(category, query);
+    const products = await productService.getByCategory(category, query);
 
-    this.successfulResponse({ res, data: { products } });
+    successfulResponse({ res, data: { products } });
   }
 
   async getByTag(req: ProductGetReq<{ tag: string }>, res: Response) {
@@ -60,9 +60,9 @@ class GetProductsController extends ControllerConfiguration {
       params: { tag },
     } = req;
 
-    const products = await DB.getByTag(tag, query);
+    const products = await productService.getByTag(tag, query);
 
-    this.successfulResponse({ res, data: { products } });
+    successfulResponse({ res, data: { products } });
   }
 
   async getByStatus(req: ProductGetReq<{ status: string }>, res: Response) {
@@ -71,9 +71,9 @@ class GetProductsController extends ControllerConfiguration {
       params: { status },
     } = req;
 
-    const products = await DB.getByStatus(status, query);
+    const products = await productService.getByStatus(status, query);
 
-    this.successfulResponse({ res, data: { products } });
+    successfulResponse({ res, data: { products } });
   }
 }
 

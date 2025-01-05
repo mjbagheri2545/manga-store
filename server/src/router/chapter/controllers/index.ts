@@ -2,12 +2,23 @@ import { Response } from "express";
 
 import { Prisma } from "@prisma/client";
 
-import ControllerConfiguration from "@/controllers/configuration.controller";
-import { EmptyObject, PaginateQuery, UserAuthorizedReq } from "@/types";
-import { newModelConnectionWithId, removeFile } from "@/utils";
+import SHARED_MESSAGES from "@/constants/messages";
+import {
+  EmptyObject,
+  PaginateQuery,
+  PermissionChapter,
+  UserAuthorizedReq,
+} from "@/types";
+import {
+  newModelConnectionWithId,
+  pick,
+  removeFile,
+  successfulResponse,
+} from "@/utils";
 
-import DB from "../db";
-import { hasChapterPermission, PermissionChapter } from "../lib/permissions";
+import chapterLogger from "../constants/logger";
+import CHAPTER_MESSAGES from "../constants/message";
+import chapterService from "../services";
 
 type GetAllChapterReq = UserAuthorizedReq<
   EmptyObject,
@@ -27,45 +38,49 @@ type CreateChapterReq = UserAuthorizedReq<CreateChapterReqBody>;
 type UpdateChapterReq = UserAuthorizedReq<
   Partial<CreateChapterReqBody> & { chapter: PermissionChapter }
 >;
-
-type DeleteChapterReq = UserAuthorizedReq<{ chapter: PermissionChapter }>;
-class Controller extends ControllerConfiguration {
+class Controller {
   async getAllChaptersOfProduct(req: GetAllChapterReq, res: Response) {
     const {
       query,
       params: { productId },
     } = req;
 
-    const chapters = await DB.getAll(productId, query);
+    const chapters = await chapterService.getAll(productId, query);
 
-    this.successfulResponse({ res, data: { chapters } });
+    successfulResponse({ res, data: { chapters } });
+  }
+
+  sendChapter(
+    req: UserAuthorizedReq<{ chapter: PermissionChapter }>,
+    res: Response
+  ) {
+    const { chapter } = req.body;
+
+    const chapterData = pick(chapter, ["chapterFile", "episode", "id"]);
+
+    successfulResponse({ res, data: { chapter: chapterData } });
   }
 
   async createChapter(req: CreateChapterReq, res: Response) {
     const { productId, translatorId, episode } = req.body;
 
-    await DB.create({
+    const createdChapter = await chapterService.create({
       data: { chapterFile: req.file?.path as string, episode },
       productId,
       translatorId,
     });
 
-    const { create: createMessage } = this.SHARED_MESSAGES.features.crud;
+    chapterLogger.info("Chapter created.", createdChapter);
 
-    this.successfulResponse({
-      res,
-      message: createMessage(`فصل ${episode}`),
-    });
+    const { create: createMessage } = SHARED_MESSAGES.features.crud;
+
+    const message = createMessage(CHAPTER_MESSAGES.crud(createdChapter));
+
+    successfulResponse({ res, message });
   }
 
   async updateChapter(req: UpdateChapterReq, res: Response) {
-    const { user, chapter } = req.body;
-
-    if (!hasChapterPermission(user, "update", chapter)) {
-      return this.forbidden(res);
-    }
-
-    const { productId, translatorId, episode } = req.body;
+    const { chapter, productId, translatorId, episode } = req.body;
 
     const productConnection = newModelConnectionWithId(productId, "product");
     const translatorConnection = newModelConnectionWithId(
@@ -84,32 +99,17 @@ class Controller extends ControllerConfiguration {
     }
 
     const [updatedChapter] = await Promise.all([
-      DB.update(chapter.id, data),
+      chapterService.update(chapter.id, data),
       removeFile(chapter.chapterFile),
     ]);
 
-    const { update: updateMessage } = this.SHARED_MESSAGES.features.crud;
+    chapterLogger.info("Chapter updated.", updatedChapter);
 
-    this.successfulResponse({
-      res,
-      message: updateMessage(`فصل ${updatedChapter.episode}`),
-    });
-  }
+    const { update: updateMessage } = SHARED_MESSAGES.features.crud;
 
-  async deleteChapter(req: DeleteChapterReq, res: Response) {
-    const { user, chapter } = req.body;
+    const message = updateMessage(CHAPTER_MESSAGES.crud(updatedChapter));
 
-    if (hasChapterPermission(user, "delete", chapter)) {
-      return this.forbidden(res);
-    }
-    const deletedChapter = await DB.delete(chapter.id);
-
-    const { delete: deleteChapterMessage } = this.SHARED_MESSAGES.features.crud;
-
-    this.successfulResponse({
-      res,
-      message: deleteChapterMessage(`فصل ${deletedChapter.episode}`),
-    });
+    successfulResponse({ res, message });
   }
 }
 

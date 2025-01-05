@@ -4,12 +4,11 @@ import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 
 import { IdentityVerificationReq, UserAuthorizedReq } from "@/types";
-import { hashPassword } from "@/utils";
+import { badRequest, hashPassword, successfulResponse } from "@/utils";
 
-import MESSAGES from "../constants/messages";
-import DB from "../db";
+import USER_MESSAGES from "../constants/messages";
+import userAccountService from "../services/account.db";
 import { identityVerification } from "../utils";
-import AccountController from "./account.controller";
 
 type ResetReq = UserAuthorizedReq<{
   currentPassword: string;
@@ -20,7 +19,7 @@ type RecoverReq = IdentityVerificationReq<{
   newPassword: string;
 }>;
 
-class PasswordController extends AccountController {
+class PasswordController {
   private async changePassword(
     res: Response,
     user: User,
@@ -29,16 +28,16 @@ class PasswordController extends AccountController {
   ) {
     const hashedNewPassword = await hashPassword(newPassword);
 
-    await DB.user.account.updatePassword({
+    await userAccountService.updatePassword({
       id: user.id,
       newPassword: hashedNewPassword,
       currentPassword: user.password,
       isRecoverPassword,
     });
 
-    const { successful: successfulMessage } = MESSAGES.account.password;
+    const { successful: successfulMessage } = USER_MESSAGES.account.password;
 
-    this.successfulResponse({ res, message: successfulMessage });
+    successfulResponse({ res, message: successfulMessage });
   }
 
   private async checkPasswordsWithNewPassword(
@@ -46,7 +45,7 @@ class PasswordController extends AccountController {
     user: User,
     newPassword: string
   ) {
-    const { failedMessage } = MESSAGES.account.password;
+    const { failedMessage } = USER_MESSAGES.account.password;
 
     const passwordsToCheckWithNewPassword = [
       user.password,
@@ -55,7 +54,7 @@ class PasswordController extends AccountController {
 
     for (const hashedPassword of passwordsToCheckWithNewPassword) {
       if (await bcrypt.compare(newPassword, hashedPassword)) {
-        return this.badRequest(res, failedMessage);
+        return badRequest(res, failedMessage);
       }
     }
   }
@@ -73,7 +72,7 @@ class PasswordController extends AccountController {
   }
 
   async reset(req: ResetReq, res: Response) {
-    const { failedMessage } = MESSAGES.account.password;
+    const { failedMessage } = USER_MESSAGES.account.password;
 
     const { user, currentPassword, newPassword } = req.body;
 
@@ -83,7 +82,7 @@ class PasswordController extends AccountController {
     );
 
     if (!isCurrentPasswordValid) {
-      return this.badRequest(res, failedMessage);
+      return badRequest(res, failedMessage);
     }
 
     await this.checkPasswordsWithNewPassword(res, user, newPassword);

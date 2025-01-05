@@ -1,11 +1,24 @@
 import { Router } from "express";
 
-import SHARED_CONFIG from "@/constants/config";
-import { createUploader } from "@/utils";
+import { Product } from "@prisma/client";
 
+import SHARED_MESSAGES from "@/constants/messages";
+import {
+  allResourcePermission,
+  idAuthorization,
+  imageAuthorization,
+  jwtAuthorization,
+  specificResourcePermission,
+} from "@/middlewares";
+import { deleteEntity } from "@/middlewares/features/crud.middleware";
+import { createUploader } from "@/utils";
+import { slugValidation } from "@/validators";
+
+import productLogger from "../constants/logger";
+import PRODUCT_MESSAGES from "../constants/messages";
 import ProductsMutationController from "../controllers/productsMutation.controller";
-import DB from "../db";
 import { hasProductPermission } from "../lib/permissions";
+import productService from "../services";
 import Validator from "../validators";
 import createGetProductsRoutes from "./getProducts.routes";
 
@@ -18,52 +31,66 @@ function createProductRouter() {
     "../../../../uploads/productImage/"
   );
 
-  const {
-    permissionAuthorization,
-    fileAuthorization,
-    jwtAuthorization,
-    getById,
-    deleteProduct,
-    createProduct,
-    updateProduct,
-  } = new ProductsMutationController();
+  const { createProduct, updateProduct } = new ProductsMutationController();
 
-  const { slugValidation, createProductValidation, updateProductValidation } =
-    new Validator();
+  const { createProductValidation, updateProductValidation } = new Validator();
+
+  const createPermission = allResourcePermission((user) =>
+    hasProductPermission(user, "create")
+  );
 
   router.post(
     "/",
     createProductValidation(),
     jwtAuthorization,
-    permissionAuthorization((user) => hasProductPermission(user, "create")),
+    createPermission,
     productImageUploader.single("productImage"),
-    fileAuthorization(SHARED_CONFIG.mime.image),
+    imageAuthorization(),
     createProduct
   );
+
+  const updatePermission = specificResourcePermission<Product>({
+    entityKey: "product",
+    hasPermission: (user, product) =>
+      hasProductPermission(user, "update", product),
+  });
+
+  const getProductById = idAuthorization({
+    entityKey: "product",
+    getByIdQuery: productService.getById,
+  });
 
   router.put(
     "/:id",
     updateProductValidation(),
     jwtAuthorization,
-    getById({
-      entityName: "محصولی",
-      entityKey: "product",
-      getByIdQuery: DB.getById,
-    }),
+    getProductById,
+    updatePermission,
     productImageUploader.single("productImage"),
-    fileAuthorization(SHARED_CONFIG.mime.image),
+    imageAuthorization(),
     updateProduct
   );
+
+  function deleteProductMessage(product: Product) {
+    const { delete: deleteMessage } = SHARED_MESSAGES.features.crud;
+    productLogger.info("Product deleted.", product);
+
+    return deleteMessage(PRODUCT_MESSAGES.crud(product));
+  }
+
+  const deleteProduct = deleteEntity({
+    delete: productService.delete,
+    entityKey: "product",
+    hasPermission: (user, product) =>
+      hasProductPermission(user, "delete", product),
+    message: deleteProductMessage,
+  });
 
   router.delete(
     "/:id",
     slugValidation(),
     jwtAuthorization,
-    getById({
-      entityName: "محصولی",
-      entityKey: "product",
-      getByIdQuery: DB.getById,
-    }),
+    getProductById,
     deleteProduct
   );
 

@@ -1,6 +1,6 @@
-const PATH = {
+const AUTH_PATH = {
   registration: "/register",
   login: "/login",
 } as const;
 
-export default PATH;
+export default AUTH_PATH;

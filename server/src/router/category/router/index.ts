@@ -1,12 +1,13 @@
 import { createGroupingModelsRouter } from "@/utils";
 
-import DB from "../db";
+import categoryLogger from "../constants/logger";
+import categoryService from "../services";
 
 function createCategoryRouter() {
   const router = createGroupingModelsRouter({
-    entityName: "دسته بندی",
-    DB,
-    entitiesKey: "categories",
+    service: categoryService,
+    entityKey: "category",
+    logger: categoryLogger,
   });
 
   return router;

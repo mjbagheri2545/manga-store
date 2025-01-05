@@ -4,15 +4,10 @@ import { json, urlencoded } from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import helmet from "helmet";
-import morgan from "morgan";
 import path from "path";
 
 import env from "@/constants/env";
-import { httpLogger } from "@/constants/loggers";
-
-const morganMiddleware = morgan("combined", {
-  stream: { write: (message) => httpLogger.log("http", message) },
-});
+import { morganMiddleware } from "@/middlewares";
 
 function useGeneralMiddlewares(app: express.Express) {
   [

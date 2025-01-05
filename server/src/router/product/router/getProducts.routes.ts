@@ -1,8 +1,10 @@
 import { Router } from "express";
 
+import { jwtAuthorization } from "@/middlewares";
+import { slugValidation } from "@/validators";
+
 import PATH from "../constants/path";
 import GetProductsController from "../controllers/getProducts.controller";
-import Validator from "../validators";
 
 // we can't use router.use for this routes because these routes
 // does not have a same parent path to group these routes like below path
@@ -10,16 +12,8 @@ import Validator from "../validators";
 // /account/password/recovery
 
 function createGetProductsRoutes(router: Router) {
-  const {
-    jwtAuthorization,
-    getAll,
-    getByProductSlug,
-    getByCategory,
-    getByTag,
-    getByStatus,
-  } = new GetProductsController();
-
-  const { slugValidation } = new Validator();
+  const { getAll, getByProductSlug, getByCategory, getByTag, getByStatus } =
+    new GetProductsController();
 
   router.get("/", jwtAuthorization, getAll);
 

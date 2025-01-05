@@ -11,6 +11,8 @@
     "pre:commit": "lint-staged",
     "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
     "prepare": "cd .. && husky server/.husky",
+    "deps:check": "madge src --circular",
+    "deps:graph": "node ./scripts/depsGraph.js",
     "postinstall": "npm run prepare"
   },
   "prisma": {

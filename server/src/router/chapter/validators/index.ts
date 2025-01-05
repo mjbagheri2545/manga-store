@@ -1,19 +1,16 @@
-import ValidatorConfiguration from "@/validators/configuration.validator";
+import { createValidation, required, slugValidator } from "@/validators";
 
-class Validator extends ValidatorConfiguration {
+class Validator {
   private getCreateChapterValidation() {
     return [
-      this.required("productId", { location: "params", label: "محصول" }),
-      this.required("translatorId", { location: "params", label: "مترجم" }),
+      required("productId", { label: "محصول" }),
+      required("translatorId", { label: "مترجم" }),
     ];
   }
   createChapterValidation() {
-    const episode = this.required("episode", { label: "قسمت فصل" }).toInt();
+    const episode = required("episode", { label: "قسمت فصل" }).toInt();
 
-    return this.createValidation([
-      ...this.getCreateChapterValidation(),
-      episode,
-    ]);
+    return createValidation([...this.getCreateChapterValidation(), episode]);
   }
 
   updateChapterValidation() {
@@ -21,12 +18,12 @@ class Validator extends ValidatorConfiguration {
       (validationChain) => validationChain.optional()
     );
 
-    const episode = this.required("episode", { label: "قسمت فصل" })
+    const episode = required("episode", { label: "قسمت فصل" })
       .optional()
       .ifExists()
       .toInt();
 
-    return this.createValidation([...optionalFields, episode, this.slug()]);
+    return createValidation([...optionalFields, episode, slugValidator()]);
   }
 }
 

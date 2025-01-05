@@ -1,19 +1,19 @@
 import { Router } from "express";
 
+import { jwtAuthorization } from "@/middlewares";
+
 import PATH from "../constants/path";
 import VerificationController from "../controllers/verification.controller";
+import {
+  emailTypeHandler,
+  sendIdentityVerificationEmail,
+} from "../middlewares";
 import VerificationValidator from "../validators/verification.validator";
 
 function createVerificationRouter() {
   const router = Router();
 
-  const {
-    jwtAuthorization,
-    sendIdentityVerificationEmail,
-    emailTypeHandler,
-    alreadyVerifiedChecker,
-    verify,
-  } = new VerificationController();
+  const { alreadyVerifiedChecker, verify } = new VerificationController();
 
   const { verifyValidation } = new VerificationValidator();
 

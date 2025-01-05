@@ -4,8 +4,6 @@ import path from "path";
 import { User } from "@prisma/client";
 
 import SHARED_CONFIG from "@/constants/config";
-import { errorLogger } from "@/constants/loggers";
-import SHARED_MESSAGES from "@/constants/messages";
 import {
   PaginateQuery,
   Permissions,
@@ -13,16 +11,14 @@ import {
   TypeOrTypeArray,
 } from "@/types";
 
+import { withCatch } from "./error.util";
+
 export function upperFirst(str: string) {
   return str.slice(1) + str[0].toUpperCase();
 }
 
 export function parseTypeOrTypeArray<T>(data: TypeOrTypeArray<T>): T[] {
   return Array.isArray(data) ? data : [data];
-}
-
-export function isError(error: unknown): error is Error {
-  return error instanceof Error;
 }
 
 export function pick<T extends object, K extends keyof T>(
@@ -55,22 +51,6 @@ export function getEmailRemainingTime() {
 
 export function isExpired(time: Date | number) {
   return (typeof time === "number" ? time : time.getTime()) <= Date.now();
-}
-
-export function withCatch<T>(
-  promise: Promise<T>
-): Promise<[Error] | [undefined, T]> {
-  return promise
-    .then((value) => {
-      return [undefined, value] as [undefined, T];
-    })
-    .catch((error: Error) => {
-      errorLogger.log("error", error.message);
-      const finalError = isError(error)
-        ? error
-        : new Error(SHARED_MESSAGES.general.unexpectedError);
-      return [finalError];
-    });
 }
 
 export function paginate(
@@ -133,4 +113,8 @@ export function newModelConnectionWithId(id: string | undefined, key: string) {
 export async function removeFile(path: string) {
   await fs.access(path);
   await fs.unlink(path);
+}
+
+export function prismaSelectId() {
+  return { id: true };
 }

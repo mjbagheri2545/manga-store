@@ -1,9 +1,9 @@
-import createAccountPath from "./account.path";
+import userAccountPath from "./account.path";
 
 const PATH = {
   getByToken: "/get-by-token",
   editProfile: "/edit-profile",
-  account: createAccountPath(),
+  account: userAccountPath,
 } as const;
 
 export default PATH;

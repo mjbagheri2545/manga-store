@@ -1,50 +1,92 @@
 import { Router } from "express";
 
+import { ENTITY_NAMES } from "@/constants/entities";
+import SHARED_MESSAGES from "@/constants/messages";
 import GroupingModelsController, {
-  GroupingModelsControllerProps,
+  GroupingModelsControllerOptions,
 } from "@/controllers/groupingModel.controller";
 import { hasGroupingModelPermission } from "@/lib/groupingModelPermissions";
+import { idAuthorization, jwtAuthorization } from "@/middlewares";
+import { deleteEntity } from "@/middlewares/features/crud.middleware";
+import {
+  allResourcePermission,
+  specificResourcePermission,
+} from "@/middlewares/permission.middleware";
 import { GroupingModels } from "@/types";
-import GroupingModelsValidator from "@/validators/groupingModel.validator";
+import { GroupingModelsValidator, slugValidation } from "@/validators";
+
+import { upperFirst } from "../general.util";
 
 export function createGroupingModelsRouter<T extends GroupingModels>(
-  props: GroupingModelsControllerProps<T>
+  options: GroupingModelsControllerOptions<T>
 ) {
   const router = Router();
 
-  const {
-    jwtAuthorization,
-    permissionAuthorization,
-    getAll,
-    createEntity,
-    updateEntity,
-    deleteEntity,
-  } = new GroupingModelsController(props);
+  const { entityKey, service, logger } = options;
 
-  const {
-    slugValidation,
-    createGroupModelValidation,
-    updateGroupModelValidation,
-  } = new GroupingModelsValidator();
+  const { getAll, createEntity, updateEntity } = new GroupingModelsController(
+    options
+  );
+
+  const { createValidation, updateValidation } = new GroupingModelsValidator();
 
   router.get("/", jwtAuthorization, getAll);
 
+  const createPermission = allResourcePermission((user) =>
+    hasGroupingModelPermission(user, "create")
+  );
+
   router.post(
     "/",
-    createGroupModelValidation(),
+    createValidation(entityKey),
     jwtAuthorization,
-    permissionAuthorization((user) =>
-      hasGroupingModelPermission(user, "create")
-    ),
+    createPermission,
     createEntity
   );
 
+  const updatePermission = specificResourcePermission<T>({
+    entityKey,
+    hasPermission: (user, entity) =>
+      hasGroupingModelPermission(user, "update", entity),
+  });
+
+  const getEntityById = idAuthorization({
+    entityKey: entityKey,
+    getByIdQuery: service.getById,
+  });
+
   router.put(
     "/:id",
-    updateGroupModelValidation(),
+    updateValidation(entityKey),
     jwtAuthorization,
+    getEntityById,
+    updatePermission,
     updateEntity
   );
 
-  router.delete("/:id", slugValidation(), jwtAuthorization, deleteEntity);
+  function deleteGroupingModelEntityMessage(entity: T) {
+    const { crud: crudMessage, groupingModel: groupingModelMessage } =
+      SHARED_MESSAGES.features;
+
+    const entityName = ENTITY_NAMES[entityKey];
+    logger.info(`${upperFirst(entityKey)} delete.`, entity);
+
+    return crudMessage.delete(groupingModelMessage.crud(entity, entityName));
+  }
+
+  const deleteGroupingModelEntity = deleteEntity({
+    delete: service.delete,
+    entityKey,
+    hasPermission: (user, entity) =>
+      hasGroupingModelPermission(user, "delete", entity),
+    message: deleteGroupingModelEntityMessage,
+  });
+
+  router.delete(
+    "/:id",
+    slugValidation(),
+    jwtAuthorization,
+    getEntityById,
+    deleteGroupingModelEntity
+  );
 }

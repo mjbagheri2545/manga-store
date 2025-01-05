@@ -1,13 +1,9 @@
-import { Chapter, User } from "@prisma/client";
+import { User } from "@prisma/client";
 
-import { Permissions, PermissionsAction } from "@/types";
+import { PermissionChapter, Permissions, PermissionsAction } from "@/types";
 import { hasPermission } from "@/utils";
 
-export type PermissionChapter = Chapter & {
-  product: { managerId: string | null };
-};
-
-const PERMISSIONS = {
+const CHAPTER_PERMISSIONS = {
   admin: { view: true, create: true, update: true, delete: true },
   manager: {
     view: true,
@@ -34,5 +30,5 @@ export function hasChapterPermission(
   action: PermissionsAction,
   data?: PermissionChapter
 ) {
-  return hasPermission(user, PERMISSIONS, action, data);
+  return hasPermission(user, CHAPTER_PERMISSIONS, action, data);
 }

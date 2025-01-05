@@ -1,13 +1,13 @@
-import createFeaturesMessages from "./features";
-import createGeneralMessages from "./general.message";
-import createStatusCodeMessages from "./statusCode.message";
-import createValidationMessages from "./validation";
+import featuresMessages from "./features.message";
+import generalMessages from "./general.message";
+import statusCodeMessages from "./statusCode.message";
+import validationMessages from "./validation";
 
 const SHARED_MESSAGES = {
-  validation: createValidationMessages(),
-  features: createFeaturesMessages(),
-  statusCode: createStatusCodeMessages(),
-  general: createGeneralMessages(),
+  validation: validationMessages,
+  features: featuresMessages,
+  statusCode: statusCodeMessages,
+  general: generalMessages,
 } as const;
 
 export default SHARED_MESSAGES;

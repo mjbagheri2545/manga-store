@@ -1,17 +1,25 @@
-import AuthUserValidator from "@/validators/auth_user.validator";
+import {
+  createValidation,
+  currentPasswordValidator,
+  emailNotInUseValidator,
+  emailValidator,
+  fullNameValidator,
+  newPasswordConfirmationValidator,
+  newPasswordValidator,
+} from "@/validators";
 
-class Validator extends AuthUserValidator {
+class Validator {
   registrationValidation() {
-    return this.createValidation([
-      this.fullName(),
-      this.emailNotInUse(),
-      this.newPassword(),
-      this.newPasswordConfirmation(),
+    return createValidation([
+      fullNameValidator(),
+      emailNotInUseValidator(),
+      newPasswordValidator(),
+      newPasswordConfirmationValidator(),
     ]);
   }
 
   loginValidation() {
-    return this.createValidation([this.email(), this.currentPassword()]);
+    return createValidation([emailValidator(), currentPasswordValidator()]);
   }
 }
 

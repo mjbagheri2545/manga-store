@@ -1,32 +1,41 @@
+import { ENTITY_NAMES } from "@/constants/entities";
 import slugify from "@/lib/slugify";
+import { EntityKey } from "@/types";
 
-import ValidatorConfiguration from "./configuration.validator";
+import {
+  createValidation,
+  required,
+  slugValidator,
+} from "./configuration.validator";
 
-class GroupingModelsValidator extends ValidatorConfiguration {
-  createGroupModelValidation() {
-    const slug = this.required("episode", {
-      label: "آدرس اینترنتی ژانر",
-    }).custom((slug) => slugify(slug));
+export class GroupingModelsValidator {
+  createValidation(entityKey: EntityKey) {
+    const entityName = ENTITY_NAMES[entityKey];
 
-    return this.createValidation([
-      slug,
-      this.required("name", { label: "نام ژانر" }),
+    const entitySlug = required(entityKey, {
+      label: `آدرس اینترنتی ${entityName}`,
+    }).custom((value) => slugify(value));
+
+    return createValidation([
+      entitySlug,
+      required("name", { label: `نام ${entityName}` }),
     ]);
   }
 
-  updateGroupModelValidation() {
-    const slug = this.required("episode", {
-      label: "آدرس اینترنتی ژانر",
-    })
-      .ifExists()
-      .custom((slug) => slugify(slug));
+  updateValidation(entityKey: EntityKey) {
+    const entityName = ENTITY_NAMES[entityKey];
 
-    return this.createValidation([
-      this.required("name", { label: "نام ژانر" }),
-      slug,
-      this.slug(),
+    const entitySlug = required(entityKey, {
+      label: `آدرس اینترنتی ${entityName}`,
+    })
+      .optional()
+      .ifExists()
+      .custom((value) => slugify(value));
+
+    return createValidation([
+      entitySlug,
+      required("name", { label: `نام ${entityName}` }).optional(),
+      slugValidator(),
     ]);
   }
 }
-
-export default GroupingModelsValidator;

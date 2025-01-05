@@ -2,13 +2,21 @@ import { Response } from "express";
 
 import { $Enums, Prisma, User } from "@prisma/client";
 
-import ControllerConfiguration from "@/controllers/configuration.controller";
+import SHARED_MESSAGES from "@/constants/messages";
+import { sharedUserService } from "@/services";
 import { EmptyObject, PaginateQuery, UserAuthorizedReq } from "@/types";
-import { hashPassword, pick, pickUserData, removeFile } from "@/utils";
+import {
+  badRequest,
+  hashPassword,
+  pick,
+  pickUserData,
+  removeFile,
+  successfulResponse,
+} from "@/utils";
 
-import MESSAGES from "../constants/messages";
-import DB from "../db";
-import { hasUserPermission } from "../lib/permissions";
+import userLogger from "../constants/logger";
+import USER_MESSAGES from "../constants/messages";
+import userService from "../services/user.db";
 import { pickUserCreateData } from "../utils";
 
 type CreateUserReqBody = Pick<
@@ -32,23 +40,20 @@ type EditProfileReq = UserAuthorizedReq<
     fullName: string;
   }>
 >;
-
-type DeleteUserReq = UserAuthorizedReq<{ userToDelete: User }>;
-
-class CrudController extends ControllerConfiguration {
+class CrudController {
   getUser(req: UserAuthorizedReq, res: Response) {
     const { user } = req.body;
 
-    this.successfulResponse({ res, data: { user: pickUserData(user) } });
+    successfulResponse({ res, data: { user: pickUserData(user) } });
   }
 
   async getAll(
     req: UserAuthorizedReq<EmptyObject, PaginateQuery>,
     res: Response
   ) {
-    const users = await DB.user.getAll(req.query);
+    const users = await userService.getAll(req.query);
 
-    this.successfulResponse({ res, data: { users } });
+    successfulResponse({ res, data: { users } });
   }
 
   async createUser(req: CreateUserReq, res: Response) {
@@ -60,30 +65,25 @@ class CrudController extends ControllerConfiguration {
 
     const hashedPassword = await hashPassword(password);
 
-    const user = await DB.user.create({
+    const user = await sharedUserService.create({
       ...restData,
       password: hashedPassword,
       roles: { set: roles },
     });
 
-    const { create: createMessage } = this.SHARED_MESSAGES.features.crud;
+    userLogger.info("User created.", pickUserData(user));
 
-    this.successfulResponse({
-      res,
-      message: createMessage(MESSAGES.crud.action(user.email, user.fullName)),
-    });
+    const { create: createMessage } = SHARED_MESSAGES.features.crud;
+
+    const message = createMessage(USER_MESSAGES.crud.action(user));
+
+    successfulResponse({ res, message });
   }
 
   async updateUser(req: UpdateUserReq, res: Response) {
-    const { user, userToUpdate } = req.body;
-
-    if (!hasUserPermission(user, "update", userToUpdate)) {
-      return this.forbidden(res);
-    }
-
-    const { role, password, ...restData } = pickUserCreateData(
+    const { role, password, userToUpdate, ...restData } = pickUserCreateData(
       req
-    ) as Partial<CreateUserReqBody>;
+    ) as Partial<CreateUserReqBody> & { userToUpdate: User };
 
     const data: Prisma.UserUpdateInput = restData;
 
@@ -95,26 +95,30 @@ class CrudController extends ControllerConfiguration {
       const hashedPassword = await hashPassword(password);
       const isSamePassword =
         hashedPassword === userToUpdate.password ||
-        user.oldPasswords.includes(hashedPassword);
+        userToUpdate.oldPasswords.includes(hashedPassword);
 
       if (isSamePassword) {
-        return this.badRequest(res, MESSAGES.crud.samePassword);
+        return badRequest(res, USER_MESSAGES.crud.samePassword);
       }
 
       data.password = hashedPassword;
       data.oldPasswords = { push: userToUpdate.password };
     }
 
-    const updatedUser = await DB.user.update(userToUpdate.id, data);
+    const updatedUser = await userService.update(userToUpdate.id, data);
 
-    const { update: updateMessage } = this.SHARED_MESSAGES.features.crud;
+    const { user } = req.body;
 
-    this.successfulResponse({
-      res,
-      message: updateMessage(
-        MESSAGES.crud.action(updatedUser.email, updatedUser.fullName)
-      ),
+    userLogger.info("User updated.", {
+      oldUser: pickUserData(user),
+      newUser: pickUserData(updatedUser),
     });
+
+    const { update: updateMessage } = SHARED_MESSAGES.features.crud;
+
+    const message = updateMessage(USER_MESSAGES.crud.action(updatedUser));
+
+    successfulResponse({ res, message });
   }
 
   async editProfile(req: EditProfileReq, res: Response) {
@@ -130,33 +134,19 @@ class CrudController extends ControllerConfiguration {
       data.avatarImage = req.file.path;
     }
 
-    await Promise.all([
-      DB.user.update(user.id, data),
+    const [updatedUser] = await Promise.all([
+      userService.update(user.id, data),
       ...(user.avatarImage != null ? [removeFile(user.avatarImage)] : []),
     ]);
 
-    this.successfulResponse({
-      res,
-      message: MESSAGES.editProfile,
+    userLogger.info("User profile edited.", {
+      oldUser: pickUserData(user),
+      newUser: pickUserData(updatedUser),
     });
-  }
 
-  async deleteUser(req: DeleteUserReq, res: Response) {
-    const { user, userToDelete } = req.body;
-
-    if (!hasUserPermission(user, "delete", userToDelete)) {
-      return this.forbidden(res);
-    }
-
-    const deletedUser = await DB.user.delete(userToDelete.id);
-
-    const { delete: deleteMessage } = this.SHARED_MESSAGES.features.crud;
-
-    this.successfulResponse({
+    successfulResponse({
       res,
-      message: deleteMessage(
-        MESSAGES.crud.action(deletedUser.email, deletedUser.fullName)
-      ),
+      message: USER_MESSAGES.editProfile,
     });
   }
 }

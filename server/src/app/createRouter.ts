@@ -5,13 +5,10 @@ import createAuthRouter from "@/router/auth/router";
 import createProductRouter from "@/router/product/router";
 import createUserRouter from "@/router/user/router";
 
-function createRouter() {
-  const router = Router();
+const router = Router();
 
-  router.use(BASE_PATH.auth, createAuthRouter());
-  router.use(BASE_PATH.user, createUserRouter());
-  router.use(BASE_PATH.product, createProductRouter());
-  return router;
-}
+router.use(BASE_PATH.auth, createAuthRouter());
+router.use(BASE_PATH.user, createUserRouter());
+router.use(BASE_PATH.product, createProductRouter());
 
-export default createRouter;
+export default router;

@@ -27,7 +27,7 @@ export function createProductImageUploader() {
       );
 
       const [error] = await withCatch(fs.access(uploadPath));
-      if (error) {
+      if (error != null) {
         await fs.mkdir(uploadPath, { recursive: true });
       }
 

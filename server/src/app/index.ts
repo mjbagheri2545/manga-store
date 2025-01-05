@@ -2,6 +2,7 @@ import http from "http";
 
 import env from "@/constants/env";
 import { errorLogger } from "@/constants/loggers";
+import { getError } from "@/utils";
 
 import createApp from "./createApp";
 
@@ -15,7 +16,7 @@ function createServer() {
   const signals: NodeJS.Signals[] = ["SIGTERM", "SIGINT", "SIGUSR2"];
   signals.forEach((signal) => {
     process.once(signal, () => {
-      server.close((error) => errorLogger.log("error", error?.message));
+      server.close((error) => errorLogger.error(getError(error)));
     });
   });
 }

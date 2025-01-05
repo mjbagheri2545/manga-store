@@ -1,13 +1,11 @@
-import createLoggerConfig from "./logger.config";
-import createMimeConfig from "./mime.config";
-import createTimeConfig from "./time.config";
-import createValidationConfig from "./validation.config";
+import loggerConfig from "./logger.config";
+import timeConfig from "./time.config";
+import validationConfig from "./validation.config";
 
 const SHARED_CONFIG = {
-  logger: createLoggerConfig(),
-  validation: createValidationConfig(),
-  time: createTimeConfig(),
-  mime: createMimeConfig(),
+  logger: loggerConfig,
+  validation: validationConfig,
+  time: timeConfig,
   defaultQueryTake: 20,
 };
 

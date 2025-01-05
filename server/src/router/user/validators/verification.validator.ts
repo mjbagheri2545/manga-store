@@ -1,8 +1,10 @@
-import AccountValidator from "./account.validator";
+import { createValidation } from "@/validators";
 
-class VerificationValidator extends AccountValidator {
+import { verificationCodeValidator } from "./account.validator";
+
+class VerificationValidator {
   verifyValidation() {
-    return this.createValidation([this.verificationCode()]);
+    return createValidation([verificationCodeValidator()]);
   }
 }
 

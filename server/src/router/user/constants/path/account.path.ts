@@ -1,19 +1,17 @@
-function createAccountPath() {
-  return {
-    verification: {
-      base: "/account/verification",
-      getEmail: "/get-email",
-      verify: "/:verificationCode",
+const userAccountPath = {
+  verification: {
+    base: "/account/verification",
+    getEmail: "/get-email",
+    verify: "/:verificationCode",
+  },
+  password: {
+    base: "/account/password",
+    recovery: {
+      getEmail: "/recovery/get-email",
+      recover: "/recovery/:verificationCode",
     },
-    password: {
-      base: "/account/password",
-      recovery: {
-        getEmail: "/recovery/get-email",
-        recover: "/recovery/:verificationCode",
-      },
-      reset: "/reset",
-    },
-  } as const;
-}
+    reset: "/reset",
+  },
+} as const;
 
-export default createAccountPath;
+export default userAccountPath;

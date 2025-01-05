@@ -1,12 +1,13 @@
 import { createGroupingModelsRouter } from "@/utils";
 
-import DB from "../db";
+import tagLogger from "../constants/logger";
+import tagService from "../services";
 
 function createTagRouter() {
   const router = createGroupingModelsRouter({
-    entityName: "ژانر",
-    DB,
-    entitiesKey: "tags",
+    service: tagService,
+    entityKey: "tag",
+    logger: tagLogger,
   });
 
   return router;

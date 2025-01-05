@@ -1,20 +1,19 @@
 import { Router } from "express";
 
+import { emailAuthorization, jwtAuthorization } from "@/middlewares";
+
 import PATH from "../constants/path";
 import PasswordController from "../controllers/password.controller";
+import {
+  emailTypeHandler,
+  sendIdentityVerificationEmail,
+} from "../middlewares";
 import PasswordValidator from "../validators/password.validator";
 
 function createPasswordRouter() {
   const router = Router();
 
-  const {
-    jwtAuthorization,
-    emailAuthorization,
-    sendIdentityVerificationEmail,
-    emailTypeHandler,
-    reset,
-    recover,
-  } = new PasswordController();
+  const { reset, recover } = new PasswordController();
 
   const { getEmailValidation, recoverValidation, resetValidation } =
     new PasswordValidator();

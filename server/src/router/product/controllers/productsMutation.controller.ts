@@ -2,13 +2,17 @@ import { Response } from "express";
 
 import { Prisma, Product } from "@prisma/client";
 
-import ControllerConfiguration from "@/controllers/configuration.controller";
+import SHARED_MESSAGES from "@/constants/messages";
 import { EmptyObject, UserAuthorizedReq } from "@/types";
-import { newModelConnectionWithId, removeFile } from "@/utils";
+import {
+  newModelConnectionWithId,
+  removeFile,
+  successfulResponse,
+} from "@/utils";
 
-import MESSAGES from "../constants/messages";
-import DB from "../db";
-import { hasProductPermission } from "../lib/permissions";
+import productLogger from "../constants/logger";
+import PRODUCT_MESSAGES from "../constants/messages";
+import productService from "../services";
 import { getTagsData, pickProductCreateData } from "../utils";
 
 type CreateProductReqBody = Pick<
@@ -45,8 +49,7 @@ type UpdateRatingReq = UserAuthorizedReq<
   { productId: string }
 >;
 
-type DeleteReq = UserAuthorizedReq<{ product: ProductResponse }>;
-class ProductsMutationController extends ControllerConfiguration {
+class ProductsMutationController {
   async createProduct(req: CreateProductReq, res: Response) {
     const { categoryId, tagsId, statusId, managerId } = req.body;
 
@@ -62,24 +65,26 @@ class ProductsMutationController extends ControllerConfiguration {
       managerId,
     };
 
-    const product = await DB.create(createOptions);
+    const product = await productService.create(createOptions);
 
-    const { create: createMessage } = this.SHARED_MESSAGES.features.crud;
+    productLogger.info("Product created.", product);
 
-    this.successfulResponse({
-      res,
-      message: createMessage(`محصول با ${product.name}`),
-    });
+    const { create: createMessage } = SHARED_MESSAGES.features.crud;
+
+    const message = createMessage(PRODUCT_MESSAGES.crud(product));
+
+    successfulResponse({ res, message });
   }
 
   async updateProduct(req: UpdateProductReq, res: Response) {
-    const { user, product } = req.body;
-
-    if (!hasProductPermission(user, "update", product)) {
-      return this.forbidden(res);
-    }
-
-    const { user: _, categoryId, tagsId = [], statusId, managerId } = req.body;
+    const {
+      user: _,
+      categoryId,
+      tagsId = [],
+      statusId,
+      managerId,
+      product,
+    } = req.body;
 
     const tagsConnection = getTagsData(tagsId, product.tags);
 
@@ -102,16 +107,20 @@ class ProductsMutationController extends ControllerConfiguration {
     }
 
     const [updatedProduct] = await Promise.all([
-      DB.update(product.id, finalData),
+      productService.update(product.id, finalData),
       removeFile(product.productImage),
     ]);
 
-    const { update: updateMessage } = this.SHARED_MESSAGES.features.crud;
-
-    this.successfulResponse({
-      res,
-      message: updateMessage(`محصول با ${updatedProduct.name}`),
+    productLogger.info("Product updated.", {
+      originalProduct: product,
+      updatedProduct,
     });
+
+    const { update: updateMessage } = SHARED_MESSAGES.features.crud;
+
+    const message = updateMessage(PRODUCT_MESSAGES.crud(updatedProduct));
+
+    successfulResponse({ res, message });
   }
 
   async updateProductRating(req: UpdateRatingReq, res: Response) {
@@ -120,27 +129,20 @@ class ProductsMutationController extends ControllerConfiguration {
       params: { productId },
     } = req;
 
-    await DB.updateRating({ productId, ratedById: user.id, rating });
-
-    this.successfulResponse({
-      res,
-      message: MESSAGES.updateRating,
+    const updatedProduct = await productService.updateRating({
+      productId,
+      ratedById: user.id,
+      rating,
     });
-  }
 
-  async deleteProduct(req: DeleteReq, res: Response) {
-    const { user, product } = req.body;
+    productLogger.info("Product rating updated.", {
+      rating,
+      newProductRating: updatedProduct.averageRating?.rating,
+    });
 
-    if (!hasProductPermission(user, "delete", product)) {
-      return this.forbidden(res);
-    }
-
-    const deletedProduct = await DB.delete(product.id);
-
-    const { delete: deleteMessage } = this.SHARED_MESSAGES.features.crud;
-    this.successfulResponse({
+    successfulResponse({
       res,
-      message: deleteMessage(`محصول با ${deletedProduct.name}`),
+      message: PRODUCT_MESSAGES.updateRating,
     });
   }
 }

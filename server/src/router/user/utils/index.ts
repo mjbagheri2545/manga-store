@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import { v4 as uuidV4 } from "uuid";
+import { User } from "@prisma/client";
 
 import SHARED_CONFIG from "@/constants/config";
 import { EmptyObject, IdentityVerificationReq } from "@/types";
@@ -8,7 +9,7 @@ import { badRequest, getExpirationTime, isExpired, pick } from "@/utils";
 
 import CONFIG from "../constants/config";
 import MESSAGES from "../constants/messages";
-import DB from "../db";
+import tokenService from "../services/token.db";
 
 export async function generateVerificationToken(userId: string) {
   const uuid = uuidV4();
@@ -16,7 +17,7 @@ export async function generateVerificationToken(userId: string) {
 
   const expirationTime = getIdentificationExpirationTime();
 
-  await DB.token.create(userId, {
+  await tokenService.create(userId, {
     verificationCode,
     expirationTime,
   });
@@ -56,7 +57,10 @@ export async function identityVerification<Body = EmptyObject>(
   const { user } = req.body;
   const { verificationCode } = req.params;
 
-  const token = await DB.token.getByUserIdAndValue(user.id, verificationCode);
+  const token = await tokenService.getByUserIdAndValue(
+    user.id,
+    verificationCode
+  );
 
   if (token == null || isExpired(token?.expirationTime)) {
     return badRequest(res, {
@@ -75,5 +79,10 @@ export function pickUserCreateData(req: Request) {
     "role",
     "bio",
     "walletBalance",
+    "userToUpdate",
   ]);
+}
+
+export function userLoggerData(user: User) {
+  return userLoggerData(user);
 }

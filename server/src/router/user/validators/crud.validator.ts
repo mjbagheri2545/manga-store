@@ -1,10 +1,23 @@
-import AuthUserValidator from "@/validators/auth_user.validator";
+import autoBind from "auto-bind";
+
+import {
+  createValidation,
+  emailNotInUseValidator,
+  fullNameValidator,
+  newPasswordConfirmationValidator,
+  newPasswordValidator,
+  required,
+  slugValidator,
+} from "@/validators";
 
 import MESSAGES from "../constants/messages";
 
-class CrudValidator extends AuthUserValidator {
+class CrudValidator {
+  constructor() {
+    autoBind(this);
+  }
   private role() {
-    return this.string("role")
+    return required("role", { label: "سطح دسترسی" })
       .custom((value) => {
         const roles = ["admin", "manager", "translator", "user"];
 
@@ -17,26 +30,27 @@ class CrudValidator extends AuthUserValidator {
   }
 
   private walletBalance() {
-    return this.required("walletBalance", {
+    return required("walletBalance", {
       label: "موجودی کیف پول",
     });
   }
 
   private bio() {
-    return this.required("bio", { label: "بیوگرافی" }).optional();
+    return required("bio", { label: "بیوگرافی" }).optional();
   }
 
   private getCreateUserValidation() {
     return [
-      this.emailNotInUse(),
-      this.fullName(),
+      emailNotInUseValidator(),
+      fullNameValidator(),
       this.role(),
-      this.newPassword(),
+      newPasswordValidator(),
+      newPasswordConfirmationValidator(),
     ];
   }
 
   createUserValidation() {
-    return this.createValidation([
+    return createValidation([
       ...this.getCreateUserValidation(),
       this.bio(),
       this.walletBalance().toInt(),
@@ -50,18 +64,18 @@ class CrudValidator extends AuthUserValidator {
 
     const walletBalance = this.walletBalance().optional().ifExists().toInt();
 
-    return this.createValidation([
+    return createValidation([
       ...optionalFields,
-      this.slug(),
+      slugValidator(),
       this.bio(),
       walletBalance,
     ]);
   }
 
   editProfileValidation() {
-    return this.createValidation([
-      this.emailNotInUse(),
-      this.fullName(),
+    return createValidation([
+      emailNotInUseValidator(),
+      fullNameValidator(),
       this.bio(),
     ]);
   }

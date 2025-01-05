@@ -1,14 +1,26 @@
+import { Response } from "express";
+
 import { createTransport, SendMailOptions, Transporter } from "nodemailer";
 import { Address } from "nodemailer/lib/mailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import env from "@/constants/env";
-import { EmptyObject, TypeOrTypeArray } from "@/types";
+import { emailLogger } from "@/constants/loggers";
+import SHARED_MESSAGES from "@/constants/messages";
+import STATUS_CODES from "@/constants/statusCodes";
+import { sharedUserService } from "@/services";
+import { EmptyObject, SendEmailReq, TypeOrTypeArray } from "@/types";
 
 import compileHandlebarsTemplate, {
   CompileHandlebarsTemplateOptions,
 } from "./compileHandlebarsTemplate.util";
-import { parseTypeOrTypeArray, pick, startCase } from "./general.util";
+import { getErrorMessageForLogger, withCatch } from "./error.util";
+import {
+  getEmailRemainingTime,
+  parseTypeOrTypeArray,
+  startCase,
+} from "./general.util";
+import { failedResponse, successfulResponse } from "./response.util";
 
 export type EmailRecipient = string | Address;
 export type EmailRecipients = EmailRecipient[];
@@ -25,11 +37,11 @@ type MainTemplateVariables = {
   appName: string;
 };
 
-export type EmailResponse = {
+type EmailResponse = {
   isSuccessful: boolean;
-} & SMTPTransport.SentMessageInfo;
+} & Pick<SMTPTransport.SentMessageInfo, "accepted" | "rejected">;
 
-export class Email<TemplateVariables = EmptyObject> {
+class Email<TemplateVariables = EmptyObject> {
   private transporter: Transporter<SMTPTransport.SentMessageInfo>;
   private subject: string;
   private templateOptions: CompileHandlebarsTemplateOptions;
@@ -88,37 +100,64 @@ export class Email<TemplateVariables = EmptyObject> {
       html: this.html,
     };
 
-    const emailResponse = await this.transporter.sendMail(emailOptions);
+    const loggerFunction = (error: Error) => {
+      emailLogger.error(getErrorMessageForLogger(error), {
+        retry: this.tryingTime,
+        accepted: this.recipients.accepted,
+        rejected: this.recipients.rejected,
+      });
+    };
+
+    const [error, emailResponse] = await withCatch(
+      this.transporter.sendMail(emailOptions),
+      loggerFunction
+    );
 
     this.tryingTime += 1;
+
+    if (error != null) {
+      const recipientsToSend = this.recipients.users.filter(
+        (user) => !this.recipients.accepted.includes(user)
+      );
+
+      return this.sendEmail(recipientsToSend);
+    }
+
     this.recipients.accepted = this.recipients.accepted.concat(
       emailResponse.accepted
     );
+
     this.recipients.rejected = this.recipients.rejected.concat(
       emailResponse.rejected
     );
 
-    if (
+    const isRetrying =
       emailResponse.accepted.length !== recipients.length &&
-      this.tryingTime < 3
-    ) {
-      return await this.sendEmail(emailResponse.rejected);
-    } else {
-      return {
-        isSuccessful:
-          this.recipients.rejected.length === this.recipients.users.length
-            ? false
-            : true,
-        accepted: this.recipients.accepted,
-        rejected: this.recipients.rejected,
-        ...pick(emailResponse, [
-          "messageId",
-          "envelope",
-          "pending",
-          "response",
-        ]),
-      };
+      this.tryingTime < 3;
+
+    if (isRetrying) {
+      return this.sendEmail(emailResponse.rejected);
     }
+
+    const isSuccessful =
+      this.recipients.rejected.length === this.recipients.users.length;
+
+    const data = {
+      accepted: this.recipients.accepted,
+      rejected: this.recipients.rejected,
+    };
+
+    emailLogger[isSuccessful ? "info" : "error"](
+      `email with status: ${isSuccessful ? "successful " : "failed"}`,
+      {
+        from: env.EMAIL_SERVICE_FROM,
+        recipients: this.recipients.users,
+        subject: startCase(this.subject),
+        ...data,
+      }
+    );
+
+    return { isSuccessful, ...data };
   }
 
   createTransporter() {
@@ -130,4 +169,54 @@ export class Email<TemplateVariables = EmptyObject> {
       },
     });
   }
+}
+
+type SendEmailOptions<T> = {
+  subject: string;
+  templateVariables: T;
+  templateOptions: CompileHandlebarsTemplateOptions;
+  isSendResponseNeed?: boolean;
+};
+
+export function sendEmail<T>({
+  subject,
+  isSendResponseNeed = true,
+  ...restOptions
+}: SendEmailOptions<T>) {
+  return async (req: SendEmailReq, res: Response) => {
+    const { user, email } = req.body;
+    const finalEmail = email ?? user.email;
+
+    const emailSender = new Email({
+      subject,
+      users: [finalEmail],
+      ...restOptions,
+    });
+    const { isSuccessful } = await emailSender.send();
+
+    if (!isSuccessful) {
+      const { failed: failedMessage } = SHARED_MESSAGES.general.sendEmail;
+
+      return failedResponse({
+        res,
+        code: STATUS_CODES.internalServerError,
+        message: failedMessage,
+      });
+    }
+
+    const remainingTime = getEmailRemainingTime();
+    await sharedUserService.setEmailRemainingTime(finalEmail, remainingTime);
+
+    if (!isSendResponseNeed) return;
+
+    const { successful: successfulMessage } = SHARED_MESSAGES.general.sendEmail;
+
+    successfulResponse({
+      res,
+      message: successfulMessage(email),
+      data: {
+        remainingTime,
+      },
+    });
+  };
 }

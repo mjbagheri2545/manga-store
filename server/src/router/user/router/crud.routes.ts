@@ -5,13 +5,28 @@
 
 import { Router } from "express";
 
-import SHARED_CONFIG from "@/constants/config";
-import { createUploader } from "@/utils";
+import { User } from "@prisma/client";
 
+import SHARED_MESSAGES from "@/constants/messages";
+import {
+  allResourcePermission,
+  idAuthorization,
+  imageAuthorization,
+  jwtAuthorization,
+  specificResourcePermission,
+} from "@/middlewares";
+import { deleteEntity } from "@/middlewares/features/crud.middleware";
+import { sharedUserService } from "@/services";
+import { createUploader } from "@/utils";
+import { slugValidation } from "@/validators";
+
+import userLogger from "../constants/logger";
+import USER_MESSAGES from "../constants/messages";
 import PATH from "../constants/path";
 import CrudController from "../controllers/crud.controller";
-import DB from "../db";
 import { hasUserPermission } from "../lib/permissions";
+import userService from "../services/user.db";
+import { userLoggerData } from "../utils";
 import CrudValidator from "../validators/crud.validator";
 
 function createUserCrudRoutes(router: Router) {
@@ -19,65 +34,60 @@ function createUserCrudRoutes(router: Router) {
     "../../../../uploads/avatarImage/"
   );
 
-  const {
-    jwtAuthorization,
-    permissionAuthorization,
-    fileAuthorization,
-    getById,
-    getUser,
-    getAll,
-    createUser,
-    updateUser,
-    editProfile,
-    deleteUser,
-  } = new CrudController();
+  const { getUser, getAll, createUser, updateUser, editProfile } =
+    new CrudController();
 
-  const {
-    slugValidation,
-    createUserValidation,
-    updateUserValidation,
-    editProfileValidation,
-  } = new CrudValidator();
+  const { createUserValidation, updateUserValidation, editProfileValidation } =
+    new CrudValidator();
+
+  const viewPermission = allResourcePermission((user) =>
+    hasUserPermission(user, "view")
+  );
 
   router.get(PATH.getByToken, jwtAuthorization, getUser);
-  router.get(
-    "/",
-    jwtAuthorization,
-    permissionAuthorization((user) => hasUserPermission(user, "view")),
-    getAll
-  );
+  router.get("/", jwtAuthorization, viewPermission, getAll);
   router.get(
     "/:id",
     slugValidation(),
-    getById({
+    idAuthorization({
       entityKey: "user",
-      entityName: "کاربری",
-      getByIdQuery: DB.user.getById,
+      getByIdQuery: sharedUserService.getById,
     }),
     getUser
+  );
+
+  const createPermission = allResourcePermission((user) =>
+    hasUserPermission(user, "create")
   );
 
   router.post(
     "/",
     createUserValidation(),
     jwtAuthorization,
-    permissionAuthorization((user) => hasUserPermission(user, "create")),
+    createPermission,
     avatarImageUploader.single("avatarImage"),
-    fileAuthorization(SHARED_CONFIG.mime.image),
+    imageAuthorization(),
     createUser
   );
+
+  const updatePermission = specificResourcePermission<User>({
+    entityKey: "userToUpdate",
+    hasPermission: (user, userToUpdate) =>
+      hasUserPermission(user, "update", userToUpdate),
+  });
 
   router.put(
     "/:id",
     updateUserValidation(),
     jwtAuthorization,
-    getById({
+    idAuthorization({
       entityKey: "userToUpdate",
       entityName: "کاربری",
-      getByIdQuery: DB.user.getById,
+      getByIdQuery: sharedUserService.getById,
     }),
+    updatePermission,
     avatarImageUploader.single("avatarImage"),
-    fileAuthorization(SHARED_CONFIG.mime.image),
+    imageAuthorization(),
     updateUser
   );
 
@@ -86,20 +96,35 @@ function createUserCrudRoutes(router: Router) {
     editProfileValidation(),
     jwtAuthorization,
     avatarImageUploader.single("avatarImage"),
-    fileAuthorization(SHARED_CONFIG.mime.image),
+    imageAuthorization(),
     editProfile
   );
+
+  function userDeleteMessage(user: User) {
+    const { delete: deleteMessage } = SHARED_MESSAGES.features.crud;
+    userLogger.info("User deleted.", userLoggerData(user));
+
+    return deleteMessage(USER_MESSAGES.crud.action(user));
+  }
+
+  const userToDelete = deleteEntity({
+    delete: userService.delete,
+    entityKey: "userToDelete",
+    hasPermission: (user, userToDelete) =>
+      hasUserPermission(user, "delete", userToDelete),
+    message: userDeleteMessage,
+  });
 
   router.delete(
     "/:id",
     slugValidation(),
     jwtAuthorization,
-    getById({
+    idAuthorization({
       entityKey: "userToDelete",
       entityName: "کاربری",
-      getByIdQuery: DB.user.getById,
+      getByIdQuery: sharedUserService.getById,
     }),
-    deleteUser
+    userToDelete
   );
 }
 

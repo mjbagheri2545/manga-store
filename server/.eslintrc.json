@@ -2,7 +2,12 @@
   "root": true,
   "env": { "node": true, "es2022": true },
   "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
-  "ignorePatterns": ["dist", ".eslintrc.json"],
+  "ignorePatterns": [
+    "dist",
+    ".eslintrc.json",
+    ".eslintrc.pre-commit.json",
+    "scripts"
+  ],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module"
@@ -33,11 +38,12 @@
         "pattern": [
           "src/constants/**/*",
           "src/lib/**/*",
-          "src/controllers/**/*",
           "src/utils/**/*",
           "src/types/**/*",
+          "src/controllers/**/*",
+          "src/middlewares/**/*",
           "src/templates/**/*",
-          "src/db/**/*",
+          "src/services/**/*",
           "src/validators/**/*"
         ]
       },
@@ -51,16 +57,6 @@
         "mode": "full",
         "type": "app",
         "pattern": ["src/app/**/*"]
-      },
-      {
-        "mode": "full",
-        "type": "helper",
-        "pattern": ["src/helpers/**/*"]
-      },
-      {
-        "mode": "full",
-        "type": "controller",
-        "pattern": ["src/controllers/**/*"]
       },
       {
         "mode": "file",
@@ -105,13 +101,12 @@
             "from": ["router"],
             "allow": [
               "shared",
-              "controller",
               ["router", { "routerName": "${from.routerName}" }]
             ]
           },
           {
             "from": ["app"],
-            "allow": ["shared", "router", "app", "controller"]
+            "allow": ["shared", "router", "app"]
           },
           {
             "from": ["entryPoint"],

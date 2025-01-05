@@ -1,28 +1,41 @@
-import AccountValidator from "./account.validator";
+import autoBind from "auto-bind";
 
-class PasswordValidator extends AccountValidator {
+import {
+  createValidation,
+  currentPasswordValidator,
+  emailValidator,
+  newPasswordConfirmationValidator,
+  newPasswordValidator,
+} from "@/validators";
+
+import { verificationCodeValidator } from "./account.validator";
+
+class PasswordValidator {
+  constructor() {
+    autoBind(this);
+  }
   private getChangePasswordValidation() {
     return [
-      this.newPassword("newPassword", "رمز عبور جدید"),
-      this.newPasswordConfirmation("newPassword", "تایید رمز عبور جدید"),
+      newPasswordValidator("newPassword", "رمز عبور جدید"),
+      newPasswordConfirmationValidator("newPassword", "تایید رمز عبور جدید"),
     ];
   }
 
   getEmailValidation() {
-    return this.createValidation([this.email()]);
+    return createValidation([emailValidator()]);
   }
 
   recoverValidation() {
-    return this.createValidation([
-      this.verificationCode(),
-      this.email(),
+    return createValidation([
+      verificationCodeValidator(),
+      emailValidator(),
       ...this.getChangePasswordValidation(),
     ]);
   }
 
   resetValidation() {
-    return this.createValidation([
-      this.currentPassword("currentPassword", "رمز عبور فعلی"),
+    return createValidation([
+      currentPasswordValidator("currentPassword", "رمز عبور فعلی"),
       ...this.getChangePasswordValidation(),
     ]);
   }
