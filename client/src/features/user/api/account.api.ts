@@ -1,81 +1,89 @@
 import { z } from "zod";
 
-import ApiConfiguration from "@/api/configuration.api";
+import PATH from "@/constants/path";
+import { HTTP } from "@/lib/http";
 
-import SCHEMA from "../schema";
+import USER_ACCOUNT_SCHEMA from "../schema/account.schema";
 
-export type VerificationVerifyData = z.infer<typeof SCHEMA.verification.verify>;
+export type AccountVerificationVerifyData = z.infer<
+  typeof USER_ACCOUNT_SCHEMA.verification.verify
+>;
 
 export type PasswordRecoveryGetEmailData = z.infer<
-  typeof SCHEMA.password.recovery.getEmail
+  typeof USER_ACCOUNT_SCHEMA.password.recovery.getEmail
 >;
 export type PasswordRecoveryRecoverData = z.infer<
-  typeof SCHEMA.password.recovery.recover
+  typeof USER_ACCOUNT_SCHEMA.password.recovery.recover
 > & {
   email: string;
 };
 
-export type PasswordResetData = z.infer<typeof SCHEMA.password.reset>;
+export type PasswordResetData = z.infer<
+  typeof USER_ACCOUNT_SCHEMA.password.reset
+>;
 
-class AccountApi extends ApiConfiguration {
+class UserAccountApi {
   readonly password;
   readonly verification;
 
   constructor() {
-    super();
     this.verification = this.createVerificationApi();
     this.password = this.createPasswordApi();
   }
 
   private createVerificationApi() {
-    const {
-      HTTP,
-      PATH: {
-        user: {
-          account: { verification },
-        },
-      },
-    } = this;
+    const { verification: verificationPath } = PATH.user.account;
 
     return {
       getEmail() {
-        return HTTP.post(verification.getEmail);
+        return HTTP.post(
+          PATH.user.getFullPath(`${verificationPath}/get-email`)
+        );
       },
-      verify({ verificationCode }: VerificationVerifyData) {
-        return HTTP.put(`${verification.verify}/${verificationCode}`);
+      verify({ verificationCode }: AccountVerificationVerifyData) {
+        return HTTP.put(
+          PATH.user.getFullPath(`${verificationPath}/${verificationCode}`)
+        );
       },
     };
   }
 
   private createPasswordApi() {
-    const {
-      HTTP,
-      PATH: {
-        user: {
-          account: { password },
-        },
-      },
-    } = this;
+    const { password: passwordPath } = PATH.user.account;
 
     return {
       recovery: {
         getEmail(data: PasswordRecoveryGetEmailData) {
-          return HTTP.post(password.recovery.getEmail, { data });
+          return HTTP.post(
+            PATH.user.getFullPath(`${passwordPath.recovery}/get-email`),
+            {
+              data,
+            }
+          );
         },
+
         recover({
           verificationCode,
           ...restData
         }: PasswordRecoveryRecoverData) {
-          return HTTP.put(`${password.recovery.recover}/${verificationCode}`, {
-            data: restData,
-          });
+          return HTTP.put(
+            PATH.user.getFullPath(
+              `${passwordPath.recovery}/${verificationCode}`
+            ),
+            {
+              data: restData,
+            }
+          );
         },
       },
+
       reset(data: PasswordResetData) {
-        return HTTP.put(password.reset, { data });
+        return HTTP.put(passwordPath.reset, { data });
       },
     };
   }
 }
 
-export default AccountApi;
+const userAccountApi = new UserAccountApi();
+
+export default userAccountApi;

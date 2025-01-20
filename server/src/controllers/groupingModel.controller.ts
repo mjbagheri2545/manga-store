@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 
-import winston from "winston";
-
 import { ENTITY_NAMES } from "@/constants/entities";
 import SHARED_MESSAGES from "@/constants/messages";
 import {
@@ -10,7 +8,7 @@ import {
   GroupingModelsService,
   UserAuthorizedReq,
 } from "@/types";
-import { successfulResponse } from "@/utils";
+import { CustomLogger, successfulResponse, upperFirst } from "@/utils";
 
 type CreateEntityReqBody = {
   slug: string;
@@ -35,7 +33,7 @@ function getPluralName(key: GroupingModelsEntityKey) {
 export type GroupingModelsControllerOptions<T extends GroupingModels> = {
   entityKey: GroupingModelsEntityKey;
   service: GroupingModelsService<T>;
-  logger: winston.Logger;
+  logger: CustomLogger;
 };
 
 class GroupingModelsController<T extends GroupingModels> {
@@ -55,7 +53,7 @@ class GroupingModelsController<T extends GroupingModels> {
     this.logger = logger;
   }
 
-  async getAll(_req: UserAuthorizedReq, res: Response) {
+  async getAllEntities(_req: UserAuthorizedReq, res: Response) {
     const entities = await this.service.getAll();
 
     const entitiesKey = getPluralName(this.entityKey);
@@ -68,7 +66,9 @@ class GroupingModelsController<T extends GroupingModels> {
 
     const entity = await this.service.create({ name, slug });
 
-    this.logger.info(`${this.entityKey} created.`, entity);
+    this.logger.logMessage(`${this.entityKey} created.`, {
+      metaData: { [this.entityKey]: entity },
+    });
 
     const { crud: crudMessage, groupingModel: groupingModelMessage } =
       SHARED_MESSAGES.features;
@@ -85,7 +85,15 @@ class GroupingModelsController<T extends GroupingModels> {
 
     const updatedEntity = await this.service.update(entity.id, { name, slug });
 
-    this.logger.info(`${this.entityKey} updated.`, entity);
+    const metaDataKeyOld = `old${upperFirst(this.entityKey)}`;
+    const metaDataKeyUpdated = `updated${upperFirst(this.entityKey)}`;
+
+    this.logger.logMessage(`${this.entityKey} updated.`, {
+      metaData: {
+        [metaDataKeyOld]: entity,
+        [metaDataKeyUpdated]: updatedEntity,
+      },
+    });
 
     const { crud: crudMessage, groupingModel: groupingModelMessage } =
       SHARED_MESSAGES.features;

@@ -1,16 +1,23 @@
 import { Route, Routes } from "react-router-dom";
 
-import PasswordRecoveryPage from "@/pages/user/PasswordRecoveryPage";
-import VerificationVerifyPage from "@/pages/user/VerificationVerifyPage";
+import PATH from "@/constants/path";
+import AccountVerificationVerifyForm from "@/features/user/components/account/AccountVerificationVerifyForm";
+import PasswordRecoveryPage from "@/pages/user/account/PasswordRecoveryPage";
+import UserAccountPage from "@/pages/user/account/UserAccountPage";
 
 function UserRouter() {
   return (
     <Routes>
-      <Route
-        path="account/password/recovery"
-        element={<PasswordRecoveryPage />}
-      />
-      <Route path="account/verification" element={<VerificationVerifyPage />} />
+      <Route element={<UserAccountPage />}>
+        <Route
+          path={PATH.user.account.password.recovery}
+          element={<PasswordRecoveryPage />}
+        />
+        <Route
+          path={PATH.user.account.verification}
+          element={<AccountVerificationVerifyForm />}
+        />
+      </Route>
     </Routes>
   );
 }

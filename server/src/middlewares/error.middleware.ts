@@ -8,7 +8,7 @@ import { failedResponse } from "@/utils";
 export function errorMiddleware(error: Error, _: Request, res: Response) {
   const { internalServerError: message } = SHARED_MESSAGES.statusCode;
 
-  errorLogger.error(error);
+  errorLogger.logMessage(error);
   failedResponse({
     res,
     code: STATUS_CODES.internalServerError,

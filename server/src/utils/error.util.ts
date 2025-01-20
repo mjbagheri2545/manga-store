@@ -11,16 +11,10 @@ export function getError(error: unknown) {
     : new Error(SHARED_MESSAGES.general.unexpectedError);
 }
 
-export function getErrorMessageForLogger(error: Error) {
-  const stack = error.stack != null ? ` with stack: ${error.stack}` : "";
-  const cause = error.cause != null ? ` and cause: ${error.cause}` : "";
-
-  return `message: ${error.message}${stack}${cause}`;
-}
-
 export function withCatch<T>(
   promise: Promise<T>,
-  loggerFunction: (error: Error) => void = (error) => errorLogger.error(error)
+  loggerFunction: (error: Error) => void = (error) =>
+    errorLogger.logMessage(error)
 ): Promise<[Error] | [undefined, T]> {
   return promise
     .then((value) => {

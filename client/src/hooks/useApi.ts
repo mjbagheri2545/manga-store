@@ -1,15 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { ApiFailedResponse, ApiResponse, ApiSuccessfulResponse } from "@/types";
+import {
+  ApiFailedResponse,
+  ApiResponse,
+  ApiSuccessfulResponse,
+  ConditionalFunctionParams,
+} from "@/types";
 
-type ApiPromise<T, P = void> = (
-  ...params: P extends void ? [] : [P]
+export type Api<T, P = void> = (
+  ...params: ConditionalFunctionParams<P>
 ) => Promise<ApiResponse<T>>;
 
 export function useApi<T, P = void>(
-  promiseFunction: ApiPromise<T, P>,
+  promiseFunction: Api<T, P>,
   dependencies: any[] = [],
-  params: Parameters<ApiPromise<T, P>>
+  params: Parameters<Api<T, P>>
 ) {
   const { execute, ...rest } = useApiCreator(
     promiseFunction,
@@ -25,14 +30,14 @@ export function useApi<T, P = void>(
 }
 
 export function useExecuteApi<T, P = void>(
-  promiseFunction: ApiPromise<T, P>,
+  promiseFunction: Api<T, P>,
   dependencies: any[] = []
 ) {
   return useApiCreator(promiseFunction, dependencies, false);
 }
 
 function useApiCreator<T, P>(
-  promiseFunction: ApiPromise<T, P>,
+  promiseFunction: Api<T, P>,
   dependencies: any[],
   initialLoading: boolean
 ) {
@@ -42,7 +47,7 @@ function useApiCreator<T, P>(
 
   const execute = useCallback(
     async (
-      ...params: P extends void ? [] : [props: P]
+      ...params: ConditionalFunctionParams<P>
     ): Promise<ApiResponse<T>> => {
       setIsLoading(true);
 

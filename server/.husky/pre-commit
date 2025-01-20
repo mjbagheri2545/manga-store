@@ -1,7 +1,9 @@
 cd server || exit 1
 
 npm run pre:commit || exit 1
+npm run deps:graph || exit 1
 
 cd ../client || exit 1
 
 npm run pre:commit || exit 1
+npm run deps:graph || exit 1

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import fs from "fs/promises";
+import { fromFile } from "file-type";
 import { PrismaPromise } from "@prisma/client";
 
 import { ENTITY_NAMES } from "@/constants/entities";
@@ -8,7 +8,13 @@ import { errorLogger } from "@/constants/loggers";
 import SHARED_MESSAGES from "@/constants/messages";
 import { sharedUserService } from "@/services";
 import { EntityKey, EntityModels } from "@/types";
-import { badRequest, notFound, unauthorized, verifyJwtToken } from "@/utils";
+import {
+  badRequest,
+  getError,
+  notFound,
+  unauthorized,
+  verifyJwtToken,
+} from "@/utils";
 
 export async function jwtAuthorization(
   req: Request,
@@ -33,7 +39,7 @@ export async function jwtAuthorization(
     req.body.user = user;
     next();
   } catch (error) {
-    errorLogger.error(error);
+    errorLogger.logMessage(getError(error));
     return unauthorized(res);
   }
 }
@@ -50,7 +56,7 @@ export function idAuthorization<T extends EntityModels>({
   getByIdQuery,
   ...restOptions
 }: GetByIdOptions<T>) {
-  return async (req: Request, res: Response) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const entity = await getByIdQuery(id);
@@ -69,6 +75,7 @@ export function idAuthorization<T extends EntityModels>({
     }
 
     req.body[restOptions.entityKey] = entity;
+    next();
   };
 }
 
@@ -81,8 +88,7 @@ export function fileAuthorization(allowedTypes: AllowedType[]) {
   return async (req: Request, res: Response, next: NextFunction) => {
     if (req.file == null) return next();
 
-    const buffer = await fs.readFile(req.file.path);
-    const type = await fileTypeFromBuffer(buffer);
+    const type = await fromFile(req.file.path);
 
     const isAllowed =
       type != null && allowedTypes.map((item) => item.mime).includes(type.mime);

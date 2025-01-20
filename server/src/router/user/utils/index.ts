@@ -7,8 +7,8 @@ import SHARED_CONFIG from "@/constants/config";
 import { EmptyObject, IdentityVerificationReq } from "@/types";
 import { badRequest, getExpirationTime, isExpired, pick } from "@/utils";
 
-import CONFIG from "../constants/config";
-import MESSAGES from "../constants/messages";
+import USER_CONFIG from "../constants/config";
+import USER_MESSAGES from "../constants/messages";
 import tokenService from "../services/token.db";
 
 export async function generateVerificationToken(userId: string) {
@@ -29,7 +29,7 @@ function generateVerificationCodeFromUuid(uuid: string): string {
   const uuidWithoutDash = uuid.replace(/-/g, "");
   const uuidLength = uuidWithoutDash.length;
 
-  const code = Array(CONFIG.verificationCodeLength)
+  const code = Array(USER_CONFIG.verificationCodeLength)
     .fill(undefined)
     .reduce((previousCode) => {
       previousCode += uuidWithoutDash[Math.floor(uuidLength * Math.random())];
@@ -39,7 +39,7 @@ function generateVerificationCodeFromUuid(uuid: string): string {
   return code;
 }
 
-export function getIdentificationExpirationTime() {
+function getIdentificationExpirationTime() {
   return getExpirationTime(SHARED_CONFIG.time.identificationExpirationMinutes);
 }
 
@@ -52,7 +52,7 @@ export async function identityVerification<Body = EmptyObject>(
   req: IdentityVerificationReq<Body>,
   res: Response
 ) {
-  const { failed } = MESSAGES.account.identityVerification;
+  const { failed } = USER_MESSAGES.account.identityVerification;
 
   const { user } = req.body;
   const { verificationCode } = req.params;
@@ -84,5 +84,5 @@ export function pickUserCreateData(req: Request) {
 }
 
 export function userLoggerData(user: User) {
-  return userLoggerData(user);
+  return pick(user, ["email", "fullName", "id"]);
 }

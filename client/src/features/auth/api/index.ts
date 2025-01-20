@@ -1,32 +1,41 @@
 import { z } from "zod";
 
-import ApiConfiguration from "@/api/configuration.api";
+import PATH from "@/constants/path";
+import { HTTP } from "@/lib/http";
 import { User } from "@/types";
 
-import SCHEMA from "../schema";
+import AUTH_SCHEMA from "../schema";
 
-export type RegistrationData = z.infer<typeof SCHEMA.registration>;
-export type LoginData = z.infer<typeof SCHEMA.login>;
+export type RegistrationData = z.infer<typeof AUTH_SCHEMA.registration>;
+export type LoginData = z.infer<typeof AUTH_SCHEMA.login>;
 
 type LoginResponse = {
   token: string;
   user: User;
 };
 
-class Api extends ApiConfiguration {
+type GetUserByTokenResponse = {
+  user: User;
+};
+
+class AuthApi {
+  getUserByToken() {
+    return HTTP.get<GetUserByTokenResponse>(PATH.user.getUserByToken);
+  }
+
   register(data: RegistrationData) {
-    return this.HTTP.post(this.PATH.auth.registration, {
+    return HTTP.post(PATH.auth.registration, {
       data,
     });
   }
 
   login(data: LoginData) {
-    return this.HTTP.post<LoginData, LoginResponse>(this.PATH.auth.login, {
+    return HTTP.post<LoginResponse, LoginData>(PATH.auth.login, {
       data,
     });
   }
 }
 
-const API = new Api();
+const authApi = new AuthApi();
 
-export default API;
+export default authApi;

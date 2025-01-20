@@ -1,26 +1,27 @@
 import { useNavigate } from "react-router-dom";
 
 import PATH from "@/constants/path";
-import { parseResponse } from "@/utils";
+import { parseApiResponse } from "@/utils";
 
-import API from "../api";
-import { VerificationVerifyData } from "../api/account.api";
+import userAccountApi, {
+  AccountVerificationVerifyData,
+} from "../api/account.api";
 
 function useAccountVerification() {
   const navigate = useNavigate();
 
   async function getEmail() {
-    const response = await API.account.verification.getEmail();
+    const response = await userAccountApi.verification.getEmail();
 
-    parseResponse(response, () => {
-      navigate(PATH.user.account.verification.verify);
+    parseApiResponse(response, () => {
+      navigate(PATH.user.getFullPath(PATH.user.account.verification));
     });
   }
 
-  async function verify(data: VerificationVerifyData) {
-    const response = await API.account.verification.verify(data);
+  async function verify(data: AccountVerificationVerifyData) {
+    const response = await userAccountApi.verification.verify(data);
 
-    parseResponse(response, () => {
+    parseApiResponse(response, () => {
       navigate(PATH.home.landingPage);
     });
   }

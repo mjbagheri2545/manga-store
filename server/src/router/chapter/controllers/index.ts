@@ -14,11 +14,13 @@ import {
   pick,
   removeFile,
   successfulResponse,
+  updatedEntityFields,
 } from "@/utils";
 
 import chapterLogger from "../constants/logger";
-import CHAPTER_MESSAGES from "../constants/message";
+import CHAPTER_MESSAGES from "../constants/messages";
 import chapterService from "../services";
+import { chapterLoggerData } from "../utils";
 
 type GetAllChapterReq = UserAuthorizedReq<
   EmptyObject,
@@ -38,8 +40,8 @@ type CreateChapterReq = UserAuthorizedReq<CreateChapterReqBody>;
 type UpdateChapterReq = UserAuthorizedReq<
   Partial<CreateChapterReqBody> & { chapter: PermissionChapter }
 >;
-class Controller {
-  async getAllChaptersOfProduct(req: GetAllChapterReq, res: Response) {
+class ChapterController {
+  async getAllChapters(req: GetAllChapterReq, res: Response) {
     const {
       query,
       params: { productId },
@@ -50,7 +52,7 @@ class Controller {
     successfulResponse({ res, data: { chapters } });
   }
 
-  sendChapter(
+  getChapter(
     req: UserAuthorizedReq<{ chapter: PermissionChapter }>,
     res: Response
   ) {
@@ -64,17 +66,19 @@ class Controller {
   async createChapter(req: CreateChapterReq, res: Response) {
     const { productId, translatorId, episode } = req.body;
 
-    const createdChapter = await chapterService.create({
+    const chapter = await chapterService.create({
       data: { chapterFile: req.file?.path as string, episode },
       productId,
       translatorId,
     });
 
-    chapterLogger.info("Chapter created.", createdChapter);
+    chapterLogger.logMessage("Chapter created.", {
+      metaData: { chapter: chapterLoggerData(chapter) },
+    });
 
     const { create: createMessage } = SHARED_MESSAGES.features.crud;
 
-    const message = createMessage(CHAPTER_MESSAGES.crud(createdChapter));
+    const message = createMessage(CHAPTER_MESSAGES.crud(chapter));
 
     successfulResponse({ res, message });
   }
@@ -103,7 +107,9 @@ class Controller {
       removeFile(chapter.chapterFile),
     ]);
 
-    chapterLogger.info("Chapter updated.", updatedChapter);
+    chapterLogger.logMessage("Chapter updated.", {
+      metaData: updatedEntityFields(chapter, updatedChapter),
+    });
 
     const { update: updateMessage } = SHARED_MESSAGES.features.crud;
 
@@ -113,4 +119,4 @@ class Controller {
   }
 }
 
-export default Controller;
+export default ChapterController;

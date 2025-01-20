@@ -5,7 +5,7 @@ import { hasPermission } from "@/utils";
 
 // view false is mean for all users list in admin page not
 // mean single user accounts in the site
-const PERMISSIONS = {
+const USER_PERMISSIONS = {
   admin: { view: true, create: true, update: true, delete: true },
   manager: {
     view: false,
@@ -32,5 +32,5 @@ export function hasUserPermission(
   action: PermissionsAction,
   data?: User
 ) {
-  return hasPermission(user, PERMISSIONS, action, data);
+  return hasPermission(user, USER_PERMISSIONS, action, data);
 }

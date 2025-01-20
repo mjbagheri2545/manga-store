@@ -2,14 +2,15 @@ import express from "express";
 
 import { errorMiddleware } from "@/middlewares";
 
-import router from "./createRouter";
+import createRouter from "./createRouter";
 import useGeneralMiddlewares from "./useGeneralMiddleware";
 
 function useMiddlewares(app: express.Express) {
   useGeneralMiddlewares(app);
 
-  app.use("/api", router);
+  const router = createRouter();
 
+  app.use("/api", router);
   app.use(errorMiddleware);
 }
 

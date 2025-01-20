@@ -3,7 +3,7 @@ import { createGroupingModelsRouter } from "@/utils";
 import productStatusLogger from "../constants/logger";
 import productStatusService from "../services";
 
-function createCategoryRouter() {
+function createProductStatusRouter() {
   const router = createGroupingModelsRouter({
     service: productStatusService,
     entityKey: "productStatus",
@@ -13,4 +13,4 @@ function createCategoryRouter() {
   return router;
 }
 
-export default createCategoryRouter;
+export default createProductStatusRouter;

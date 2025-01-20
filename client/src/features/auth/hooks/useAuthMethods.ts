@@ -3,32 +3,32 @@ import { useNavigate } from "react-router-dom";
 
 import PATH from "@/constants/path";
 import { State } from "@/types";
-import { parseResponse } from "@/utils";
+import { parseApiResponse } from "@/utils";
 
-import API, { LoginData, RegistrationData } from "../api";
-import MESSAGES from "../constants/messages";
-import useUser from "./useGetUser";
+import authApi, { LoginData, RegistrationData } from "../api";
+import AUTH_MESSAGES from "../constants/messages";
+import useGetUser from "./useGetUser";
 
 type UseAuthMethods = {
   setToken: State<string | undefined>[1];
-} & ReturnType<typeof useUser>;
+} & ReturnType<typeof useGetUser>;
 
 function useAuthMethods({ user, setUser, setToken }: UseAuthMethods) {
   const navigate = useNavigate();
 
   async function register(data: RegistrationData) {
-    parseResponse(await API.register(data), () => {
+    parseApiResponse(await authApi.register(data), () => {
       navigate(PATH.auth.login);
     });
   }
 
   async function login(data: LoginData) {
     if (user?.email === data.email) {
-      toast.info(MESSAGES.alreadyLoggedIn);
+      toast.info(AUTH_MESSAGES.alreadyLoggedIn);
       return;
     }
 
-    parseResponse(await API.login(data), ({ data: responseData }) => {
+    parseApiResponse(await authApi.login(data), ({ data: responseData }) => {
       setToken(responseData.token);
       setUser(responseData.user);
       navigate(PATH.home.landingPage);
@@ -40,7 +40,7 @@ function useAuthMethods({ user, setUser, setToken }: UseAuthMethods) {
     setUser(undefined);
     navigate(PATH.auth.login);
 
-    toast.success(MESSAGES.logout);
+    toast.success(AUTH_MESSAGES.logout);
   }
 
   return { register, login, logout };

@@ -16,10 +16,11 @@ import { slugValidation } from "@/validators";
 
 import productLogger from "../constants/logger";
 import PRODUCT_MESSAGES from "../constants/messages";
-import ProductsMutationController from "../controllers/productsMutation.controller";
+import ProductMutationController from "../controllers/productMutation.controller";
 import { hasProductPermission } from "../lib/permissions";
 import productService from "../services";
-import Validator from "../validators";
+import { productLoggerData } from "../utils";
+import ProductMutationValidator from "../validators/productMutation.validator";
 import createGetProductsRoutes from "./getProducts.routes";
 
 function createProductRouter() {
@@ -31,9 +32,10 @@ function createProductRouter() {
     "../../../../uploads/productImage/"
   );
 
-  const { createProduct, updateProduct } = new ProductsMutationController();
+  const { createProduct, updateProduct } = new ProductMutationController();
 
-  const { createProductValidation, updateProductValidation } = new Validator();
+  const { createProductValidation, updateProductValidation } =
+    new ProductMutationValidator();
 
   const createPermission = allResourcePermission((user) =>
     hasProductPermission(user, "create")
@@ -73,7 +75,9 @@ function createProductRouter() {
 
   function deleteProductMessage(product: Product) {
     const { delete: deleteMessage } = SHARED_MESSAGES.features.crud;
-    productLogger.info("Product deleted.", product);
+    productLogger.logMessage("Product deleted.", {
+      metaData: { product: productLoggerData(product) },
+    });
 
     return deleteMessage(PRODUCT_MESSAGES.crud(product));
   }

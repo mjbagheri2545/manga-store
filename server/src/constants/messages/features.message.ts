@@ -8,13 +8,12 @@ const crud = {
   update: (message: string) => `${message} با موفقیت به روز رسانی شد.`,
 } as const;
 
+type GroupingModelsEntityName = (typeof ENTITY_NAMES)[GroupingModelsEntityKey];
+
 const featuresMessages = {
   crud,
   groupingModel: {
-    crud: (
-      entity: GroupingModels,
-      entityName: (typeof ENTITY_NAMES)[GroupingModelsEntityKey]
-    ) => {
+    crud: (entity: GroupingModels, entityName: GroupingModelsEntityName) => {
       return `${entityName} با اسم ${entity.name}`;
     },
   },

@@ -14,7 +14,7 @@ import { EmptyObject, SendEmailReq, TypeOrTypeArray } from "@/types";
 import compileHandlebarsTemplate, {
   CompileHandlebarsTemplateOptions,
 } from "./compileHandlebarsTemplate.util";
-import { getErrorMessageForLogger, withCatch } from "./error.util";
+import { withCatch } from "./error.util";
 import {
   getEmailRemainingTime,
   parseTypeOrTypeArray,
@@ -101,10 +101,13 @@ class Email<TemplateVariables = EmptyObject> {
     };
 
     const loggerFunction = (error: Error) => {
-      emailLogger.error(getErrorMessageForLogger(error), {
-        retry: this.tryingTime,
-        accepted: this.recipients.accepted,
-        rejected: this.recipients.rejected,
+      emailLogger.logMessage(error, {
+        metaData: {
+          retry: this.tryingTime,
+          accepted: this.recipients.accepted,
+          rejected: this.recipients.rejected,
+        },
+        level: "error",
       });
     };
 
@@ -140,20 +143,23 @@ class Email<TemplateVariables = EmptyObject> {
     }
 
     const isSuccessful =
-      this.recipients.rejected.length === this.recipients.users.length;
+      this.recipients.accepted.length === this.recipients.users.length;
 
     const data = {
       accepted: this.recipients.accepted,
       rejected: this.recipients.rejected,
     };
 
-    emailLogger[isSuccessful ? "info" : "error"](
+    emailLogger.logMessage(
       `email with status: ${isSuccessful ? "successful " : "failed"}`,
       {
-        from: env.EMAIL_SERVICE_FROM,
-        recipients: this.recipients.users,
-        subject: startCase(this.subject),
-        ...data,
+        metaData: {
+          from: env.EMAIL_SERVICE_FROM,
+          recipients: this.recipients.users,
+          subject: startCase(this.subject),
+          ...data,
+        },
+        level: isSuccessful ? "info" : "error",
       }
     );
 
@@ -194,7 +200,7 @@ export function sendEmail<T>({
     });
     const { isSuccessful } = await emailSender.send();
 
-    if (!isSuccessful) {
+    if (!isSuccessful && isSendResponseNeed) {
       const { failed: failedMessage } = SHARED_MESSAGES.general.sendEmail;
 
       return failedResponse({

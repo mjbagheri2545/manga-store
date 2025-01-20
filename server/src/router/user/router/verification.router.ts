@@ -2,33 +2,39 @@ import { Router } from "express";
 
 import { jwtAuthorization } from "@/middlewares";
 
-import PATH from "../constants/path";
-import VerificationController from "../controllers/verification.controller";
+import USER_PATH from "../constants/path";
+import UserAccountVerificationController from "../controllers/verification.controller";
 import {
   emailTypeHandler,
   sendIdentityVerificationEmail,
 } from "../middlewares";
-import VerificationValidator from "../validators/verification.validator";
+import UserAccountVerificationValidator from "../validators/verification.validator";
 
-function createVerificationRouter() {
+function createUserAccountVerificationRouter() {
   const router = Router();
 
-  const { alreadyVerifiedChecker, verify } = new VerificationController();
+  const { alreadyVerifiedChecker, verifyAccount } =
+    new UserAccountVerificationController();
 
-  const { verifyValidation } = new VerificationValidator();
+  const { verifyValidation } = new UserAccountVerificationValidator();
 
-  const { verification } = PATH.account;
+  const { verification: verificationPath } = USER_PATH.account;
 
   router.post(
-    verification.getEmail,
+    verificationPath.getEmail,
     jwtAuthorization,
     alreadyVerifiedChecker,
     emailTypeHandler,
     sendIdentityVerificationEmail
   );
-  router.put(verification.verify, verifyValidation(), jwtAuthorization, verify);
+  router.put(
+    verificationPath.verify,
+    verifyValidation(),
+    jwtAuthorization,
+    verifyAccount
+  );
 
   return router;
 }
 
-export default createVerificationRouter;
+export default createUserAccountVerificationRouter;

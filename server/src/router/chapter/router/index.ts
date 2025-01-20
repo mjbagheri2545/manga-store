@@ -16,11 +16,12 @@ import { createUploader } from "@/utils";
 import { slugValidation } from "@/validators";
 
 import chapterLogger from "../constants/logger";
-import CHAPTER_MESSAGES from "../constants/message";
-import Controller from "../controllers";
+import CHAPTER_MESSAGES from "../constants/messages";
+import ChapterController from "../controllers";
 import { hasChapterPermission } from "../lib/permissions";
 import chapterService from "../services";
-import Validator from "../validators";
+import { chapterLoggerData } from "../utils";
+import ChapterValidator from "../validators";
 
 function createChapterRouter() {
   const router = Router();
@@ -29,16 +30,17 @@ function createChapterRouter() {
     "../../../../uploads/chapterFile/"
   );
 
-  const { getAllChaptersOfProduct, sendChapter, createChapter, updateChapter } =
-    new Controller();
+  const { getAllChapters, getChapter, createChapter, updateChapter } =
+    new ChapterController();
 
-  const { createChapterValidation, updateChapterValidation } = new Validator();
+  const { createChapterValidation, updateChapterValidation } =
+    new ChapterValidator();
 
   router.get(
     "/product/:productId",
     slugValidation("productId", "محصولی با آیدی مورد نظر"),
     jwtAuthorization,
-    getAllChaptersOfProduct
+    getAllChapters
   );
 
   const getChapterById = idAuthorization({
@@ -51,7 +53,7 @@ function createChapterRouter() {
     slugValidation(),
     jwtAuthorization,
     getChapterById,
-    sendChapter
+    getChapter
   );
 
   router.post(
@@ -83,7 +85,9 @@ function createChapterRouter() {
 
   function deleteChapterMessage(chapter: Chapter) {
     const { delete: deleteMessage } = SHARED_MESSAGES.features.crud;
-    chapterLogger.info("Chapter deleted.", chapter);
+    chapterLogger.logMessage("Chapter deleted.", {
+      metaData: { chapter: chapterLoggerData(chapter) },
+    });
 
     return deleteMessage(CHAPTER_MESSAGES.crud(chapter));
   }

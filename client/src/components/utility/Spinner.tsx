@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 
 export type SpinnerProps = LucideProps;
 
-function Spinner({ className, ...restProps }: SpinnerProps) {
+export function Spinner({ className, ...restProps }: SpinnerProps) {
   return (
     <LoaderPinwheel
       {...restProps}
@@ -11,5 +11,3 @@ function Spinner({ className, ...restProps }: SpinnerProps) {
     />
   );
 }
-
-export default Spinner;

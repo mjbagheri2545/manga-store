@@ -2,41 +2,47 @@ import { Router } from "express";
 
 import { emailAuthorization, jwtAuthorization } from "@/middlewares";
 
-import PATH from "../constants/path";
-import PasswordController from "../controllers/password.controller";
+import USER_PATH from "../constants/path";
+import UserAccountPasswordController from "../controllers/password.controller";
 import {
   emailTypeHandler,
   sendIdentityVerificationEmail,
 } from "../middlewares";
-import PasswordValidator from "../validators/password.validator";
+import UserAccountPasswordValidator from "../validators/password.validator";
 
-function createPasswordRouter() {
+function createUserAccountPasswordRouter() {
   const router = Router();
 
-  const { reset, recover } = new PasswordController();
+  const { resetPassword, recoverPassword } =
+    new UserAccountPasswordController();
 
   const { getEmailValidation, recoverValidation, resetValidation } =
-    new PasswordValidator();
+    new UserAccountPasswordValidator();
 
-  const { password } = PATH.account;
+  const { password: passwordPath } = USER_PATH.account;
 
   router.post(
-    password.recovery.getEmail,
+    passwordPath.recovery.getEmail,
     getEmailValidation(),
     emailAuthorization,
     emailTypeHandler,
     sendIdentityVerificationEmail
   );
   router.put(
-    password.recovery.recover,
+    passwordPath.recovery.recover,
     recoverValidation(),
     emailAuthorization,
-    recover
+    recoverPassword
   );
 
-  router.put(password.reset, resetValidation(), jwtAuthorization, reset);
+  router.put(
+    passwordPath.reset,
+    resetValidation(),
+    jwtAuthorization,
+    resetPassword
+  );
 
   return router;
 }
 
-export default createPasswordRouter;
+export default createUserAccountPasswordRouter;

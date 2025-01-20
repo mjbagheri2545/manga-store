@@ -28,7 +28,7 @@ type RegistrationReq = Req<{
 
 type LoginReq = UserAuthorizedReq<{ password: string }>;
 
-class Controller {
+class AuthController {
   async register(req: RegistrationReq, res: Response) {
     const { password } = req.body;
 
@@ -59,9 +59,9 @@ class Controller {
     // internal server error
     await withCatch(sendEmailPromise);
 
-    const userData = pickUserData(user);
-
-    authLogger.info("Registration", userData);
+    authLogger.logMessage("Registration", {
+      metaData: { userData: pickUserData(user) },
+    });
 
     successfulResponse({
       res,
@@ -80,9 +80,8 @@ class Controller {
 
     const token = await generateJwtToken(user.id);
 
-    authLogger.info("Login", {
-      email: user.email,
-      fullName: user.fullName,
+    authLogger.logMessage("Login", {
+      metaData: { email: user.email, fullName: user.fullName },
     });
 
     successfulResponse({
@@ -93,4 +92,4 @@ class Controller {
   }
 }
 
-export default Controller;
+export default AuthController;

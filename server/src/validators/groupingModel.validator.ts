@@ -9,7 +9,7 @@ import {
 } from "./configuration.validator";
 
 export class GroupingModelsValidator {
-  createValidation(entityKey: EntityKey) {
+  createEntityValidation(entityKey: EntityKey) {
     const entityName = ENTITY_NAMES[entityKey];
 
     const entitySlug = required(entityKey, {
@@ -22,7 +22,7 @@ export class GroupingModelsValidator {
     ]);
   }
 
-  updateValidation(entityKey: EntityKey) {
+  updateEntityValidation(entityKey: EntityKey) {
     const entityName = ENTITY_NAMES[entityKey];
 
     const entitySlug = required(entityKey, {

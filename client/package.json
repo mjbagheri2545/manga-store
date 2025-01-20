@@ -6,11 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint . --config .eslintrc.json --config .eslintrc.pre-commit.json",
-    "lint:fix": "eslint . --fix --config .eslintrc.json --config .eslintrc.pre-commit.json",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "pre:commit": "lint-staged",
-    "preview": "vite preview"
+    "deps:check": "madge src --circular",
+    "deps:graph": "node ./scripts/depsGraph.cjs",
+    "create-feature": "node ./scripts/createFeature/index.cjs"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

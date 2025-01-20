@@ -1,7 +1,8 @@
-import { TypeOrTypeArray } from "./common.type";
+import { ConditionalFunctionParams, TypeOrTypeArray } from "./general.type";
 
 export type ApiMethodsWithBody = "POST" | "PUT" | "DELETE";
 export type ApiMethodsWithoutBody = "GET";
+export type ApiMethods = ApiMethodsWithBody | ApiMethodsWithoutBody;
 
 export type ApiResponse<T = unknown> =
   | ApiSuccessfulResponse<T>
@@ -19,3 +20,11 @@ export type ApiFailedResponse = {
   isSuccessful: false;
   error: TypeOrTypeArray<string>;
 };
+
+export type Api<T, P = void> = (
+  ...params: ConditionalFunctionParams<P>
+) => Promise<ApiResponse<T>>;
+
+export type ApiWrapper<P = void> = (
+  ...params: ConditionalFunctionParams<P>
+) => Promise<void>;

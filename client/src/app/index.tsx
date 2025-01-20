@@ -1,8 +1,7 @@
 import { BrowserRouter } from "react-router-dom";
 
-import ToastContainer from "@/components/utility/toastContainer";
+import { ToastContainer } from "@/components/utility";
 import AuthProvider from "@/features/auth/components/AuthProvider";
-import UserProvider from "@/features/user/components/UseProvider";
 import Router from "@/router";
 
 import "./index.css";
@@ -11,10 +10,8 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <UserProvider>
-          <Router />
-          <ToastContainer />
-        </UserProvider>
+        <Router />
+        <ToastContainer />
       </AuthProvider>
     </BrowserRouter>
   );

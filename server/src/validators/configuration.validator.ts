@@ -130,5 +130,6 @@ function validate(req: Request, res: Response, next: NextFunction) {
       message: messages,
     });
   }
+
   next();
 }

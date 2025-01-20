@@ -3,8 +3,8 @@ import { Router } from "express";
 import { jwtAuthorization } from "@/middlewares";
 import { slugValidation } from "@/validators";
 
-import PATH from "../constants/path";
-import GetProductsController from "../controllers/getProducts.controller";
+import PRODUCT_PATH from "../constants/path";
+import GetProductController from "../controllers/getProduct.controller";
 
 // we can't use router.use for this routes because these routes
 // does not have a same parent path to group these routes like below path
@@ -12,36 +12,41 @@ import GetProductsController from "../controllers/getProducts.controller";
 // /account/password/recovery
 
 function createGetProductsRoutes(router: Router) {
-  const { getAll, getByProductSlug, getByCategory, getByTag, getByStatus } =
-    new GetProductsController();
+  const {
+    getAllProducts,
+    getProductByProductSlug,
+    getProductsByCategory,
+    getProductsByTag,
+    getProductsByStatus,
+  } = new GetProductController();
 
-  router.get("/", jwtAuthorization, getAll);
+  router.get("/", jwtAuthorization, getAllProducts);
 
   router.get(
-    PATH.getByProductSlug,
+    PRODUCT_PATH.getByProductSlug,
     slugValidation("productSlug", "محصول مورد نظر"),
     jwtAuthorization,
-    getByProductSlug
+    getProductByProductSlug
   );
 
   router.get(
-    PATH.getByCategory,
+    PRODUCT_PATH.getByCategory,
     slugValidation("category", "دسته بندی مورد نظر"),
     jwtAuthorization,
-    getByCategory
+    getProductsByCategory
   );
 
   router.get(
-    PATH.getByTag,
+    PRODUCT_PATH.getByTag,
     slugValidation("tag", "ژانر مورد نظر"),
     jwtAuthorization,
-    getByTag
+    getProductsByTag
   );
   router.get(
-    PATH.getByStatus,
+    PRODUCT_PATH.getByStatus,
     slugValidation("status", "وضعیت مورد نظر"),
     jwtAuthorization,
-    getByStatus
+    getProductsByStatus
   );
 }
 

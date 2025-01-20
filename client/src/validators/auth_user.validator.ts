@@ -1,28 +1,27 @@
-import ValidatorConfiguration from "@/validators/configuration.validator";
+import SHARED_CONFIG from "@/constants/config";
+import SHARED_MESSAGES from "@/constants/messages";
 
-class AuthUserValidator extends ValidatorConfiguration {
-  email() {
-    return this.required({ label: "ایمیل" }).email(
-      this.SHARED_MESSAGES.common.auth_user.email
-    );
-  }
+import { minLength, required, string } from "./configuration.validator";
 
-  newPassword(label = "رمز عبور") {
-    return this.string(label).regex(this.SHARED_CONFIG.password.pattern, {
-      message: this.SHARED_MESSAGES.common.auth_user.password.new(label),
-    });
-  }
-
-  newPasswordConfirmation(label = "رمز عبور") {
-    return this.required({ label: `تایید ${label}` });
-  }
-
-  currentPassword(label = "رمز عبور") {
-    return this.minLength({
-      label,
-      minLength: this.SHARED_CONFIG.password.minLength,
-    });
-  }
+export function emailValidator() {
+  return required({ label: "ایمیل" }).email(
+    SHARED_MESSAGES.validation.general.auth_user.email
+  );
 }
 
-export default AuthUserValidator;
+export function newPasswordValidator(label = "رمز عبور") {
+  return string(label).regex(SHARED_CONFIG.validation.password.pattern, {
+    message: SHARED_MESSAGES.validation.general.auth_user.password.new(label),
+  });
+}
+
+export function newPasswordConfirmationValidator(label = "رمز عبور") {
+  return required({ label: `تایید ${label}` });
+}
+
+export function currentPasswordValidator(label = "رمز عبور") {
+  return minLength({
+    label,
+    minLength: SHARED_CONFIG.validation.password.minLength,
+  });
+}

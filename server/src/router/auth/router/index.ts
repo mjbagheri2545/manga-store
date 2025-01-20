@@ -3,18 +3,19 @@ import { Router } from "express";
 import { emailAuthorization } from "@/middlewares";
 
 import AUTH_PATH from "../constants/path";
-import Controller from "../controllers";
-import Validator from "../validators";
+import AuthController from "../controllers";
+import AuthValidator from "../validators";
 
 function createAuthRouter() {
   const router = Router();
 
-  const { register, login } = new Controller();
+  const { register, login } = new AuthController();
 
-  const { registrationValidation, loginValidation } = new Validator();
+  const { registrationValidation, loginValidation } = new AuthValidator();
 
   router.post(AUTH_PATH.login, loginValidation(), emailAuthorization, login);
   router.post(AUTH_PATH.registration, registrationValidation(), register);
+
   return router;
 }
 

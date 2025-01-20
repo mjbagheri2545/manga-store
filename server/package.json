@@ -5,15 +5,17 @@
   "scripts": {
     "dev": "tsx watch --env-file=.env.development.local ./src/server.ts",
     "build": "tsc --watch",
-    "lint": "eslint . --config .eslintrc.json --config .eslintrc.pre-commit.json",
-    "lint:fix": "eslint . --fix --config .eslintrc.json --config .eslintrc.pre-commit.json",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "pre:commit": "lint-staged",
     "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
-    "prepare": "cd .. && husky server/.husky",
     "deps:check": "madge src --circular",
     "deps:graph": "node ./scripts/depsGraph.js",
-    "postinstall": "npm run prepare"
+    "husky:prepare": "cd .. && husky server/.husky",
+    "init": "node ./scripts/init.js",
+    "postinstall": "npm run init",
+    "create-feature": "node ./scripts/createFeature"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -69,7 +71,7 @@
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "express-validator": "^7.1.0",
-    "file-type": "^19.6.0",
+    "file-type": "^16.5.4",
     "handlebars": "^4.7.8",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",

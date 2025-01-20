@@ -1,7 +1,7 @@
 import React, { ComponentProps, PropsWithChildren } from "react";
 import { FieldErrors, FormProvider, UseFormReturn } from "react-hook-form";
 
-import Button from "../utility/Button";
+import { Button } from "../utility";
 
 export type FormProps = PropsWithChildren & {
   containerProps?: Omit<ComponentProps<"form">, "children">;
@@ -11,7 +11,7 @@ export type FormProps = PropsWithChildren & {
   submitButtonText: string;
 };
 
-function Form({
+export function Form({
   formMethods,
   handleOnSubmit: onSubmit,
   handleOnFailure: onFailure = console.log,
@@ -45,5 +45,3 @@ function Form({
     </FormProvider>
   );
 }
-
-export default Form;

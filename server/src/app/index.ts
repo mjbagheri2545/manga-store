@@ -6,7 +6,7 @@ import { getError } from "@/utils";
 
 import createApp from "./createApp";
 
-function createServer() {
+function startServer() {
   const app = createApp();
   const server = http.createServer(app);
   server.listen({ host: env.HOST, port: env.PORT }, () => {
@@ -16,9 +16,11 @@ function createServer() {
   const signals: NodeJS.Signals[] = ["SIGTERM", "SIGINT", "SIGUSR2"];
   signals.forEach((signal) => {
     process.once(signal, () => {
-      server.close((error) => errorLogger.error(getError(error)));
+      server.close((error) => {
+        errorLogger.logMessage(getError(error));
+      });
     });
   });
 }
 
-export default createServer;
+export default startServer;

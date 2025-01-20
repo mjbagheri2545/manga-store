@@ -2,17 +2,17 @@ import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import InputField from "@/components/form/inputField";
-import Auth_UserForm from "@/components/ui/auth_user/Auth_UserForm";
+import { InputField } from "@/components/form";
+import { Auth_UserAccountForm } from "@/components/ui/auth_user";
 
 import { LoginData } from "../../api";
-import CONTENT from "../../constants/content";
+import AUTH_CONTENT from "../../constants/content";
 import { useAuth } from "../../contexts";
-import SCHEMA from "../../schema";
+import AUTH_SCHEMA from "../../schema";
 
 function LoginForm() {
   const formMethods = useForm({
-    resolver: zodResolver(SCHEMA.login),
+    resolver: zodResolver(AUTH_SCHEMA.login),
   });
   const { login } = useAuth();
 
@@ -21,11 +21,11 @@ function LoginForm() {
   }
 
   return (
-    <Auth_UserForm
+    <Auth_UserAccountForm
       formMethods={formMethods}
       handleOnSubmit={handleOnSubmit}
-      submitButtonText={CONTENT.login.submitButtonText}
-      content={CONTENT.login.mainContent}
+      submitButtonText={AUTH_CONTENT.login.submitButtonText}
+      content={AUTH_CONTENT.login.mainContent}
     >
       <InputField
         controllerName="email"
@@ -37,7 +37,7 @@ function LoginForm() {
         inputProps={{ type: "password" }}
         label="رمز عبور"
       />
-    </Auth_UserForm>
+    </Auth_UserAccountForm>
   );
 }
 

@@ -4,7 +4,12 @@ import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 
 import { IdentityVerificationReq, UserAuthorizedReq } from "@/types";
-import { badRequest, hashPassword, successfulResponse } from "@/utils";
+import {
+  AutoBind,
+  badRequest,
+  hashPassword,
+  successfulResponse,
+} from "@/utils";
 
 import USER_MESSAGES from "../constants/messages";
 import userAccountService from "../services/account.db";
@@ -19,7 +24,7 @@ type RecoverReq = IdentityVerificationReq<{
   newPassword: string;
 }>;
 
-class PasswordController {
+class UserAccountPasswordController extends AutoBind {
   private async changePassword(
     res: Response,
     user: User,
@@ -59,7 +64,7 @@ class PasswordController {
     }
   }
 
-  async recover(req: RecoverReq, res: Response) {
+  async recoverPassword(req: RecoverReq, res: Response) {
     const { user, newPassword } = req.body;
 
     await this.checkPasswordsWithNewPassword(res, user, newPassword);
@@ -71,7 +76,7 @@ class PasswordController {
     await this.changePassword(res, user, newPassword, true);
   }
 
-  async reset(req: ResetReq, res: Response) {
+  async resetPassword(req: ResetReq, res: Response) {
     const { failedMessage } = USER_MESSAGES.account.password;
 
     const { user, currentPassword, newPassword } = req.body;
@@ -91,4 +96,4 @@ class PasswordController {
   }
 }
 
-export default PasswordController;
+export default UserAccountPasswordController;

@@ -17,7 +17,7 @@ import {
 import userLogger from "../constants/logger";
 import USER_MESSAGES from "../constants/messages";
 import userService from "../services/user.db";
-import { pickUserCreateData } from "../utils";
+import { pickUserCreateData, userLoggerData } from "../utils";
 
 type CreateUserReqBody = Pick<
   Prisma.UserCreateInput,
@@ -40,14 +40,14 @@ type EditProfileReq = UserAuthorizedReq<
     fullName: string;
   }>
 >;
-class CrudController {
+class UserCrudController {
   getUser(req: UserAuthorizedReq, res: Response) {
     const { user } = req.body;
 
     successfulResponse({ res, data: { user: pickUserData(user) } });
   }
 
-  async getAll(
+  async getAllUsers(
     req: UserAuthorizedReq<EmptyObject, PaginateQuery>,
     res: Response
   ) {
@@ -71,7 +71,9 @@ class CrudController {
       roles: { set: roles },
     });
 
-    userLogger.info("User created.", pickUserData(user));
+    userLogger.logMessage("User created.", {
+      metaData: { user: userLoggerData(user) },
+    });
 
     const { create: createMessage } = SHARED_MESSAGES.features.crud;
 
@@ -109,9 +111,11 @@ class CrudController {
 
     const { user } = req.body;
 
-    userLogger.info("User updated.", {
-      oldUser: pickUserData(user),
-      newUser: pickUserData(updatedUser),
+    userLogger.logMessage("User updated.", {
+      metaData: {
+        oldUser: pickUserData(user),
+        updatedUser: pickUserData(updatedUser),
+      },
     });
 
     const { update: updateMessage } = SHARED_MESSAGES.features.crud;
@@ -139,9 +143,11 @@ class CrudController {
       ...(user.avatarImage != null ? [removeFile(user.avatarImage)] : []),
     ]);
 
-    userLogger.info("User profile edited.", {
-      oldUser: pickUserData(user),
-      newUser: pickUserData(updatedUser),
+    userLogger.logMessage("User profile edited.", {
+      metaData: {
+        oldUser: pickUserData(user),
+        updatedUser: pickUserData(updatedUser),
+      },
     });
 
     successfulResponse({
@@ -151,4 +157,4 @@ class CrudController {
   }
 }
 
-export default CrudController;
+export default UserCrudController;

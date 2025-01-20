@@ -8,7 +8,7 @@ import {
   newPasswordValidator,
 } from "@/validators";
 
-class Validator {
+class AuthValidator {
   registrationValidation() {
     return createValidation([
       fullNameValidator(),
@@ -23,4 +23,4 @@ class Validator {
   }
 }
 
-export default Validator;
+export default AuthValidator;

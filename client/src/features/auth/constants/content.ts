@@ -1,6 +1,6 @@
 import PATH from "@/constants/path";
 
-const CONTENT = {
+const AUTH_CONTENT = {
   registration: {
     submitButtonText: "ثبت نام",
     mainContent: {
@@ -19,7 +19,7 @@ const CONTENT = {
       title: "ورود به حساب کاربری",
       links: [
         {
-          to: PATH.user.account.password.recovery.recover,
+          to: PATH.user.getFullPath(PATH.user.account.password.recovery),
           text: "رمز عبور خود را فراموش کرده ام!",
         },
         {
@@ -31,4 +31,4 @@ const CONTENT = {
   },
 } as const;
 
-export default CONTENT;
+export default AUTH_CONTENT;

@@ -7,16 +7,17 @@ import useToken from "../hooks/useToken";
 
 function AuthProvider({ children: App }: PropsWithChildren) {
   const { isLoggedIn, setToken } = useToken();
-  const { user, setUser } = useUser(isLoggedIn);
+  const userState = useUser(isLoggedIn);
 
   const methods = useAuthMethods({
-    user,
-    setUser,
+    ...userState,
     setToken,
   });
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, ...methods }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, user: userState.user, ...methods }}
+    >
       {App}
     </AuthContext.Provider>
   );

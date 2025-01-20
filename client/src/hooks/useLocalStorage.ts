@@ -4,7 +4,10 @@ import { storageGetItem, storageRemoveItem, storageSetItem } from "@/utils";
 
 type DefaultValue<T> = T | (() => T | undefined) | undefined;
 
-function useLocalStorage<T>(key: string, defaultValue?: DefaultValue<T>) {
+export function useLocalStorage<T>(
+  key: string,
+  defaultValue?: DefaultValue<T>
+) {
   const [value, setValue] = useState<T | undefined>(() => {
     const value = storageGetItem<T>(key);
     if (value != null) return value;
@@ -20,5 +23,3 @@ function useLocalStorage<T>(key: string, defaultValue?: DefaultValue<T>) {
 
   return [value, setValue] as const;
 }
-
-export default useLocalStorage;

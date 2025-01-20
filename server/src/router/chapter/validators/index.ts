@@ -1,12 +1,14 @@
+import { AutoBind } from "@/utils";
 import { createValidation, required, slugValidator } from "@/validators";
 
-class Validator {
+class ChapterValidator extends AutoBind {
   private getCreateChapterValidation() {
     return [
       required("productId", { label: "محصول" }),
       required("translatorId", { label: "مترجم" }),
     ];
   }
+
   createChapterValidation() {
     const episode = required("episode", { label: "قسمت فصل" }).toInt();
 
@@ -27,4 +29,4 @@ class Validator {
   }
 }
 
-export default Validator;
+export default ChapterValidator;

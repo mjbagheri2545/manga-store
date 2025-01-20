@@ -1,9 +1,9 @@
-import createGeneralMessages from "./general.message";
-import createValidationMessages from "./validation";
+import generalMessages from "./general.message";
+import validationMessages from "./validation";
 
 const SHARED_MESSAGES = {
-  validation: createValidationMessages(),
-  general: createGeneralMessages(),
+  validation: validationMessages,
+  general: generalMessages,
 } as const;
 
 export default SHARED_MESSAGES;

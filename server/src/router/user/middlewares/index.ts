@@ -44,7 +44,7 @@ export function emailTypeHandler(
 
     const remainingTime = getEmailRemainingSeconds(user.emailRemainingTime);
 
-    failedResponse({
+    return failedResponse({
       res,
       code: STATUS_CODES.tooEarly,
       message: alreadySentMessage(remainingTime),

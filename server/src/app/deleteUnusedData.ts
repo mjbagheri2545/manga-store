@@ -9,7 +9,7 @@ async function deleteUnusedData() {
       sharedUserService.resetExpiredEmailRemainingTimes(),
     ]);
   } catch (error) {
-    errorLogger.error(getError(error));
+    errorLogger.logMessage(getError(error));
   }
 }
 

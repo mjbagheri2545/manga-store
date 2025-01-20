@@ -5,7 +5,7 @@ import CloseButton from "./CloseButton";
 import "react-toastify/dist/ReactToastify.min.css";
 import "./style.css";
 
-function ToastContainer() {
+export function ToastContainer() {
   return (
     <Container
       position="top-center"
@@ -16,5 +16,3 @@ function ToastContainer() {
     />
   );
 }
-
-export default ToastContainer;

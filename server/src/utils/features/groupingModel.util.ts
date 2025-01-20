@@ -24,13 +24,13 @@ export function createGroupingModelsRouter<T extends GroupingModels>(
 
   const { entityKey, service, logger } = options;
 
-  const { getAll, createEntity, updateEntity } = new GroupingModelsController(
-    options
-  );
+  const { getAllEntities, createEntity, updateEntity } =
+    new GroupingModelsController(options);
 
-  const { createValidation, updateValidation } = new GroupingModelsValidator();
+  const { createEntityValidation, updateEntityValidation } =
+    new GroupingModelsValidator();
 
-  router.get("/", jwtAuthorization, getAll);
+  router.get("/", jwtAuthorization, getAllEntities);
 
   const createPermission = allResourcePermission((user) =>
     hasGroupingModelPermission(user, "create")
@@ -38,7 +38,7 @@ export function createGroupingModelsRouter<T extends GroupingModels>(
 
   router.post(
     "/",
-    createValidation(entityKey),
+    createEntityValidation(entityKey),
     jwtAuthorization,
     createPermission,
     createEntity
@@ -57,7 +57,7 @@ export function createGroupingModelsRouter<T extends GroupingModels>(
 
   router.put(
     "/:id",
-    updateValidation(entityKey),
+    updateEntityValidation(entityKey),
     jwtAuthorization,
     getEntityById,
     updatePermission,
@@ -69,7 +69,10 @@ export function createGroupingModelsRouter<T extends GroupingModels>(
       SHARED_MESSAGES.features;
 
     const entityName = ENTITY_NAMES[entityKey];
-    logger.info(`${upperFirst(entityKey)} delete.`, entity);
+
+    logger.logMessage(`${upperFirst(entityKey)} delete.`, {
+      metaData: { [entityKey]: entity },
+    });
 
     return crudMessage.delete(groupingModelMessage.crud(entity, entityName));
   }
@@ -89,4 +92,6 @@ export function createGroupingModelsRouter<T extends GroupingModels>(
     getEntityById,
     deleteGroupingModelEntity
   );
+
+  return router;
 }

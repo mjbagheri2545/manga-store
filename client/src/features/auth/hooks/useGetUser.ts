@@ -1,25 +1,26 @@
 import { useLayoutEffect, useState } from "react";
 
-import SHARED_API from "@/api";
 import { User } from "@/types";
-import { parseResponse } from "@/utils";
+import { parseApiResponse } from "@/utils";
+
+import authApi from "../api";
 
 function useGetUser(isLoggedIn: boolean) {
   const [user, setUser] = useState<User>();
 
   useLayoutEffect(() => {
-    if (isLoggedIn) {
-      const request = async () => {
-        parseResponse(
-          await SHARED_API.user.getUser(),
-          ({ data }) => {
-            setUser(data.user);
-          },
-          { isToastSuccessfulMessageNeed: false }
-        );
-      };
-      request();
-    }
+    if (!isLoggedIn) return;
+
+    const request = async () => {
+      parseApiResponse(
+        await authApi.getUserByToken(),
+        ({ data }) => {
+          setUser(data.user);
+        },
+        { isToastSuccessfulMessageNeed: false, isToastErrorMessageNeed: false }
+      );
+    };
+    request();
   }, [isLoggedIn]);
 
   return { user, setUser };

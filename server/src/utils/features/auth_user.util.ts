@@ -20,5 +20,7 @@ export function pickUserData(user: User) {
     "createdAt",
     "avatarImage",
     "isVerified",
+    "walletBalance",
+    "bio",
   ]);
 }

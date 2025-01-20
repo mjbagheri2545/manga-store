@@ -5,12 +5,8 @@ export const errorLogger = createLogger({
   fileName: "error",
 });
 
-export const unhandledRejectionLogger = createLogger({
-  level: "error",
-  fileName: "rejection",
-});
-
-export const httpLogger = createLogger({
+export const requestLogger = createLogger({
+  level: "http",
   fileName: "request",
 });
 

@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 
-import Button from "../Button";
+import { Button } from "../Button";
 
 type CloseButtonProps = {
   closeToast: (e: React.MouseEvent<HTMLElement>) => void;

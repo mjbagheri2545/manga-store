@@ -1,9 +1,9 @@
-import CONFIG from "./config";
+import USER_CONFIG from "./config";
 
-const MESSAGES = {
+const USER_MESSAGES = {
   validation: {
-    verificationCode: `طول کد تأیید باید ${CONFIG.verificationCodeLength} کاراکتر باشد.`,
+    verificationCode: `طول کد تأیید باید ${USER_CONFIG.verificationCodeLength} کاراکتر باشد.`,
   },
 } as const;
 
-export default MESSAGES;
+export default USER_MESSAGES;

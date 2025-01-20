@@ -1,29 +1,33 @@
 import { z } from "zod";
 
 import SHARED_MESSAGES from "@/constants/messages";
-import AuthUserValidator from "@/validators/auth_user.validator";
+import {
+  currentPasswordValidator,
+  emailValidator,
+  newPasswordConfirmationValidator,
+  newPasswordValidator,
+} from "@/validators";
+import { minLength } from "@/validators/configuration.validator";
 
 function createAuthSchema() {
-  const validator = new AuthUserValidator();
-
   const registrationSchema = z
     .object({
-      fullName: validator.minLength({ label: "نام و نام خانوادگی" }),
-      email: validator.email(),
-      password: validator.newPassword(),
-      passwordConfirmation: validator.newPasswordConfirmation(),
+      fullName: minLength({ label: "نام و نام خانوادگی" }),
+      email: emailValidator(),
+      password: newPasswordValidator(),
+      passwordConfirmation: newPasswordConfirmationValidator(),
     })
     .refine((data) => data.password === data.passwordConfirmation, {
       message:
-        SHARED_MESSAGES.validation.common.auth_user.password.confirmation(
+        SHARED_MESSAGES.validation.general.auth_user.password.confirmation(
           "رمز عبور"
         ),
       path: ["passwordConfirmation"],
     });
 
   const loginSchema = z.object({
-    email: validator.email(),
-    password: validator.currentPassword(),
+    email: emailValidator(),
+    password: currentPasswordValidator(),
   });
 
   return {
@@ -32,6 +36,6 @@ function createAuthSchema() {
   };
 }
 
-const SCHEMA = createAuthSchema();
+const AUTH_SCHEMA = createAuthSchema();
 
-export default SCHEMA;
+export default AUTH_SCHEMA;

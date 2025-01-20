@@ -1,10 +1,10 @@
 import PATH from "@/constants/path";
 
-import CONFIG from "./config";
+import USER_CONFIG from "./config";
 
-const CONTENT = {
+const USER_CONTENT = {
   account: {
-    identityVerificationNoticeText: `کد تایید ${CONFIG.verificationCodeLength} کاراکتری که به ایمیل شما ارسال شد را وارد کنید.`,
+    identityVerificationNoticeText: `کد تایید ${USER_CONFIG.verificationCodeLength} کاراکتری که به ایمیل شما ارسال شد را وارد کنید.`,
     verification: {
       getEmail: {
         submitButtonText: "ارسال ایمیل تایید",
@@ -48,4 +48,4 @@ const CONTENT = {
   },
 } as const;
 
-export default CONTENT;
+export default USER_CONTENT;

@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Server",
+      "type": "shell",
+      "command": "npm run dev",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "echo": true,
+        "showReuseMessage": false
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/server"
+      }
+    },
+    {
+      "label": "Run Client",
+      "type": "shell",
+      "command": "npm run dev",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "echo": true,
+        "showReuseMessage": false
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      }
+    },
+    {
+      "label": "Run",
+      "dependsOn": ["Run Client", "Run Server"],
+      "type": "shell",
+      "presentation": {
+        "reveal": "always"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import autoBind from "auto-bind";
 import fs from "fs/promises";
 import multer from "multer";
 import path from "path";
@@ -5,6 +6,7 @@ import { User } from "@prisma/client";
 
 import SHARED_CONFIG from "@/constants/config";
 import {
+  EntityModels,
   PaginateQuery,
   Permissions,
   PermissionsAction,
@@ -117,4 +119,27 @@ export async function removeFile(path: string) {
 
 export function prismaSelectId() {
   return { id: true };
+}
+
+export abstract class AutoBind {
+  constructor() {
+    autoBind(this);
+  }
+}
+
+export function updatedEntityFields<E extends EntityModels>(
+  oldObj: E,
+  updatedObj: E
+) {
+  const changedFieldsKeys = Object.keys(updatedObj).filter((key) => {
+    const finalKey = key as keyof E;
+
+    return updatedObj[finalKey] !== oldObj[finalKey];
+  }) as (keyof E)[];
+
+  return pick(updatedObj, changedFieldsKeys);
+}
+
+export function sleep(waitTime: number = 1000) {
+  return new Promise((resolve) => setTimeout(resolve, waitTime));
 }

@@ -1,14 +1,15 @@
 import { string } from "@/validators";
 
-import CONFIG from "../constants/config";
-import MESSAGES from "../constants/messages";
+import USER_CONFIG from "../constants/config";
+import USER_MESSAGES from "../constants/messages";
 
 export function verificationCodeValidator() {
-  const { verificationCodeLength } = CONFIG;
+  const { verificationCodeLength } = USER_CONFIG;
+
   return string("verificationCode", "param")
     .isLength({
       max: verificationCodeLength,
       min: verificationCodeLength,
     })
-    .withMessage(MESSAGES.validation.verificationCode);
+    .withMessage(USER_MESSAGES.validation.verificationCode);
 }

@@ -1,5 +1,4 @@
-import autoBind from "auto-bind";
-
+import { AutoBind } from "@/utils";
 import {
   createValidation,
   emailNotInUseValidator,
@@ -10,12 +9,9 @@ import {
   slugValidator,
 } from "@/validators";
 
-import MESSAGES from "../constants/messages";
+import USER_MESSAGES from "../constants/messages";
 
-class CrudValidator {
-  constructor() {
-    autoBind(this);
-  }
+class UserCrudValidator extends AutoBind {
   private role() {
     return required("role", { label: "سطح دسترسی" })
       .custom((value) => {
@@ -26,7 +22,7 @@ class CrudValidator {
         }
         return;
       })
-      .withMessage(MESSAGES.validation.role);
+      .withMessage(USER_MESSAGES.validation.role);
   }
 
   private walletBalance() {
@@ -81,4 +77,4 @@ class CrudValidator {
   }
 }
 
-export default CrudValidator;
+export default UserCrudValidator;

@@ -22,30 +22,30 @@ import { slugValidation } from "@/validators";
 
 import userLogger from "../constants/logger";
 import USER_MESSAGES from "../constants/messages";
-import PATH from "../constants/path";
-import CrudController from "../controllers/crud.controller";
+import USER_PATH from "../constants/path";
+import UserCrudController from "../controllers/crud.controller";
 import { hasUserPermission } from "../lib/permissions";
 import userService from "../services/user.db";
 import { userLoggerData } from "../utils";
-import CrudValidator from "../validators/crud.validator";
+import UserCrudValidator from "../validators/crud.validator";
 
 function createUserCrudRoutes(router: Router) {
   const avatarImageUploader = createUploader(
     "../../../../uploads/avatarImage/"
   );
 
-  const { getUser, getAll, createUser, updateUser, editProfile } =
-    new CrudController();
+  const { getUser, getAllUsers, createUser, updateUser, editProfile } =
+    new UserCrudController();
 
   const { createUserValidation, updateUserValidation, editProfileValidation } =
-    new CrudValidator();
+    new UserCrudValidator();
 
   const viewPermission = allResourcePermission((user) =>
     hasUserPermission(user, "view")
   );
 
-  router.get(PATH.getByToken, jwtAuthorization, getUser);
-  router.get("/", jwtAuthorization, viewPermission, getAll);
+  router.get(USER_PATH.getByToken, jwtAuthorization, getUser);
+  router.get("/", jwtAuthorization, viewPermission, getAllUsers);
   router.get(
     "/:id",
     slugValidation(),
@@ -92,7 +92,7 @@ function createUserCrudRoutes(router: Router) {
   );
 
   router.put(
-    PATH.editProfile,
+    USER_PATH.editProfile,
     editProfileValidation(),
     jwtAuthorization,
     avatarImageUploader.single("avatarImage"),
@@ -102,7 +102,7 @@ function createUserCrudRoutes(router: Router) {
 
   function userDeleteMessage(user: User) {
     const { delete: deleteMessage } = SHARED_MESSAGES.features.crud;
-    userLogger.info("User deleted.", userLoggerData(user));
+    userLogger.logMessage("User deleted.", { metaData: userLoggerData(user) });
 
     return deleteMessage(USER_MESSAGES.crud.action(user));
   }

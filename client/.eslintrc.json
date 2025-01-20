@@ -9,7 +9,12 @@
     "plugin:react-hooks/recommended",
     "plugin:jsx-a11y/recommended"
   ],
-  "ignorePatterns": ["dist", ".eslintrc.json"],
+  "ignorePatterns": [
+    "dist",
+    ".eslintrc.json",
+    ".eslintrc.pre-commit.json",
+    "scripts"
+  ],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module",
@@ -157,7 +162,7 @@
           },
           {
             "from": ["router"],
-            "allow": ["shared", "router", "page"]
+            "allow": ["shared", "router", "page", "feature"]
           },
           {
             "from": ["entryPoint"],

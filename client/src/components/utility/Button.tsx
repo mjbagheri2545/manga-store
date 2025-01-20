@@ -3,7 +3,7 @@ import { ComponentProps } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
-import Spinner, { SpinnerProps } from "./Spinner";
+import { Spinner, SpinnerProps } from ".";
 
 const buttonStyles = cva("btn disabled:bg-slate-500/15", {
   variants: {
@@ -23,7 +23,7 @@ type ButtonProps = VariantProps<typeof buttonStyles> &
     spinnerProps?: SpinnerProps;
   };
 
-function Button({
+export function Button({
   children,
   variant,
   className,
@@ -49,5 +49,3 @@ function Button({
     </button>
   );
 }
-
-export default Button;

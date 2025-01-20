@@ -8,7 +8,7 @@ import USER_MESSAGES from "../constants/messages";
 import userAccountService from "../services/account.db";
 import { identityVerification, userLoggerData } from "../utils";
 
-class VerificationController {
+class UserAccountVerificationController {
   alreadyVerifiedChecker(
     req: UserAuthorizedReq,
     res: Response,
@@ -28,7 +28,7 @@ class VerificationController {
     next();
   }
 
-  async verify(req: IdentityVerificationReq, res: Response) {
+  async verifyAccount(req: IdentityVerificationReq, res: Response) {
     await identityVerification(req, res);
 
     if (res.headersSent) return;
@@ -36,7 +36,9 @@ class VerificationController {
     const { user } = req.body;
     await userAccountService.verify(user.id);
 
-    userLogger.info("User account verification.", userLoggerData(user));
+    userLogger.logMessage("User account verification.", {
+      metaData: { user: userLoggerData(user) },
+    });
 
     const { successful: successfulMessage } =
       USER_MESSAGES.account.verification;
@@ -45,4 +47,4 @@ class VerificationController {
   }
 }
 
-export default VerificationController;
+export default UserAccountVerificationController;

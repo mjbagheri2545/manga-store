@@ -1,5 +1,4 @@
-import autoBind from "auto-bind";
-
+import { AutoBind } from "@/utils";
 import {
   createValidation,
   currentPasswordValidator,
@@ -10,10 +9,7 @@ import {
 
 import { verificationCodeValidator } from "./account.validator";
 
-class PasswordValidator {
-  constructor() {
-    autoBind(this);
-  }
+class UserAccountPasswordValidator extends AutoBind {
   private getChangePasswordValidation() {
     return [
       newPasswordValidator("newPassword", "رمز عبور جدید"),
@@ -41,4 +37,4 @@ class PasswordValidator {
   }
 }
 
-export default PasswordValidator;
+export default UserAccountPasswordValidator;

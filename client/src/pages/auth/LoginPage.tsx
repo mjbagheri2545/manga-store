@@ -1,11 +1,11 @@
-import Auth_UserFormLayout from "@/components/ui/auth_user/Auth_UserFormLayout";
+import { Auth_UserAccountFormLayout } from "@/components/ui/auth_user";
 import LoginForm from "@/features/auth/components/forms/LoginForm";
 
 function LoginPage() {
   return (
-    <Auth_UserFormLayout>
+    <Auth_UserAccountFormLayout>
       <LoginForm />
-    </Auth_UserFormLayout>
+    </Auth_UserAccountFormLayout>
   );
 }
 

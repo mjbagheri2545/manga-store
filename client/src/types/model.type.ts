@@ -1,4 +1,6 @@
-export const USER_ROLES = ["basic", "verified", "writer", "manager", "admin"];
+export const USER_ROLES = ["user", "translator", "manager", "admin"] as const;
+
+export type UserRole = (typeof USER_ROLES)[number];
 
 export type User = {
   id: string;
@@ -6,5 +8,5 @@ export type User = {
   fullName: string;
   createdAt: string;
   avatarImage?: string;
-  roles: (typeof USER_ROLES)[number][];
+  roles: UserRole[];
 };

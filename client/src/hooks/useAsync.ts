@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { ConditionalFunctionParams } from "@/types";
 import { withCatch } from "@/utils";
 
-type PromiseFunction<T, P = void> = (
-  ...params: P extends void ? [] : [P]
+type PromiseFunction<T, P> = (
+  ...params: ConditionalFunctionParams<P>
 ) => Promise<T>;
 
 export function useAsync<T = void, P = void>(
   promiseFunction: PromiseFunction<T, P>,
   dependencies: any[] = [],
-  params: Parameters<PromiseFunction<T, P>>
+  params: ConditionalFunctionParams<P>
 ) {
   const { execute, ...rest } = useAsyncCreator(
     promiseFunction,
@@ -41,7 +42,7 @@ function useAsyncCreator<T, P>(
   const [value, setValue] = useState<T>();
 
   const execute = useCallback(
-    async (...params: P extends void ? [] : [props: P]) => {
+    async (...params: ConditionalFunctionParams<P>) => {
       setIsLoading(true);
       const [error, value] = await withCatch(promiseFunction(...params));
 

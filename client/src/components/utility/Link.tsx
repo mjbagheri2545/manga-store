@@ -23,7 +23,12 @@ type LinkProps = VariantProps<typeof linkStyles> &
   ComponentProps<"a"> &
   RouterLinkProps;
 
-function Link({ children, variant, className, ...restProps }: LinkProps) {
+export function Link({
+  children,
+  variant,
+  className,
+  ...restProps
+}: LinkProps) {
   return (
     <RouterLink
       {...restProps}
@@ -33,5 +38,3 @@ function Link({ children, variant, className, ...restProps }: LinkProps) {
     </RouterLink>
   );
 }
-
-export default Link;

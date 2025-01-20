@@ -2,16 +2,18 @@ import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import InputField from "@/components/form/inputField";
-import Auth_UserForm from "@/components/ui/auth_user/Auth_UserForm";
+import { InputField } from "@/components/form";
+import { Auth_UserAccountForm } from "@/components/ui/auth_user";
 
 import { RegistrationData } from "../../api";
-import CONTENT from "../../constants/content";
+import AUTH_CONTENT from "../../constants/content";
 import { useAuth } from "../../contexts";
-import SCHEMA from "../../schema";
+import AUTH_SCHEMA from "../../schema";
 
 function RegistrationForm() {
-  const formMethods = useForm({ resolver: zodResolver(SCHEMA.registration) });
+  const formMethods = useForm({
+    resolver: zodResolver(AUTH_SCHEMA.registration),
+  });
   const { register } = useAuth();
 
   function handleOnSubmit(data: RegistrationData) {
@@ -19,11 +21,11 @@ function RegistrationForm() {
   }
 
   return (
-    <Auth_UserForm
+    <Auth_UserAccountForm
       formMethods={formMethods}
       handleOnSubmit={handleOnSubmit}
-      submitButtonText={CONTENT.registration.submitButtonText}
-      content={CONTENT.registration.mainContent}
+      submitButtonText={AUTH_CONTENT.registration.submitButtonText}
+      content={AUTH_CONTENT.registration.mainContent}
     >
       <InputField controllerName="fullName" label="نام و نام خانوادگی" />
       <InputField
@@ -41,7 +43,7 @@ function RegistrationForm() {
         inputProps={{ type: "password" }}
         label="تایید رمز عبور"
       />
-    </Auth_UserForm>
+    </Auth_UserAccountForm>
   );
 }
 

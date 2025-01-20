@@ -4,7 +4,7 @@ import { hasPermission } from "@/utils";
 
 import { GroupingModels, Permissions, PermissionsAction } from "../types";
 
-const PERMISSIONS = {
+const GROUPING_MODELS_PERMISSIONS = {
   admin: { view: true, create: true, update: true, delete: true },
   manager: {
     view: true,
@@ -31,5 +31,5 @@ export function hasGroupingModelPermission<T extends GroupingModels>(
   action: PermissionsAction,
   data?: T
 ) {
-  return hasPermission(user, PERMISSIONS, action, data);
+  return hasPermission(user, GROUPING_MODELS_PERMISSIONS, action, data);
 }

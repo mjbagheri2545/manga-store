@@ -6,7 +6,7 @@ type InputFieldProps = Omit<InputField_FieldProps, "controllerOnChange"> & {
   defaultValue?: string;
 };
 
-function InputField({
+export function InputField({
   controllerName,
   defaultValue = "",
   ...restProps
@@ -31,5 +31,3 @@ function InputField({
     />
   );
 }
-
-export default InputField;
