@@ -1,7 +1,8 @@
+import { TUserAccountContext } from "../contexts/UserAccountContext";
 import useAccountVerification from "./useAccountVerification";
 import useUpdatePassword from "./useUpdatePassword";
 
-function useCreateUserAccountContextValue() {
+function useCreateUserAccountContextValue(): TUserAccountContext {
   const accountVerification = useAccountVerification();
   const updatePassword = useUpdatePassword();
 

@@ -5,7 +5,7 @@ import { User } from "@/types";
 
 import { LoginData, RegistrationData } from "../api";
 
-type TAuthContext = {
+export type TAuthContext = {
   user?: User;
   isLoggedIn: boolean;
   register: (data: RegistrationData) => Promise<void>;

@@ -10,7 +10,7 @@ import {
   PasswordResetData,
 } from "../api/account.api";
 
-type TUserAccountContext = {
+export type TUserAccountContext = {
   verification: {
     getEmail: ApiWrapper;
     verify: ApiWrapper<AccountVerificationVerifyData>;

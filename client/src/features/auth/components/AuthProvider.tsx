@@ -1,25 +1,13 @@
 import { PropsWithChildren } from "react";
 
 import { AuthContext } from "../contexts";
-import useAuthMethods from "../hooks/useAuthMethods";
-import useUser from "../hooks/useGetUser";
-import useToken from "../hooks/useToken";
+import useCreateAuthContextValue from "../hooks/useCreateAuthContextValue";
 
 function AuthProvider({ children: App }: PropsWithChildren) {
-  const { isLoggedIn, setToken } = useToken();
-  const userState = useUser(isLoggedIn);
-
-  const methods = useAuthMethods({
-    ...userState,
-    setToken,
-  });
+  const contextValue = useCreateAuthContextValue();
 
   return (
-    <AuthContext.Provider
-      value={{ isLoggedIn, user: userState.user, ...methods }}
-    >
-      {App}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{App}</AuthContext.Provider>
   );
 }
 
