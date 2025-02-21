@@ -92,9 +92,10 @@ model ProductAverageRating {
 }
 
 model Chapter {
-  id          String @id @default(uuid()) @db.Char(36)
-  episode     Int    @db.SmallInt
-  chapterFile String @db.VarChar(255)
+  id          String   @id @default(uuid()) @db.Char(36)
+  episode     Int      @db.SmallInt
+  chapterFile String   @db.VarChar(255)
+  createdAt   DateTime @default(now())
 
   translator   User?   @relation(fields: [translatorId], references: [id], onDelete: SetDefault)
   translatorId String? @default("مترجم حذف شده") @db.Char(36)

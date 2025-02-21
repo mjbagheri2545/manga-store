@@ -1,9 +1,6 @@
 dist
-.prettierrc.json
-.eslintrc.json
-package.json
-package-lock.json
-tsconfig.json
+*.json
+scripts
 README.md
 uploads
 *.local

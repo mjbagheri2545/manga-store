@@ -6,15 +6,13 @@ const createApi = require("./createApi.cjs");
 const createContexts = require("./createContexts.cjs");
 const createHooks = require("./createHooks.cjs");
 const createSchema = require("./createSchema.cjs");
-const createLib = require("./createLib.cjs");
 
 async function createFeature() {
   const name = process.env.npm_config_name;
-  const noLib = process.env.npm_config_nolib === "true";
 
   if (name == null) {
     const errorMessage = `
-      You must provide a name like this: npm run create-feature --name=invoice --noLib(optional, default=false)
+      You must provide a name like this: npm run create-feature --name=invoice
     `;
 
     throw new Error(errorMessage);
@@ -28,15 +26,13 @@ async function createFeature() {
 
   const promises = [];
 
-  promises.push(createApi(featureDirPath, name, capitalizedName));
-  promises.push(createComponents(featureDirPath, capitalizedName));
-  promises.push(createContexts(featureDirPath, name, capitalizedName));
-  promises.push(createSchema(featureDirPath, capitalizedName, upperCasedName));
-  promises.push(createHooks(featureDirPath, capitalizedName));
+  const commonArgs = [featureDirPath, name, capitalizedName];
 
-  if (!noLib) {
-    promises.push(createLib(featureDirPath, capitalizedName, upperCasedName));
-  }
+  promises.push(createApi(...commonArgs));
+  promises.push(createComponents(featureDirPath, capitalizedName));
+  promises.push(createContexts(...commonArgs));
+  promises.push(createSchema(featureDirPath, capitalizedName, upperCasedName));
+  promises.push(createHooks(...commonArgs));
 
   await Promise.all(promises);
 }

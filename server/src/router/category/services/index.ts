@@ -1,15 +1,28 @@
 import { Category, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { GroupingModelsService } from "@/types";
+import {
+  IProductGroupModelService,
+  PaginateQuery,
+  ProductGroupModelUniquenessCheckOptions,
+} from "@/types";
+import { paginate } from "@/utils";
 
-class CategoryService implements GroupingModelsService<Category> {
-  getAll() {
-    return prisma.category.findMany();
+class CategoryService implements IProductGroupModelService<Category> {
+  getAll(query: PaginateQuery) {
+    return prisma.category.findMany(paginate(query));
   }
 
   getById(id: string) {
     return prisma.category.findUnique({ where: { id } });
+  }
+
+  uniquenessCheck({ name, slug }: ProductGroupModelUniquenessCheckOptions) {
+    return prisma.category.findFirst({ where: { OR: [{ name }, { slug }] } });
+  }
+
+  count() {
+    return prisma.category.count();
   }
 
   create(data: Prisma.CategoryCreateInput) {

@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { PaginateQuery } from "@/types";
-import { paginate } from "@/utils";
+import { PaginateQueryWithSort } from "@/types";
+import { parseQueryWithSort } from "@/utils";
 
 type CreateChapterOptions = {
   data: Pick<Prisma.ChapterCreateInput, "episode" | "chapterFile">;
@@ -11,11 +11,16 @@ type CreateChapterOptions = {
 };
 
 class ChapterService {
-  getAll(productId: string, query: PaginateQuery) {
+  getAll(productId: string, query: PaginateQueryWithSort) {
     return prisma.chapter.findMany({
       where: { productId },
-      ...paginate(query),
+      select: { id: true, episode: true },
+      ...parseQueryWithSort(query),
     });
+  }
+
+  count() {
+    return prisma.chapter.count();
   }
 
   getById(id: string) {

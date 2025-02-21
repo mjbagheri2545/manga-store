@@ -1,13 +1,11 @@
 import { AutoBind } from "@/utils";
+import { createValidation, required, slugValidator } from "@/validators";
 import {
-  createValidation,
   emailNotInUseValidator,
   fullNameValidator,
   newPasswordConfirmationValidator,
   newPasswordValidator,
-  required,
-  slugValidator,
-} from "@/validators";
+} from "@/validators/auth_user.validator";
 
 import USER_MESSAGES from "../constants/messages";
 

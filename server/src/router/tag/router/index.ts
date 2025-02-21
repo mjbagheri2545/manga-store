@@ -1,10 +1,10 @@
-import { createGroupingModelsRouter } from "@/utils";
+import { createProductGroupModelRouter } from "@/utils/features/productGroup.util";
 
 import tagLogger from "../constants/logger";
 import tagService from "../services";
 
 function createTagRouter() {
-  const router = createGroupingModelsRouter({
+  const router = createProductGroupModelRouter({
     service: tagService,
     entityKey: "tag",
     logger: tagLogger,

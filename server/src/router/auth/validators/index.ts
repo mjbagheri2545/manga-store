@@ -1,12 +1,12 @@
+import { createValidation } from "@/validators";
 import {
-  createValidation,
   currentPasswordValidator,
   emailNotInUseValidator,
   emailValidator,
   fullNameValidator,
   newPasswordConfirmationValidator,
   newPasswordValidator,
-} from "@/validators";
+} from "@/validators/auth_user.validator";
 
 class AuthValidator {
   registrationValidation() {

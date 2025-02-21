@@ -8,4 +8,6 @@ class SharedTokenService {
   }
 }
 
-export const sharedTokenService = new SharedTokenService();
+const sharedTokenService = new SharedTokenService();
+
+export default sharedTokenService;

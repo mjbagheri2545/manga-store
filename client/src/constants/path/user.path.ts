@@ -7,7 +7,7 @@ function createUserPath() {
     return `${userPath}/${path}`;
   }
 
-  function crateAccountPath(path: string) {
+  function createAccountPath(path: string) {
     return `account/${path}`;
   }
 
@@ -15,10 +15,10 @@ function createUserPath() {
     getFullPath: (path: string) => createPath(path),
     getUserByToken: createPath("get-by-token"),
     account: {
-      verification: crateAccountPath("verification"),
+      verification: createAccountPath("verification"),
       password: {
-        recovery: crateAccountPath("password/recovery"),
-        reset: crateAccountPath("password/reset"),
+        recovery: createAccountPath("password/recovery"),
+        reset: createAccountPath("password/reset"),
       },
     },
   } as const;

@@ -1,15 +1,16 @@
 import axios, { AxiosRequestConfig, isAxiosError } from "axios";
 
 import env from "@/constants/env";
+import SHARED_MESSAGES from "@/constants/messages";
 import {
-  ApiFailedResponse,
-  ApiMethods,
-  ApiMethodsWithBody,
-  ApiMethodsWithoutBody,
   ApiResponse,
-  ApiSuccessfulResponse,
+  ApiResult,
+  HttpMethods,
+  HttpMethodsWithBody,
+  HttpMethodsWithoutBody,
+  TypeOrTypeArray,
 } from "@/types";
-import { withCatch } from "@/utils";
+import { ApiError, withCatch } from "@/utils";
 
 const http = axios.create({
   baseURL: env.VITE_API_END_POINT,
@@ -17,23 +18,24 @@ const http = axios.create({
   timeout: env.VITE_REQUEST_TIMEOUT,
 });
 
-function getFailedResponseError(error: Error): ApiFailedResponse["error"] {
+// string[] because error.response?.data?.message maybe is string[]
+function getFailedResponseErrorMessages(error: Error): TypeOrTypeArray<string> {
   return isAxiosError(error)
     ? (error.response?.data?.message ?? error.message)
-    : `An unexpected error happened with message: ${error.message}`;
+    : SHARED_MESSAGES.general.unexpectedError(error.message);
 }
 
-type AxiosOptions<T, M extends ApiMethods> = AxiosRequestConfig & {
-  method?: T extends never ? ApiMethodsWithoutBody : ApiMethodsWithBody;
-  data: M extends ApiMethodsWithoutBody ? never : T;
+type HttpOptions<T, M extends HttpMethods> = AxiosRequestConfig & {
+  method?: T extends never ? HttpMethodsWithoutBody : HttpMethodsWithBody;
+  data?: M extends HttpMethodsWithoutBody ? never : T;
 };
 
-function createHttpMethod<M extends ApiMethods>(method: M) {
+function createHttpMethod<M extends HttpMethods>(method: M) {
   return async function <V = unknown, T = unknown>(
     url: string,
-    options?: AxiosOptions<T, M>
+    options?: HttpOptions<T, M>
   ): Promise<ApiResponse<V>> {
-    const request = http<ApiSuccessfulResponse<V>["result"]>({
+    const request = http<ApiResult<V>>({
       url,
       method,
       ...options,
@@ -44,7 +46,7 @@ function createHttpMethod<M extends ApiMethods>(method: M) {
     if (error != null) {
       return {
         isSuccessful: false,
-        error: getFailedResponseError(error),
+        error: new ApiError(getFailedResponseErrorMessages(error)),
       };
     }
 

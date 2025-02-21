@@ -1,36 +1,38 @@
 import { Response } from "express";
 
-import { EmptyObject, UserAuthorizedReq } from "@/types";
+import { EmptyObject, PaginateQueryWithSort, UserAuthorizedReq } from "@/types";
 import { notFound, successfulResponse } from "@/utils";
 
 import productService from "../services";
-import { ProductQuery } from "../types";
 
 type ProductGetReq<P = EmptyObject> = UserAuthorizedReq<
   EmptyObject,
-  ProductQuery,
+  PaginateQueryWithSort,
   P
 >;
 
-type GetByProductSlugReq = UserAuthorizedReq<
+type GetBySlugReq = UserAuthorizedReq<
   EmptyObject,
   EmptyObject,
-  { productSlug: string }
+  { slug: string }
 >;
 
 class GetProductController {
   async getAllProducts(req: ProductGetReq, res: Response) {
-    const products = await productService.getAll(req.query);
+    const [products, count] = await Promise.all([
+      productService.getAll(req.query),
+      productService.count(),
+    ]);
 
-    successfulResponse({ res, data: { products } });
+    successfulResponse({ res, data: { products, count } });
   }
 
-  async getProductByProductSlug(req: GetByProductSlugReq, res: Response) {
+  async getProductBySlug(req: GetBySlugReq, res: Response) {
     const {
-      params: { productSlug },
+      params: { slug },
     } = req;
 
-    const product = await productService.getByProductSlug(productSlug);
+    const product = await productService.getBySlug(slug);
 
     if (product == null) {
       return notFound({
@@ -52,9 +54,12 @@ class GetProductController {
       params: { category },
     } = req;
 
-    const products = await productService.getByCategory(category, query);
+    const [products, count] = await Promise.all([
+      productService.getByCategory(category, query),
+      productService.count(),
+    ]);
 
-    successfulResponse({ res, data: { products } });
+    successfulResponse({ res, data: { products, count } });
   }
 
   async getProductsByTag(req: ProductGetReq<{ tag: string }>, res: Response) {
@@ -63,9 +68,12 @@ class GetProductController {
       params: { tag },
     } = req;
 
-    const products = await productService.getByTag(tag, query);
+    const [products, count] = await Promise.all([
+      productService.getByTag(tag, query),
+      productService.count(),
+    ]);
 
-    successfulResponse({ res, data: { products } });
+    successfulResponse({ res, data: { products, count } });
   }
 
   async getProductsByStatus(
@@ -77,9 +85,12 @@ class GetProductController {
       params: { status },
     } = req;
 
-    const products = await productService.getByStatus(status, query);
+    const [products, count] = await Promise.all([
+      productService.getByStatus(status, query),
+      productService.count(),
+    ]);
 
-    successfulResponse({ res, data: { products } });
+    successfulResponse({ res, data: { products, count } });
   }
 }
 

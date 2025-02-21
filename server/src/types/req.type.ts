@@ -35,3 +35,7 @@ export type PaginateQuery = {
   take?: string;
   skip?: string;
 };
+
+export type PaginateQueryWithSort = PaginateQuery & {
+  sort?: string;
+};

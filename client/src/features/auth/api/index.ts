@@ -1,13 +1,7 @@
-import { z } from "zod";
-
 import PATH from "@/constants/path";
 import { HTTP } from "@/lib/http";
+import { LoginData, RegistrationData } from "@/schemas/auth.schema";
 import { User } from "@/types";
-
-import AUTH_SCHEMA from "../schema";
-
-export type RegistrationData = z.infer<typeof AUTH_SCHEMA.registration>;
-export type LoginData = z.infer<typeof AUTH_SCHEMA.login>;
 
 type LoginResponse = {
   token: string;

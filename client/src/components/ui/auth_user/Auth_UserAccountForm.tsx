@@ -1,3 +1,5 @@
+import { FieldValues } from "react-hook-form";
+
 import { Form, FormProps } from "@/components/form";
 import { Link } from "@/components/utility";
 
@@ -6,15 +8,15 @@ type Content = {
   links: readonly { to: string; text: string }[];
 };
 
-export type Auth_UserFormProps = FormProps & {
+export type Auth_UserFormProps<T extends FieldValues> = FormProps<T> & {
   content: Content;
 };
 
-export function Auth_UserAccountForm({
+export function Auth_UserAccountForm<T extends FieldValues>({
   children,
   content,
   ...restProps
-}: Auth_UserFormProps) {
+}: Auth_UserFormProps<T>) {
   return (
     <>
       <h3 className="text-xl font-bold mb-6 text-center">{content.title}</h3>

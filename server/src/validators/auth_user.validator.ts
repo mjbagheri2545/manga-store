@@ -1,33 +1,29 @@
-import SHARED_CONFIG from "@/constants/config";
-import SHARED_MESSAGES from "@/constants/messages";
-import { sharedUserService } from "@/services";
+import { PASSWORD_CONFIG } from "@/constants/global/featuers/auth_user.global";
+import AUTH_USER_MESSAGES from "@/constants/messages/features/auth_user.message";
+import sharedUserService from "@/services/user.service";
 
-import { isLength, string } from "./configuration.validator";
+import { isLength, string, uniquenessValidator } from ".";
 
 export function emailValidator() {
   return string("email")
     .isEmail()
-    .withMessage(SHARED_MESSAGES.validation.features.auth_user.email);
+    .withMessage(AUTH_USER_MESSAGES.validation.email.invalid);
 }
 
 export function currentPasswordValidator(
   field = "password",
   label = "رمز عبور"
 ) {
-  const { minLength } = SHARED_CONFIG.validation.password;
-
   return isLength(field, {
-    min: minLength,
+    min: PASSWORD_CONFIG.minLength,
     label,
   });
 }
 
 export function newPasswordValidator(field = "password", label = "رمز عبور") {
   return string(field)
-    .matches(SHARED_CONFIG.validation.password.pattern)
-    .withMessage(
-      SHARED_MESSAGES.validation.features.auth_user.password.new(label)
-    );
+    .matches(PASSWORD_CONFIG.regex)
+    .withMessage(AUTH_USER_MESSAGES.validation.password.new(label));
 }
 
 export function newPasswordConfirmationValidator(
@@ -36,9 +32,7 @@ export function newPasswordConfirmationValidator(
 ) {
   return string(`${field}Confirmation`)
     .custom((value, { req }) => value === req.body[field])
-    .withMessage(
-      SHARED_MESSAGES.validation.features.auth_user.password.confirmation(label)
-    );
+    .withMessage(AUTH_USER_MESSAGES.validation.password.confirmation(label));
 }
 
 export function fullNameValidator() {
@@ -47,12 +41,6 @@ export function fullNameValidator() {
 
 export function emailNotInUseValidator() {
   return emailValidator()
-    .custom(async (value: string) => {
-      const user = await sharedUserService.getByEmail(value);
-      if (user != null) {
-        throw new Error();
-      }
-      return;
-    })
-    .withMessage(SHARED_MESSAGES.validation.features.auth_user.emailInUse);
+    .custom(uniquenessValidator(sharedUserService.getByEmail))
+    .withMessage(AUTH_USER_MESSAGES.validation.email.inUse);
 }

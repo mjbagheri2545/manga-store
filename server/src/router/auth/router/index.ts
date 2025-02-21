@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { emailAuthorization } from "@/middlewares";
+import { emailAuthorization } from "@/middlewares/features/auth_user.middleware";
 
 import AUTH_PATH from "../constants/path";
 import AuthController from "../controllers";

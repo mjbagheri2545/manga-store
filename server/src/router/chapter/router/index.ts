@@ -5,12 +5,12 @@ import { Chapter } from "@prisma/client";
 import SHARED_MESSAGES from "@/constants/messages";
 import {
   allResourcePermission,
+  deleteEntity,
   fileAuthorization,
   idAuthorization,
   jwtAuthorization,
   specificResourcePermission,
 } from "@/middlewares";
-import { deleteEntity } from "@/middlewares/features/crud.middleware";
 import { PermissionChapter } from "@/types";
 import { createUploader } from "@/utils";
 import { slugValidation } from "@/validators";
@@ -84,7 +84,7 @@ function createChapterRouter() {
   );
 
   function deleteChapterMessage(chapter: Chapter) {
-    const { delete: deleteMessage } = SHARED_MESSAGES.features.crud;
+    const { delete: deleteMessage } = SHARED_MESSAGES.crud;
     chapterLogger.logMessage("Chapter deleted.", {
       metaData: { chapter: chapterLoggerData(chapter) },
     });

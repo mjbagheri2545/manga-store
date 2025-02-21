@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
 
 import { v4 as uuidV4 } from "uuid";
-import { User } from "@prisma/client";
 
-import SHARED_CONFIG from "@/constants/config";
+import { TIME } from "@/constants/global/general.global";
 import { EmptyObject, IdentityVerificationReq } from "@/types";
 import { badRequest, getExpirationTime, isExpired, pick } from "@/utils";
 
 import USER_CONFIG from "../constants/config";
 import USER_MESSAGES from "../constants/messages";
-import tokenService from "../services/token.db";
+import tokenService from "../services/token.service";
 
 export async function generateVerificationToken(userId: string) {
   const uuid = uuidV4();
@@ -40,7 +39,7 @@ function generateVerificationCodeFromUuid(uuid: string): string {
 }
 
 function getIdentificationExpirationTime() {
-  return getExpirationTime(SHARED_CONFIG.time.identificationExpirationMinutes);
+  return getExpirationTime(TIME.identificationExpirationMinutes);
 }
 
 export function getEmailRemainingSeconds(date: Date) {
@@ -81,8 +80,4 @@ export function pickUserCreateData(req: Request) {
     "walletBalance",
     "userToUpdate",
   ]);
-}
-
-export function userLoggerData(user: User) {
-  return pick(user, ["email", "fullName", "id"]);
 }

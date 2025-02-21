@@ -1,26 +1,12 @@
-import { z } from "zod";
-
 import PATH from "@/constants/path";
 import { HTTP } from "@/lib/http";
 
-import USER_ACCOUNT_SCHEMA from "../schema/account.schema";
-
-export type AccountVerificationVerifyData = z.infer<
-  typeof USER_ACCOUNT_SCHEMA.verification.verify
->;
-
-export type PasswordRecoveryGetEmailData = z.infer<
-  typeof USER_ACCOUNT_SCHEMA.password.recovery.getEmail
->;
-export type PasswordRecoveryRecoverData = z.infer<
-  typeof USER_ACCOUNT_SCHEMA.password.recovery.recover
-> & {
-  email: string;
-};
-
-export type PasswordResetData = z.infer<
-  typeof USER_ACCOUNT_SCHEMA.password.reset
->;
+import {
+  GetEmailData,
+  PasswordRecoveryRecoverData,
+  PasswordResetData,
+  VerificationData,
+} from "../schemas/account.schema";
 
 class UserAccountApi {
   readonly password;
@@ -40,7 +26,7 @@ class UserAccountApi {
           PATH.user.getFullPath(`${verificationPath}/get-email`)
         );
       },
-      verify({ verificationCode }: AccountVerificationVerifyData) {
+      verify({ verificationCode }: VerificationData) {
         return HTTP.put(
           PATH.user.getFullPath(`${verificationPath}/${verificationCode}`)
         );
@@ -53,7 +39,7 @@ class UserAccountApi {
 
     return {
       recovery: {
-        getEmail(data: PasswordRecoveryGetEmailData) {
+        getEmail(data: GetEmailData) {
           return HTTP.post(
             PATH.user.getFullPath(`${passwordPath.recovery}/get-email`),
             {

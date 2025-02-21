@@ -1,11 +1,11 @@
 import { AutoBind } from "@/utils";
+import { createValidation } from "@/validators";
 import {
-  createValidation,
   currentPasswordValidator,
   emailValidator,
   newPasswordConfirmationValidator,
   newPasswordValidator,
-} from "@/validators";
+} from "@/validators/auth_user.validator";
 
 import { verificationCodeValidator } from "./account.validator";
 

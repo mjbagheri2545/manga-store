@@ -1,10 +1,8 @@
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { StrictOmit } from "@/types";
-
-import { ProductQuery } from "../types";
-import { parseQuery } from "../utils";
+import { PaginateQueryWithSort, StrictOmit } from "@/types";
+import { parseQueryWithSort } from "@/utils";
 
 type CreateProductOptions = {
   data: StrictOmit<Prisma.ProductCreateInput, "manager" | "category" | "tags">;
@@ -48,11 +46,19 @@ class ProductService {
       name: true,
       productImage: true,
       slug: true,
+      id: true,
     };
   }
 
-  getAll(query: ProductQuery) {
-    return prisma.product.findMany(parseQuery(query));
+  getAll(query: PaginateQueryWithSort) {
+    return prisma.product.findMany({
+      ...parseQueryWithSort(query),
+      select: this.getSelectProducts(),
+    });
+  }
+
+  count() {
+    return prisma.product.count();
   }
 
   getById(id: string) {
@@ -64,41 +70,41 @@ class ProductService {
     });
   }
 
-  getByProductSlug(productSlug: string) {
-    const groupingModelSelect = { select: { name: true, slug: true } };
+  getBySlug(slug: string) {
+    const ProductGroupModelSelect = { select: { name: true, slug: true } };
 
     return prisma.product.findUnique({
-      where: { slug: productSlug },
+      where: { slug },
       include: {
         averageRating: { select: { rating: true } },
-        category: groupingModelSelect,
-        status: groupingModelSelect,
-        tags: groupingModelSelect,
-        chapters: { select: { translator: true, episode: true } },
+        category: ProductGroupModelSelect,
+        status: ProductGroupModelSelect,
+        tags: ProductGroupModelSelect,
+        chapters: { select: { translator: true, episode: true, id: true } },
       },
     });
   }
 
-  getByCategory(categorySlug: string, query: ProductQuery) {
+  getByCategory(categorySlug: string, query: PaginateQueryWithSort) {
     return prisma.product.findMany({
       where: { category: { slug: categorySlug } },
-      ...parseQuery(query),
+      ...parseQueryWithSort(query),
       select: this.getSelectProducts(),
     });
   }
 
-  getByTag(tagSlug: string, query: ProductQuery) {
+  getByTag(tagSlug: string, query: PaginateQueryWithSort) {
     return prisma.product.findMany({
       where: { tags: { every: { slug: tagSlug } } },
-      ...parseQuery(query),
+      ...parseQueryWithSort(query),
       select: this.getSelectProducts(),
     });
   }
 
-  getByStatus(statusSlug: string, query: ProductQuery) {
+  getByStatus(statusSlug: string, query: PaginateQueryWithSort) {
     return prisma.product.findMany({
       where: { status: { slug: statusSlug } },
-      ...parseQuery(query),
+      ...parseQueryWithSort(query),
       select: this.getSelectProducts(),
     });
   }

@@ -1,5 +1,5 @@
 import generalMessages from "./general.message";
-import validationMessages from "./validation";
+import validationMessages from "./validation.message";
 
 const SHARED_MESSAGES = {
   validation: validationMessages,

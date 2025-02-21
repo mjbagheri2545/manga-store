@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { sharedUserService } from "@/services";
+import sharedUserService from "@/services/user.service";
 import { notFound } from "@/utils";
 
 export async function emailAuthorization(

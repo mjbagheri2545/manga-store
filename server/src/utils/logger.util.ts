@@ -1,6 +1,6 @@
 import winston, { transports } from "winston";
 
-import SHARED_CONFIG from "@/constants/config";
+import { LOGGER_CONFIG } from "@/constants/global/general.global";
 
 import "winston-daily-rotate-file";
 
@@ -32,7 +32,7 @@ const getFileRotateTransport = ({
 }: GetFileRotateTransportOptions) => {
   const baseFormats = [
     errors({ stack: true }),
-    timestamp({ format: SHARED_CONFIG.logger.timestampFormat }),
+    timestamp({ format: LOGGER_CONFIG.timestampFormat }),
     splat(),
     prettyPrint({ depth: 5 }),
     metadata({ fillExcept: ["timestamp", "level", "message"] }),
@@ -44,10 +44,10 @@ const getFileRotateTransport = ({
   const format = combine(...baseFormats, ...formats);
 
   return new transports.DailyRotateFile({
-    filename: SHARED_CONFIG.logger.fileName(fileName),
-    datePattern: SHARED_CONFIG.logger.datePattern,
-    maxFiles: SHARED_CONFIG.logger.maxFiles,
-    maxSize: SHARED_CONFIG.logger.maxSize,
+    filename: LOGGER_CONFIG.fileName(fileName),
+    datePattern: LOGGER_CONFIG.datePattern,
+    maxFiles: LOGGER_CONFIG.maxFiles,
+    maxSize: LOGGER_CONFIG.maxSize,
     level,
     format,
   });

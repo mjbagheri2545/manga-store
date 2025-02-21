@@ -4,15 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { InputField } from "@/components/form";
 import { Auth_UserAccountForm } from "@/components/ui/auth_user";
+import { useAuth } from "@/contexts/AuthContext";
+import { RegistrationData, registrationSchema } from "@/schemas/auth.schema";
 
-import { RegistrationData } from "../../api";
 import AUTH_CONTENT from "../../constants/content";
-import { useAuth } from "../../contexts";
-import AUTH_SCHEMA from "../../schema";
 
 function RegistrationForm() {
-  const formMethods = useForm({
-    resolver: zodResolver(AUTH_SCHEMA.registration),
+  const formMethods = useForm<RegistrationData>({
+    resolver: zodResolver(registrationSchema),
   });
   const { register } = useAuth();
 
@@ -30,17 +29,17 @@ function RegistrationForm() {
       <InputField controllerName="fullName" label="نام و نام خانوادگی" />
       <InputField
         controllerName="email"
-        inputProps={{ type: "email" }}
+        fieldProps={{ type: "email" }}
         label="ایمیل"
       />
       <InputField
         controllerName="password"
-        inputProps={{ type: "password" }}
+        fieldProps={{ type: "password" }}
         label="رمز عبور"
       />
       <InputField
         controllerName="passwordConfirmation"
-        inputProps={{ type: "password" }}
+        fieldProps={{ type: "password" }}
         label="تایید رمز عبور"
       />
     </Auth_UserAccountForm>

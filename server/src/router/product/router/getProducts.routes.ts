@@ -1,10 +1,12 @@
 import { Router } from "express";
 
 import { jwtAuthorization } from "@/middlewares";
+import { getAllEntities } from "@/middlewares/crud.middleware";
 import { slugValidation } from "@/validators";
 
 import PRODUCT_PATH from "../constants/path";
 import GetProductController from "../controllers/getProduct.controller";
+import productService from "../services";
 
 // we can't use router.use for this routes because these routes
 // does not have a same parent path to group these routes like below path
@@ -13,20 +15,24 @@ import GetProductController from "../controllers/getProduct.controller";
 
 function createGetProductsRoutes(router: Router) {
   const {
-    getAllProducts,
-    getProductByProductSlug,
+    getProductBySlug,
     getProductsByCategory,
     getProductsByTag,
     getProductsByStatus,
   } = new GetProductController();
 
+  const getAllProducts = getAllEntities({
+    service: productService,
+    entitiesKey: "products",
+  });
+
   router.get("/", jwtAuthorization, getAllProducts);
 
   router.get(
-    PRODUCT_PATH.getByProductSlug,
-    slugValidation("productSlug", "محصول مورد نظر"),
+    PRODUCT_PATH.getBySlug,
+    slugValidation("slug", "محصول مورد نظر"),
     jwtAuthorization,
-    getProductByProductSlug
+    getProductBySlug
   );
 
   router.get(

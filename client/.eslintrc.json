@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/eslintrc",
   "root": true,
   "env": { "browser": true, "es2020": true },
   "extends": [
@@ -11,9 +12,8 @@
   ],
   "ignorePatterns": [
     "dist",
-    ".eslintrc.json",
-    ".eslintrc.pre-commit.json",
-    "scripts"
+    "scripts",
+    "**/*.json"
   ],
   "parserOptions": {
     "ecmaVersion": "latest",
@@ -49,15 +49,7 @@
         "mode": "full",
         "type": "shared",
         "pattern": [
-          "src/api/**/*",
-          "src/components/**/*",
-          "src/constants/**/*",
-          "src/assets/**/*",
-          "src/hooks/**/*",
-          "src/lib/**/*",
-          "src/utils/**/*",
-          "src/types/**/*",
-          "src/validators/**/*"
+          "src/{api,components,constants,assets,hooks,lib,utils,types,validators,schemas,contexts}/**/*"
         ]
       },
       {
@@ -101,7 +93,7 @@
 
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error",
-    "react-hooks/exhaustive-deps": ["warn"],
+    "react-hooks/exhaustive-deps": "warn",
     "react/jsx-filename-extension": [1, { "extensions": [".ts", ".tsx"] }],
     "react-refresh/only-export-components": [
       "warn",

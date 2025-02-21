@@ -3,11 +3,11 @@ import { NextFunction, Request, Response } from "express";
 import { fromFile } from "file-type";
 import { PrismaPromise } from "@prisma/client";
 
-import { ENTITY_NAMES } from "@/constants/entities";
+import { ENTITY_NAMES } from "@/constants/global/general.global";
 import { errorLogger } from "@/constants/loggers";
 import SHARED_MESSAGES from "@/constants/messages";
-import { sharedUserService } from "@/services";
-import { EntityKey, EntityModels } from "@/types";
+import sharedUserService from "@/services/user.service";
+import { EntityKey, Model } from "@/types";
 import {
   badRequest,
   getError,
@@ -52,7 +52,7 @@ function getEntityName(name: string) {
   return name === "دسته بندی" ? name + " ای" : "ی";
 }
 
-export function idAuthorization<T extends EntityModels>({
+export function idAuthorization<T extends Model>({
   getByIdQuery,
   ...restOptions
 }: GetByIdOptions<T>) {

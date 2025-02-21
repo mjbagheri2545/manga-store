@@ -1,15 +1,28 @@
 import { Prisma, Tag } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { GroupingModelsService } from "@/types";
+import {
+  IProductGroupModelService,
+  PaginateQuery,
+  ProductGroupModelUniquenessCheckOptions,
+} from "@/types";
+import { paginate } from "@/utils";
 
-class TagService implements GroupingModelsService<Tag> {
-  getAll() {
-    return prisma.tag.findMany();
+class TagService implements IProductGroupModelService<Tag> {
+  getAll(query: PaginateQuery) {
+    return prisma.tag.findMany(paginate(query));
   }
 
   getById(id: string) {
     return prisma.tag.findUnique({ where: { id } });
+  }
+
+  uniquenessCheck({ name, slug }: ProductGroupModelUniquenessCheckOptions) {
+    return prisma.tag.findFirst({ where: { OR: [{ name }, { slug }] } });
+  }
+
+  count() {
+    return prisma.tag.count();
   }
 
   create(data: Prisma.TagCreateInput) {

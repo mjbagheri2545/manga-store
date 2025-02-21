@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 
 import PATH from "@/constants/path";
 
+import AdminRouter from "./admin";
 import AuthRouter from "./auth.router";
 import HomeRouter from "./home.router";
 import UserRouter from "./user.router";
@@ -12,6 +13,7 @@ function Router() {
       <Routes>
         <Route path={`${PATH.base.auth}/*`} element={<AuthRouter />} />
         <Route path={`${PATH.base.user}/*`} element={<UserRouter />} />
+        <Route path="/admin/*" element={<AdminRouter />} />
         <Route path={`${PATH.base.home}*`} element={<HomeRouter />} />
       </Routes>
     </>

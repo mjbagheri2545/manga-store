@@ -1,13 +1,14 @@
-import { LoaderPinwheel, LucideProps } from "lucide-react";
+import { ComponentProps } from "react";
+
 import { twMerge } from "tailwind-merge";
 
-export type SpinnerProps = LucideProps;
+export type SpinnerProps = ComponentProps<"span">;
 
 export function Spinner({ className, ...restProps }: SpinnerProps) {
   return (
-    <LoaderPinwheel
+    <span
       {...restProps}
-      className={twMerge("size-12 animate-spin", className)}
+      className={twMerge("loading loading-spinner w-12", className)}
     />
   );
 }

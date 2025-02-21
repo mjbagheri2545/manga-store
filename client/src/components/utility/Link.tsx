@@ -19,7 +19,7 @@ const linkStyles = cva("link transition no-underline", {
   },
 });
 
-type LinkProps = VariantProps<typeof linkStyles> &
+export type LinkProps = VariantProps<typeof linkStyles> &
   ComponentProps<"a"> &
   RouterLinkProps;
 

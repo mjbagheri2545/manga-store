@@ -4,10 +4,9 @@ import multer from "multer";
 import path from "path";
 import { User } from "@prisma/client";
 
-import SHARED_CONFIG from "@/constants/config";
+import { TIME } from "@/constants/global/general.global";
 import {
-  EntityModels,
-  PaginateQuery,
+  Model,
   Permissions,
   PermissionsAction,
   TypeOrTypeArray,
@@ -16,7 +15,7 @@ import {
 import { withCatch } from "./error.util";
 
 export function upperFirst(str: string) {
-  return str.slice(1) + str[0].toUpperCase();
+  return str[0].toUpperCase() + str.slice(1);
 }
 
 export function parseTypeOrTypeArray<T>(data: TypeOrTypeArray<T>): T[] {
@@ -48,22 +47,11 @@ export function getExpirationTime(expirationMinutes: number) {
 }
 
 export function getEmailRemainingTime() {
-  return getExpirationTime(SHARED_CONFIG.time.minutesUntilResendingEmail);
+  return getExpirationTime(TIME.minutesUntilResendingEmail);
 }
 
 export function isExpired(time: Date | number) {
   return (typeof time === "number" ? time : time.getTime()) <= Date.now();
-}
-
-export function paginate(
-  query: PaginateQuery,
-  defaultTake: number = SHARED_CONFIG.defaultQueryTake
-) {
-  const { take, skip } = query;
-  return {
-    take: take != null ? parseInt(take) : defaultTake,
-    skip: skip != null ? parseInt(skip) : 0,
-  };
 }
 
 export function hasPermission<T>(
@@ -117,20 +105,13 @@ export async function removeFile(path: string) {
   await fs.unlink(path);
 }
 
-export function prismaSelectId() {
-  return { id: true };
-}
-
 export abstract class AutoBind {
   constructor() {
     autoBind(this);
   }
 }
 
-export function updatedEntityFields<E extends EntityModels>(
-  oldObj: E,
-  updatedObj: E
-) {
+export function updatedEntityFields<E extends Model>(oldObj: E, updatedObj: E) {
   const changedFieldsKeys = Object.keys(updatedObj).filter((key) => {
     const finalKey = key as keyof E;
 
@@ -140,6 +121,6 @@ export function updatedEntityFields<E extends EntityModels>(
   return pick(updatedObj, changedFieldsKeys);
 }
 
-export function sleep(waitTime: number = 1000) {
+export function wait(waitTime: number = 1000) {
   return new Promise((resolve) => setTimeout(resolve, waitTime));
 }

@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import PATH from "@/constants/path";
 import { parseApiResponse } from "@/utils";
 
-import userAccountApi, {
-  AccountVerificationVerifyData,
-} from "../api/account.api";
+import userAccountApi from "../api/account.api";
+import { VerificationData } from "../schemas/account.schema";
 
 function useAccountVerification() {
   const navigate = useNavigate();
@@ -18,7 +17,7 @@ function useAccountVerification() {
     });
   }
 
-  async function verify(data: AccountVerificationVerifyData) {
+  async function verify(data: VerificationData) {
     const response = await userAccountApi.verification.verify(data);
 
     parseApiResponse(response, () => {

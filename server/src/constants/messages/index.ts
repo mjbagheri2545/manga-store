@@ -1,11 +1,11 @@
-import featuresMessages from "./features.message";
+import crudMessages from "./crud.message";
 import generalMessages from "./general.message";
 import statusCodeMessages from "./statusCode.message";
-import validationMessages from "./validation";
+import validationMessages from "./validation.message";
 
 const SHARED_MESSAGES = {
   validation: validationMessages,
-  features: featuresMessages,
+  crud: crudMessages,
   statusCode: statusCodeMessages,
   general: generalMessages,
 } as const;

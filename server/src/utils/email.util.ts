@@ -8,7 +8,7 @@ import env from "@/constants/env";
 import { emailLogger } from "@/constants/loggers";
 import SHARED_MESSAGES from "@/constants/messages";
 import STATUS_CODES from "@/constants/statusCodes";
-import { sharedUserService } from "@/services";
+import sharedUserService from "@/services/user.service";
 import { EmptyObject, SendEmailReq, TypeOrTypeArray } from "@/types";
 
 import compileHandlebarsTemplate, {

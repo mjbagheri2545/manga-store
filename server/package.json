@@ -7,9 +7,11 @@
     "build": "tsc --watch",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "lint:unusedExports": "eslint . --fix --c .eslintrc.pre-push.json",
     "format": "prettier . --write",
-    "pre:commit": "lint-staged",
+    "pre:commit": "lint-staged -c lint-staged.pre-commit.json",
     "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
+    "db:seed": "dotenv -e .env.development.local -- npx prisma db seed",
     "deps:check": "madge src --circular",
     "deps:graph": "node ./scripts/depsGraph.js",
     "husky:prepare": "cd .. && husky server/.husky",
@@ -19,12 +21,6 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
-  },
-  "lint-staged": {
-    "*.ts": [
-      "eslint --fix --config .eslintrc.json --config .eslintrc.pre-commit.json",
-      "prettier --write"
-    ]
   },
   "keywords": [],
   "author": "",
@@ -39,7 +35,7 @@
     "@types/module-alias": "^2.0.4",
     "@types/morgan": "^1.9.9",
     "@types/multer": "^1.4.12",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.13.1",
     "@types/nodemailer": "^6.4.15",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.17.0",

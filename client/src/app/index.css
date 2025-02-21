@@ -7,4 +7,20 @@
   --color-success: #008b00;
   --color-info: #0ea5e9;
   --color-warning: #ffd600;
+
+  --color-alert-bgInfo: #061217;
+  --color-alert-bgSuccess: #051005;
+  --color-alert-bgWarning: #191605;
+  --color-alert-bgError: #130507;
+
+  --color-alert-colorInfo: #b1e2f7;
+  --color-alert-colorSuccess: #add9ad;
+  --color-alert-colorWarning: #fff1ad;
+  --color-alert-colorError: #e5adb7;
+}
+
+@layer utilities {
+  .fix-modal {
+    scrollbar-gutter: auto !important;
+  }
 }

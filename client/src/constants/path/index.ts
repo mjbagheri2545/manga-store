@@ -1,3 +1,4 @@
+import createAdminPath from "./admin.path";
 import createAuthPath from "./auth.path";
 import createBasePath from "./base.path";
 import createHomePath from "./home.path";
@@ -8,6 +9,11 @@ const PATH = {
   auth: createAuthPath(),
   user: createUserPath(),
   home: createHomePath(),
+  admin: createAdminPath(),
+  getPathForRoute(path: string) {
+    // /categories -> categories
+    return path.slice(1);
+  },
 } as const;
 
 export default PATH;

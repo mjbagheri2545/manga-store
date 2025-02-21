@@ -8,40 +8,49 @@ import {
   User,
 } from "@prisma/client";
 
-export type GroupingModelsEntityKey = "tag" | "category" | "productStatus";
+import { PaginateQuery } from "./req.type";
+
+export type ProductGroupModelEntityKey = "tag" | "category" | "productStatus";
 
 export type EntityKey =
-  | GroupingModelsEntityKey
+  | ProductGroupModelEntityKey
   | "user"
   | "product"
   | "chapter";
 
-export type GroupingModels = Tag | Category | ProductStatus;
+export type ProductGroupModel = Tag | Category | ProductStatus;
 
 export type PermissionChapter = Chapter & {
   product: { managerId: string | null };
 };
 
-export type EntityModels = GroupingModels | Product | User | Chapter;
+export type Model = ProductGroupModel | Product | User | Chapter;
 
-export type PermissionModels =
-  | Exclude<EntityModels, Chapter>
-  | PermissionChapter;
+export type PermissionModels = Exclude<Model, Chapter> | PermissionChapter;
 
-type GroupingModelsCreateInput = {
+type ProductGroupModelCreateInput = {
   name: string;
   slug: string;
 };
 
-type GroupingModelsUpdateInput = Partial<GroupingModelsCreateInput>;
+type ProductGroupModelUpdateInput = Partial<ProductGroupModelCreateInput>;
 
-export interface GroupingModelsService<T extends GroupingModels> {
-  getAll: () => Prisma.PrismaPromise<T[]>;
+export type ProductGroupModelUniquenessCheckOptions = {
+  name?: string;
+  slug?: string;
+};
+
+export interface IProductGroupModelService<T extends ProductGroupModel> {
+  getAll: (query: PaginateQuery) => Prisma.PrismaPromise<T[]>;
   getById: (id: string) => Prisma.PrismaPromise<T | null>;
-  create: (data: GroupingModelsCreateInput) => Prisma.PrismaPromise<T>;
+  uniquenessCheck: (
+    options: ProductGroupModelUniquenessCheckOptions
+  ) => Prisma.PrismaPromise<T | null>;
+  count: () => Prisma.PrismaPromise<number>;
+  create: (data: ProductGroupModelCreateInput) => Prisma.PrismaPromise<T>;
   update: (
     id: string,
-    data?: GroupingModelsUpdateInput
+    data?: ProductGroupModelUpdateInput
   ) => Prisma.PrismaPromise<T>;
   delete: (id: string) => Prisma.PrismaPromise<T>;
 }

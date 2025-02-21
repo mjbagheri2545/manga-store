@@ -1,0 +1,9 @@
+cd server || exit 1
+
+npm run lint:unusedExports || exit 1
+npm run format || exit 1
+
+cd ../client || exit 1
+
+npm run lint:unusedExports || exit 1
+npm run format || exit 1

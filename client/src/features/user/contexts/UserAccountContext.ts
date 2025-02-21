@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
 import { useContextValue } from "@/hooks";
-import { ApiWrapper } from "@/types";
+import { ApiMethodWrapper } from "@/types";
 
 import {
   AccountVerificationVerifyData,
@@ -12,16 +12,16 @@ import {
 
 export type TUserAccountContext = {
   verification: {
-    getEmail: ApiWrapper;
-    verify: ApiWrapper<AccountVerificationVerifyData>;
+    getEmail: ApiMethodWrapper;
+    verify: ApiMethodWrapper<AccountVerificationVerifyData>;
   };
   password: {
     recovery: {
-      getEmail: ApiWrapper<PasswordRecoveryGetEmailData>;
-      recover: ApiWrapper<PasswordRecoveryRecoverData>;
+      getEmail: ApiMethodWrapper<PasswordRecoveryGetEmailData>;
+      recover: ApiMethodWrapper<PasswordRecoveryRecoverData>;
       getEmailData?: PasswordRecoveryGetEmailData;
     };
-    reset: ApiWrapper<PasswordResetData>;
+    reset: ApiMethodWrapper<PasswordResetData>;
   };
 };
 

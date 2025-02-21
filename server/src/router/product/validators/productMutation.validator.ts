@@ -5,7 +5,11 @@ import {
   isLength,
   required,
   slugValidator,
+  uniquenessValidator,
 } from "@/validators";
+
+import PRODUCT_MESSAGES from "../constants/messages";
+import productService from "../services";
 
 class ProductMutationValidator extends AutoBind {
   private getLabel(label: string) {
@@ -36,7 +40,10 @@ class ProductMutationValidator extends AutoBind {
 
     const slug = required("slug", {
       label: this.getLabel("آدرس اینترنتی"),
-    }).customSanitizer((slug) => slugify(slug));
+    })
+      .customSanitizer((slug) => slugify(slug))
+      .custom(uniquenessValidator(productService.getBySlug))
+      .withMessage(PRODUCT_MESSAGES.alreadyExistsSlug);
 
     return createValidation([
       ...this.getCreateProductValidation(),

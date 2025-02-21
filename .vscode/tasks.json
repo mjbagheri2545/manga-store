@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Run Server",
+      "label": "npm: run server",
       "type": "shell",
       "command": "npm run dev",
       "presentation": {
@@ -20,7 +20,7 @@
       }
     },
     {
-      "label": "Run Client",
+      "label": "npm: run client",
       "type": "shell",
       "command": "npm run dev",
       "presentation": {
@@ -38,8 +38,8 @@
       }
     },
     {
-      "label": "Run",
-      "dependsOn": ["Run Client", "Run Server"],
+      "label": "npm: run",
+      "dependsOn": ["npm: run client", "npm: run server"],
       "type": "shell",
       "presentation": {
         "reveal": "always"

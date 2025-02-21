@@ -1,7 +1,6 @@
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { prismaSelectId } from "@/utils";
 
 class SharedUserService {
   create(data: Prisma.UserCreateInput) {
@@ -24,7 +23,6 @@ class SharedUserService {
     return prisma.user.update({
       where: { email },
       data: { emailRemainingTime },
-      select: prismaSelectId(),
     });
   }
 
@@ -36,4 +34,6 @@ class SharedUserService {
   }
 }
 
-export const sharedUserService = new SharedUserService();
+const sharedUserService = new SharedUserService();
+
+export default sharedUserService;

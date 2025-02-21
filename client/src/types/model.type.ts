@@ -9,4 +9,13 @@ export type User = {
   createdAt: string;
   avatarImage?: string;
   roles: UserRole[];
+  isVerified: boolean;
+  bio?: string;
+  walletBalance: number;
+};
+
+export type ProductGroup = {
+  id: string;
+  slug: string;
+  name: string;
 };

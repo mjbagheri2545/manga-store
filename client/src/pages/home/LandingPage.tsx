@@ -1,5 +1,5 @@
 import { Button } from "@/components/utility";
-import { useAuth } from "@/features/auth/contexts";
+import { useAuth } from "@/contexts/AuthContext";
 
 function LandingPage() {
   const { logout } = useAuth();

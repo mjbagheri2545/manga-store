@@ -5,12 +5,12 @@ import { Product } from "@prisma/client";
 import SHARED_MESSAGES from "@/constants/messages";
 import {
   allResourcePermission,
+  deleteEntity,
   idAuthorization,
-  imageAuthorization,
   jwtAuthorization,
   specificResourcePermission,
 } from "@/middlewares";
-import { deleteEntity } from "@/middlewares/features/crud.middleware";
+import { imageAuthorization } from "@/middlewares/features/user_product.middleware";
 import { createUploader } from "@/utils";
 import { slugValidation } from "@/validators";
 
@@ -74,7 +74,8 @@ function createProductRouter() {
   );
 
   function deleteProductMessage(product: Product) {
-    const { delete: deleteMessage } = SHARED_MESSAGES.features.crud;
+    const { delete: deleteMessage } = SHARED_MESSAGES.crud;
+
     productLogger.logMessage("Product deleted.", {
       metaData: { product: productLoggerData(product) },
     });

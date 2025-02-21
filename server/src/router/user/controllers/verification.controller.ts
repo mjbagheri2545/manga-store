@@ -2,11 +2,12 @@ import { NextFunction, Response } from "express";
 
 import { IdentityVerificationReq, UserAuthorizedReq } from "@/types";
 import { badRequest, successfulResponse } from "@/utils";
+import { userLoggerData } from "@/utils/features/auth_user.util";
 
 import userLogger from "../constants/logger";
 import USER_MESSAGES from "../constants/messages";
-import userAccountService from "../services/account.db";
-import { identityVerification, userLoggerData } from "../utils";
+import userAccountService from "../services/account.service";
+import { identityVerification } from "../utils";
 
 class UserAccountVerificationController {
   alreadyVerifiedChecker(

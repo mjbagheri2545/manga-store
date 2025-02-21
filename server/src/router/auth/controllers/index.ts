@@ -4,17 +4,20 @@ import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 
 import STATUS_CODES from "@/constants/statusCodes";
-import { sharedUserService } from "@/services";
+import sharedUserService from "@/services/user.service";
 import { Req, UserAuthorizedReq } from "@/types";
 import {
   badRequest,
   generateJwtToken,
-  hashPassword,
-  pickUserData,
   sendEmail,
   successfulResponse,
   withCatch,
 } from "@/utils";
+import {
+  hashPassword,
+  pickUserData,
+  userLoggerData,
+} from "@/utils/features/auth_user.util";
 
 import authLogger from "../constants/logger";
 import AUTH_MESSAGES from "../constants/messages";
@@ -81,7 +84,7 @@ class AuthController {
     const token = await generateJwtToken(user.id);
 
     authLogger.logMessage("Login", {
-      metaData: { email: user.email, fullName: user.fullName },
+      metaData: userLoggerData(user),
     });
 
     successfulResponse({

@@ -5,20 +5,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { InputField } from "@/components/form";
 import { Auth_UserAccountForm } from "@/components/ui/auth_user";
 
-import { PasswordRecoveryGetEmailData } from "../../api/account.api";
 import USER_CONTENT from "../../constants/content";
 import { useUserAccount } from "../../contexts/UserAccountContext";
-import USER_ACCOUNT_SCHEMA from "../../schema/account.schema";
+import { GetEmailData, getEmailSchema } from "../../schemas/account.schema";
 import FormNoticeText from "./FormNoticeText";
 
 function PasswordRecoveryGetEmailForm() {
-  const formMethods = useForm({
-    resolver: zodResolver(USER_ACCOUNT_SCHEMA.password.recovery.getEmail),
+  const formMethods = useForm<GetEmailData>({
+    resolver: zodResolver(getEmailSchema),
   });
 
   const { getEmail } = useUserAccount().password.recovery;
 
-  function handleOnSubmit(data: PasswordRecoveryGetEmailData) {
+  function handleOnSubmit(data: GetEmailData) {
     return getEmail(data);
   }
 
@@ -34,7 +33,11 @@ function PasswordRecoveryGetEmailForm() {
       <FormNoticeText>
         {USER_CONTENT.account.password.recovery.getEmail.noticeText}
       </FormNoticeText>
-      <InputField controllerName="email" label="ایمیل" />
+      <InputField
+        controllerName="email"
+        label="ایمیل"
+        fieldProps={{ type: "email" }}
+      />
     </Auth_UserAccountForm>
   );
 }

@@ -4,21 +4,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { InputField } from "@/components/form";
 
-import { PasswordRecoveryRecoverData } from "../../api/account.api";
 import USER_CONTENT from "../../constants/content";
 import { useUserAccount } from "../../contexts/UserAccountContext";
-import USER_ACCOUNT_SCHEMA from "../../schema/account.schema";
+import {
+  passwordRecoveryRecoverSchema,
+  PasswordResetData,
+} from "../../schemas/account.schema";
 import IdentityVerificationForm from "./IdentityVerificationForm";
 
 function PasswordRecoveryRecoverForm() {
-  const formMethods = useForm({
-    resolver: zodResolver(USER_ACCOUNT_SCHEMA.password.recovery.recover),
+  const formMethods = useForm<PasswordResetData>({
+    resolver: zodResolver(passwordRecoveryRecoverSchema),
   });
 
   const { recover, getEmail, getEmailData } =
     useUserAccount().password.recovery;
 
-  function handleOnSubmit(data: Omit<PasswordRecoveryRecoverData, "email">) {
+  function handleOnSubmit(data: PasswordResetData) {
     if (getEmailData == null) return Promise.reject();
 
     return recover({ ...data, email: getEmailData.email });

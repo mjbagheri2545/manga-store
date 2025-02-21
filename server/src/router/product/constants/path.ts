@@ -1,5 +1,5 @@
 const PRODUCT_PATH = {
-  getByProductSlug: "/:productSlug",
+  getBySlug: "/:slug",
   getByCategory: "/category/:category",
   getByTag: "/tag/:tag",
   getByStatus: "/status/:status",

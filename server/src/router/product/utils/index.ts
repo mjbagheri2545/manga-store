@@ -1,19 +1,8 @@
 import { Request } from "express";
 
-import { Prisma, Product } from "@prisma/client";
+import { Product } from "@prisma/client";
 
-import { paginate, pick } from "@/utils";
-
-import { ProductQuery } from "../types";
-
-export function parseQuery(query: ProductQuery): Prisma.ProductFindManyArgs {
-  return {
-    ...paginate(query),
-    orderBy: {
-      createdAt: query.sort ?? "desc",
-    } as Prisma.ProductFindManyArgs["orderBy"],
-  };
-}
+import { pick } from "@/utils";
 
 export function pickProductCreateData(req: Request) {
   return pick(req.body, [

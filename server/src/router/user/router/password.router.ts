@@ -1,6 +1,7 @@
 import { Router } from "express";
 
-import { emailAuthorization, jwtAuthorization } from "@/middlewares";
+import { jwtAuthorization } from "@/middlewares";
+import { emailAuthorization } from "@/middlewares/features/auth_user.middleware";
 
 import USER_PATH from "../constants/path";
 import UserAccountPasswordController from "../controllers/password.controller";

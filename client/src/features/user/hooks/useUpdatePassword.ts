@@ -4,19 +4,19 @@ import { useNavigate } from "react-router-dom";
 import PATH from "@/constants/path";
 import { parseApiResponse } from "@/utils";
 
-import userAccountApi, {
-  PasswordRecoveryGetEmailData,
+import userAccountApi from "../api/account.api";
+import {
+  GetEmailData,
   PasswordRecoveryRecoverData,
   PasswordResetData,
-} from "../api/account.api";
+} from "../schemas/account.schema";
 
 function useUpdatePassword() {
-  const [getEmailData, setGetEmailData] =
-    useState<PasswordRecoveryGetEmailData>();
+  const [getEmailData, setGetEmailData] = useState<GetEmailData>();
 
   const navigate = useNavigate();
 
-  async function passwordRecoveryGetEmail(data: PasswordRecoveryGetEmailData) {
+  async function passwordRecoveryGetEmail(data: GetEmailData) {
     const response = await userAccountApi.password.recovery.getEmail(data);
 
     parseApiResponse(response, () => {

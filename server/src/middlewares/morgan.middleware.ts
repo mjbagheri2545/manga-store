@@ -19,19 +19,22 @@ export const morganMiddleware = morgan(
       method: tokens.method(req, res),
       url: tokens.url(req, res),
       statusCode: Number.parseFloat(tokens.status(req, res) ?? "200"),
-      userAgent: tokens["user-agent"](req, res),
-      response_time: Number.parseFloat(
+      response_time: `${Number.parseFloat(
         tokens["response-time"](req, res) ?? "0"
-      ),
-      headers: tokens.headers(req, res),
+      )}ms`,
       query: tokens.query(req, res),
+      headers: tokens.headers(req, res),
+      userAgent: tokens["user-agent"](req, res),
     });
   },
   {
     stream: {
       write: (message) => {
         const data = JSON.parse(message);
-        requestLogger.http("Incoming Request", data);
+        requestLogger.logMessage("Incoming Request", {
+          level: "http",
+          metaData: data,
+        });
       },
     },
   }

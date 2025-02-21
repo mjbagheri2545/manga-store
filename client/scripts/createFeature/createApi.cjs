@@ -9,38 +9,22 @@ async function createApi(featureDirPath, name, capitalizedName) {
     import PATH from "@/constants/path"
     import { HTTP } from "@/lib/http";
     import { ${capitalizedName} } from "@/types"
+    import { Create${capitalizedName}Data } from "../schema";
+    import { CrudApi } from "@/utils";
 
-    type Get${capitalizedName}Response = {${name}: ${capitalizedName}}
+    type ${capitalizedName}Response = {${name}: ${capitalizedName}}
 
     type GetAll${capitalizedName}Response = {${name}s: ${capitalizedName}[]}
 
-    type Create${capitalizedName}Data = {}
-
-    type Update${capitalizedName}Data = {}
-
     class ${capitalizedName}Api {
-        getById(id: string) {
-            return HTTP.get<Get${capitalizedName}Response>(PATH.${name}.id(id))
-        }
-
-        getAll() {
-            return HTTP.get<GetAll${capitalizedName}Response>(PATH.${name}.index)
-        }
-
-        create${capitalizedName}(data: Create${capitalizedName}Data) {
-            return HTTP.post(PATH.${name}.index, {data})
-        }
-
-        update${capitalizedName}(id: string, data: Update${capitalizedName}Data) {
-            return HTTP.put(PATH.${name}.id(id), {data})
-        }
-
-        delete${capitalizedName}(id: string) {
-            return HTTP.delete(PATH.${name}.id(id))
-        }
     }
 
-    const ${name}Api = new ${capitalizedName}Api()
+    const ${name}CrudApi = new CrudApi<
+        GetAll${capitalizedName}Response,
+        ${capitalizedName}Response,
+        Create${capitalizedName}Data
+    >("${name}");
+
 
     export default ${name}Api;
   `;

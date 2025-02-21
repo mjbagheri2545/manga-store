@@ -10,14 +10,16 @@ import { User } from "@prisma/client";
 import SHARED_MESSAGES from "@/constants/messages";
 import {
   allResourcePermission,
+  deleteEntity,
   idAuthorization,
-  imageAuthorization,
   jwtAuthorization,
   specificResourcePermission,
 } from "@/middlewares";
-import { deleteEntity } from "@/middlewares/features/crud.middleware";
-import { sharedUserService } from "@/services";
+import { getAllEntities } from "@/middlewares/crud.middleware";
+import { imageAuthorization } from "@/middlewares/features/user_product.middleware";
+import sharedUserService from "@/services/user.service";
 import { createUploader } from "@/utils";
+import { userLoggerData } from "@/utils/features/auth_user.util";
 import { slugValidation } from "@/validators";
 
 import userLogger from "../constants/logger";
@@ -25,8 +27,7 @@ import USER_MESSAGES from "../constants/messages";
 import USER_PATH from "../constants/path";
 import UserCrudController from "../controllers/crud.controller";
 import { hasUserPermission } from "../lib/permissions";
-import userService from "../services/user.db";
-import { userLoggerData } from "../utils";
+import userService from "../services/user.service";
 import UserCrudValidator from "../validators/crud.validator";
 
 function createUserCrudRoutes(router: Router) {
@@ -34,7 +35,7 @@ function createUserCrudRoutes(router: Router) {
     "../../../../uploads/avatarImage/"
   );
 
-  const { getUser, getAllUsers, createUser, updateUser, editProfile } =
+  const { getUser, createUser, updateUser, editProfile } =
     new UserCrudController();
 
   const { createUserValidation, updateUserValidation, editProfileValidation } =
@@ -44,8 +45,14 @@ function createUserCrudRoutes(router: Router) {
     hasUserPermission(user, "view")
   );
 
-  router.get(USER_PATH.getByToken, jwtAuthorization, getUser);
+  const getAllUsers = getAllEntities({
+    service: userService,
+    entitiesKey: "users",
+  });
+
   router.get("/", jwtAuthorization, viewPermission, getAllUsers);
+
+  router.get(USER_PATH.getByToken, jwtAuthorization, getUser);
   router.get(
     "/:id",
     slugValidation(),
@@ -101,7 +108,7 @@ function createUserCrudRoutes(router: Router) {
   );
 
   function userDeleteMessage(user: User) {
-    const { delete: deleteMessage } = SHARED_MESSAGES.features.crud;
+    const { delete: deleteMessage } = SHARED_MESSAGES.crud;
     userLogger.logMessage("User deleted.", { metaData: userLoggerData(user) });
 
     return deleteMessage(USER_MESSAGES.crud.action(user));

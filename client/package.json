@@ -9,23 +9,19 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "lint:unusedExports": "eslint . --fix --c .eslintrc.pre-push.json",
     "format": "prettier . --write",
-    "pre:commit": "lint-staged",
+    "pre:commit": "lint-staged -c lint-staged.pre-commit.json",
     "deps:check": "madge src --circular",
     "deps:graph": "node ./scripts/depsGraph.cjs",
     "create-feature": "node ./scripts/createFeature/index.cjs"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix --config .eslintrc.json --config .eslintrc.pre-commit.json",
-      "prettier --write"
-    ]
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
     "auto-bind": "^5.0.1",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

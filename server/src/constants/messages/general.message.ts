@@ -1,5 +1,5 @@
 const generalMessages = {
-  unexpectedError: "متأسفیم، خطایی غیرمنتظره رخ داده است.",
+  unexpectedError: "متأسفیم! مشکلی پیش آمده، لطفاً دوباره تلاش کنید.",
   invalidFile: (fileTypes: string) =>
     `فایل نامعتیر است، فقط ${fileTypes} مجاز است.`,
 

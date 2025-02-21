@@ -1,5 +1,6 @@
 import { errorLogger } from "@/constants/loggers";
-import { sharedTokenService, sharedUserService } from "@/services";
+import sharedTokenService from "@/services/token.service";
+import sharedUserService from "@/services/user.service";
 import { getError } from "@/utils";
 
 async function deleteUnusedData() {

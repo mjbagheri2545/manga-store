@@ -4,20 +4,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { InputField } from "@/components/form";
 
-import { AccountVerificationVerifyData } from "../../api/account.api";
 import USER_CONTENT from "../../constants/content";
 import { useUserAccount } from "../../contexts/UserAccountContext";
-import USER_ACCOUNT_SCHEMA from "../../schema/account.schema";
+import {
+  VerificationData,
+  verificationSchema,
+} from "../../schemas/account.schema";
 import IdentityVerificationForm from "./IdentityVerificationForm";
 
 function AccountVerificationVerifyForm() {
-  const formMethods = useForm({
-    resolver: zodResolver(USER_ACCOUNT_SCHEMA.verification.verify),
+  const formMethods = useForm<VerificationData>({
+    resolver: zodResolver(verificationSchema),
   });
 
   const { verify, getEmail } = useUserAccount().verification;
 
-  function handleOnSubmit(data: AccountVerificationVerifyData) {
+  function handleOnSubmit(data: VerificationData) {
     return verify(data);
   }
 

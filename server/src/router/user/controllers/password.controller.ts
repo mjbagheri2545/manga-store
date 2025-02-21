@@ -4,15 +4,11 @@ import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 
 import { IdentityVerificationReq, UserAuthorizedReq } from "@/types";
-import {
-  AutoBind,
-  badRequest,
-  hashPassword,
-  successfulResponse,
-} from "@/utils";
+import { AutoBind, badRequest, successfulResponse } from "@/utils";
+import { hashPassword } from "@/utils/features/auth_user.util";
 
 import USER_MESSAGES from "../constants/messages";
-import userAccountService from "../services/account.db";
+import userAccountService from "../services/account.service";
 import { identityVerification } from "../utils";
 
 type ResetReq = UserAuthorizedReq<{

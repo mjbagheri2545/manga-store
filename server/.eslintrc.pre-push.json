@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc",
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts"]
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": "./tsconfig.json"
+      }
+    }
+  },
+
+  "overrides": [
+    {
+      "files": ["src/**/*.ts"],
+      "parser": "@typescript-eslint/parser",
+
+      "plugins": ["unused-imports", "import"],
+
+      "rules": {
+        "unused-imports/no-unused-imports": "error",
+        "import/no-unused-modules": ["error", { "unusedExports": true }]
+      }
+    }
+  ]
+}

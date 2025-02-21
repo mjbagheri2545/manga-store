@@ -47,9 +47,12 @@ class ChapterController {
       params: { productId },
     } = req;
 
-    const chapters = await chapterService.getAll(productId, query);
+    const [chapters, count] = await Promise.all([
+      chapterService.getAll(productId, query),
+      chapterService.count(),
+    ]);
 
-    successfulResponse({ res, data: { chapters } });
+    successfulResponse({ res, data: { chapters, count } });
   }
 
   getChapter(
@@ -76,11 +79,11 @@ class ChapterController {
       metaData: { chapter: chapterLoggerData(chapter) },
     });
 
-    const { create: createMessage } = SHARED_MESSAGES.features.crud;
+    const { create: createMessage } = SHARED_MESSAGES.crud;
 
     const message = createMessage(CHAPTER_MESSAGES.crud(chapter));
 
-    successfulResponse({ res, message });
+    successfulResponse({ res, message, data: { chapter } });
   }
 
   async updateChapter(req: UpdateChapterReq, res: Response) {
@@ -111,11 +114,11 @@ class ChapterController {
       metaData: updatedEntityFields(chapter, updatedChapter),
     });
 
-    const { update: updateMessage } = SHARED_MESSAGES.features.crud;
+    const { update: updateMessage } = SHARED_MESSAGES.crud;
 
     const message = updateMessage(CHAPTER_MESSAGES.crud(updatedChapter));
 
-    successfulResponse({ res, message });
+    successfulResponse({ res, message, data: { chapter: updatedChapter } });
   }
 }
 

@@ -76,11 +76,11 @@ class ProductMutationController {
       metaData: { product: productLoggerData(product) },
     });
 
-    const { create: createMessage } = SHARED_MESSAGES.features.crud;
+    const { create: createMessage } = SHARED_MESSAGES.crud;
 
     const message = createMessage(PRODUCT_MESSAGES.crud(product));
 
-    successfulResponse({ res, message });
+    successfulResponse({ res, message, data: { product } });
   }
 
   async updateProduct(req: UpdateProductReq, res: Response) {
@@ -115,11 +115,11 @@ class ProductMutationController {
       metaData: updatedEntityFields(product, updatedProduct),
     });
 
-    const { update: updateMessage } = SHARED_MESSAGES.features.crud;
+    const { update: updateMessage } = SHARED_MESSAGES.crud;
 
     const message = updateMessage(PRODUCT_MESSAGES.crud(updatedProduct));
 
-    successfulResponse({ res, message });
+    successfulResponse({ res, message, data: { product: updatedProduct } });
   }
 
   async updateProductRating(req: UpdateRatingReq, res: Response) {

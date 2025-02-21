@@ -3,21 +3,19 @@ import { Response } from "express";
 import { $Enums, Prisma, User } from "@prisma/client";
 
 import SHARED_MESSAGES from "@/constants/messages";
-import { sharedUserService } from "@/services";
-import { EmptyObject, PaginateQuery, UserAuthorizedReq } from "@/types";
+import sharedUserService from "@/services/user.service";
+import { UserAuthorizedReq } from "@/types";
+import { badRequest, pick, removeFile, successfulResponse } from "@/utils";
 import {
-  badRequest,
   hashPassword,
-  pick,
   pickUserData,
-  removeFile,
-  successfulResponse,
-} from "@/utils";
+  userLoggerData,
+} from "@/utils/features/auth_user.util";
 
 import userLogger from "../constants/logger";
 import USER_MESSAGES from "../constants/messages";
-import userService from "../services/user.db";
-import { pickUserCreateData, userLoggerData } from "../utils";
+import userService from "../services/user.service";
+import { pickUserCreateData } from "../utils";
 
 type CreateUserReqBody = Pick<
   Prisma.UserCreateInput,
@@ -47,15 +45,6 @@ class UserCrudController {
     successfulResponse({ res, data: { user: pickUserData(user) } });
   }
 
-  async getAllUsers(
-    req: UserAuthorizedReq<EmptyObject, PaginateQuery>,
-    res: Response
-  ) {
-    const users = await userService.getAll(req.query);
-
-    successfulResponse({ res, data: { users } });
-  }
-
   async createUser(req: CreateUserReq, res: Response) {
     const { role, password, ...restData } = pickUserCreateData(
       req
@@ -75,11 +64,11 @@ class UserCrudController {
       metaData: { user: userLoggerData(user) },
     });
 
-    const { create: createMessage } = SHARED_MESSAGES.features.crud;
+    const { create: createMessage } = SHARED_MESSAGES.crud;
 
     const message = createMessage(USER_MESSAGES.crud.action(user));
 
-    successfulResponse({ res, message });
+    successfulResponse({ res, message, data: { user } });
   }
 
   async updateUser(req: UpdateUserReq, res: Response) {
@@ -118,11 +107,11 @@ class UserCrudController {
       },
     });
 
-    const { update: updateMessage } = SHARED_MESSAGES.features.crud;
+    const { update: updateMessage } = SHARED_MESSAGES.crud;
 
     const message = updateMessage(USER_MESSAGES.crud.action(updatedUser));
 
-    successfulResponse({ res, message });
+    successfulResponse({ res, message, data: { user: updatedUser } });
   }
 
   async editProfile(req: EditProfileReq, res: Response) {

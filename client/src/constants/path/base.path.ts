@@ -1,8 +1,12 @@
 function createBasePath() {
   return {
     auth: "/auth",
+    admin: "/admin",
     user: "/users",
     home: "/",
+    category: "/categories",
+    tag: "/tags",
+    productStatus: "/product-statuses",
   } as const;
 }
 

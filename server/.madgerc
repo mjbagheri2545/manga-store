@@ -1,9 +1,0 @@
-{
-  "fileExtensions": [
-    "ts"
-  ],
-  "excludeRegExp": [
-    "^node_modules"
-  ],
-  "tsConfig": "./tsconfig.json"
-}

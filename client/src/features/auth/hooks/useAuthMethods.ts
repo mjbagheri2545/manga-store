@@ -2,16 +2,18 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 import PATH from "@/constants/path";
-import { State } from "@/types";
+import { LoginData, RegistrationData } from "@/schemas/auth.schema";
+import { State, User } from "@/types";
 import { parseApiResponse } from "@/utils";
 
-import authApi, { LoginData, RegistrationData } from "../api";
+import authApi from "../api";
 import AUTH_MESSAGES from "../constants/messages";
-import useGetUser from "./useGetUser";
 
 type UseAuthMethods = {
   setToken: State<string | undefined>[1];
-} & ReturnType<typeof useGetUser>;
+  user: State<User | undefined>[0];
+  setUser: State<User | undefined>[1];
+};
 
 function useAuthMethods({ user, setUser, setToken }: UseAuthMethods) {
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ function useAuthMethods({ user, setUser, setToken }: UseAuthMethods) {
     });
   }
 
-  async function logout() {
+  function logout() {
     setToken(undefined);
     setUser(undefined);
     navigate(PATH.auth.login);

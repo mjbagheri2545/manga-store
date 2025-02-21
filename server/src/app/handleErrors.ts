@@ -1,11 +1,11 @@
 import { errorLogger } from "@/constants/loggers";
-import { getError, sleep } from "@/utils";
+import { getError, wait } from "@/utils";
 
 function handleErrors() {
   process.on("uncaughtException", async (error, origin) => {
     errorLogger.logMessage(error, { metaData: { origin } });
 
-    await sleep();
+    await wait();
 
     console.log("app crashed");
     process.exit(1);

@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 
-import SHARED_CONFIG from "@/constants/config";
+import { TIME } from "@/constants/global/general.global";
 import SHARED_MESSAGES from "@/constants/messages";
 import STATUS_CODES from "@/constants/statusCodes";
 import { EmptyObject, SendEmailReq, UserAuthorizedReq } from "@/types";
@@ -24,7 +24,7 @@ export async function sendIdentityVerificationEmail(
     templateVariables: {
       name: user.fullName,
       verificationCode,
-      expirationMinutes: SHARED_CONFIG.time.identificationExpirationMinutes,
+      expirationMinutes: TIME.identificationExpirationMinutes,
     },
   })(req, res);
 }

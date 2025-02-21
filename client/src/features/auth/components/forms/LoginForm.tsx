@@ -4,15 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { InputField } from "@/components/form";
 import { Auth_UserAccountForm } from "@/components/ui/auth_user";
+import { useAuth } from "@/contexts/AuthContext";
+import { LoginData, loginSchema } from "@/schemas/auth.schema";
 
-import { LoginData } from "../../api";
 import AUTH_CONTENT from "../../constants/content";
-import { useAuth } from "../../contexts";
-import AUTH_SCHEMA from "../../schema";
 
 function LoginForm() {
-  const formMethods = useForm({
-    resolver: zodResolver(AUTH_SCHEMA.login),
+  const formMethods = useForm<LoginData>({
+    resolver: zodResolver(loginSchema),
   });
   const { login } = useAuth();
 
@@ -29,12 +28,12 @@ function LoginForm() {
     >
       <InputField
         controllerName="email"
-        inputProps={{ type: "email" }}
+        fieldProps={{ type: "email" }}
         label="ایمیل"
       />
       <InputField
         controllerName="password"
-        inputProps={{ type: "password" }}
+        fieldProps={{ type: "password" }}
         label="رمز عبور"
       />
     </Auth_UserAccountForm>
