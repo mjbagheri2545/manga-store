@@ -10,7 +10,10 @@ import { paginate } from "@/utils";
 
 class ProductStatusService implements IProductGroupModelService<ProductStatus> {
   getAll(query: PaginateQuery) {
-    return prisma.productStatus.findMany(paginate(query));
+    return Promise.all([
+      prisma.productStatus.findMany(paginate(query)),
+      prisma.productStatus.count(),
+    ]);
   }
 
   getById(id: string) {
@@ -21,10 +24,6 @@ class ProductStatusService implements IProductGroupModelService<ProductStatus> {
     return prisma.productStatus.findFirst({
       where: { OR: [{ name }, { slug }] },
     });
-  }
-
-  count() {
-    return prisma.productStatus.count();
   }
 
   create(data: Prisma.ProductStatusCreateInput) {

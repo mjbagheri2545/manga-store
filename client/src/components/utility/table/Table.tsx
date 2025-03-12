@@ -89,7 +89,7 @@ function TableHeader<T>({ columns, columnHeaderProps }: TableHeaderProps<T>) {
   const tableHeaderCellClassName = "text-white text-sm px-3";
 
   return (
-    <thead>
+    <thead className="sticky -top-0.5 z-10">
       <tr
         {...columnHeaderProps}
         className={twMerge(
@@ -151,9 +151,16 @@ type TableCellProps<T> = {
 };
 
 function TableCell<T>({ cellProps, value, render }: TableCellProps<T>) {
+  // w-[1%] whitespace-nowrap this is a trick i saw in somewhere
   return (
-    <td {...cellProps} className={twMerge("py-2 px-3", cellProps?.className)}>
-      {render != null ? render(value) : String(value)}
+    <td
+      {...cellProps}
+      className={twMerge(
+        "py-2 px-3 w-[1%] whitespace-nowrap",
+        cellProps?.className
+      )}
+    >
+      {(render ?? String)(value)}
     </td>
   );
 }

@@ -1,11 +1,20 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 
-import { EmptyObject, PaginateQueryWithSort, UserAuthorizedReq } from "@/types";
+import { Product } from "@prisma/client";
+
+import {
+  EmptyObject,
+  PaginateQueryWithSort,
+  Req,
+  UserAuthorizedReq,
+} from "@/types";
 import { notFound, successfulResponse } from "@/utils";
 
 import productService from "../services";
 
-type ProductGetReq<P = EmptyObject> = UserAuthorizedReq<
+type GetProductReq = Req<{ product: Product }>;
+
+type GetAllProductReq<P = EmptyObject> = UserAuthorizedReq<
   EmptyObject,
   PaginateQueryWithSort,
   P
@@ -18,13 +27,17 @@ type GetBySlugReq = UserAuthorizedReq<
 >;
 
 class GetProductController {
-  async getAllProducts(req: ProductGetReq, res: Response) {
-    const [products, count] = await Promise.all([
-      productService.getAll(req.query),
-      productService.count(),
-    ]);
+  async getAllProductGroups(_req: Request, res: Response) {
+    const [categories, tags, productStatuses] =
+      await productService.getProductGroups();
 
-    successfulResponse({ res, data: { products, count } });
+    successfulResponse({ res, data: { categories, tags, productStatuses } });
+  }
+
+  getProduct(req: GetProductReq, res: Response) {
+    const { product } = req.body;
+
+    successfulResponse({ res, data: { product } });
   }
 
   async getProductBySlug(req: GetBySlugReq, res: Response) {
@@ -46,7 +59,7 @@ class GetProductController {
   }
 
   async getProductsByCategory(
-    req: ProductGetReq<{ category: string }>,
+    req: GetAllProductReq<{ category: string }>,
     res: Response
   ) {
     const {
@@ -54,41 +67,24 @@ class GetProductController {
       params: { category },
     } = req;
 
-    const [products, count] = await Promise.all([
-      productService.getByCategory(category, query),
-      productService.count(),
-    ]);
+    const [products, count] = await productService.getByCategory(
+      category,
+      query
+    );
 
     successfulResponse({ res, data: { products, count } });
   }
 
-  async getProductsByTag(req: ProductGetReq<{ tag: string }>, res: Response) {
+  async getProductsByTag(
+    req: GetAllProductReq<{ tag: string }>,
+    res: Response
+  ) {
     const {
       query,
       params: { tag },
     } = req;
 
-    const [products, count] = await Promise.all([
-      productService.getByTag(tag, query),
-      productService.count(),
-    ]);
-
-    successfulResponse({ res, data: { products, count } });
-  }
-
-  async getProductsByStatus(
-    req: ProductGetReq<{ status: string }>,
-    res: Response
-  ) {
-    const {
-      query,
-      params: { status },
-    } = req;
-
-    const [products, count] = await Promise.all([
-      productService.getByStatus(status, query),
-      productService.count(),
-    ]);
+    const [products, count] = await productService.getByTag(tag, query);
 
     successfulResponse({ res, data: { products, count } });
   }

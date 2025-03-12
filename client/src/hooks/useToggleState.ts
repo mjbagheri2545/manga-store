@@ -7,5 +7,5 @@ export function useToggleState(initialState: boolean = false) {
     setState((current) => !current);
   }
 
-  return [state, toggleState] as const;
+  return [state, toggleState, setState] as const;
 }

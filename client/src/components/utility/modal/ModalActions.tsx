@@ -16,7 +16,7 @@ export function ModalActions({
   return (
     <div
       {...containerProps}
-      className={twMerge("modal-action mt-8", containerProps?.className)}
+      className={twMerge("modal-action mt-8 gap-4", containerProps?.className)}
     >
       {"children" in restProps ? (
         restProps.children

@@ -4,8 +4,8 @@ async function createSchema(featureDirPath, name, capitalizedName) {
   const hooksDirPath = `${featureDirPath}/hooks`;
   await fs.mkdir(hooksDirPath);
 
-  const methodsPath = `${hooksDirPath}/useCreate${capitalizedName}ContextValue.ts`;
-  const methodsData = `
+  const createContextValuePath = `${hooksDirPath}/useCreate${capitalizedName}ContextValue.ts`;
+  const createContextValueData = `
     import ${name}Api from "../api";
     import { T${capitalizedName}Context } from "../contexts"
 
@@ -21,7 +21,7 @@ async function createSchema(featureDirPath, name, capitalizedName) {
     export default useCreate${capitalizedName}ContextValue;
   `;
 
-  await fs.writeFile(methodsPath, methodsData);
+  await fs.writeFile(createContextValuePath, createContextValueData);
 }
 
 module.exports = createSchema;

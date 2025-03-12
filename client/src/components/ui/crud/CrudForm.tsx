@@ -22,7 +22,7 @@ export function CrudForm<T extends FieldValues>({
 }: CrudFormProps<T>) {
   const formMethods = useForm<T>({
     ...useFormProps,
-    resolver: useFormProps?.resolver ?? zodResolver(schema),
+    resolver: zodResolver(schema),
   });
 
   function finalHandleOnSubmit(data: T) {

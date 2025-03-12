@@ -23,3 +23,5 @@ export const LOGGER_CONFIG = {
   timestampFormat: "YYYY-MM-DD hh:mm:ss A",
   fileName: (path: string) => `logs/${path}/%DATE%.log`,
 } as const;
+
+export const PUBLIC_FOLDER_NAME = "public";

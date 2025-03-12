@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 
 import { $Enums, Prisma, User } from "@prisma/client";
 
@@ -43,6 +43,12 @@ class UserCrudController {
     const { user } = req.body;
 
     successfulResponse({ res, data: { user: pickUserData(user) } });
+  }
+
+  async getAllManagers(_req: Request, res: Response) {
+    const managers = await userService.getManagers();
+
+    successfulResponse({ res, data: { managers } });
   }
 
   async createUser(req: CreateUserReq, res: Response) {

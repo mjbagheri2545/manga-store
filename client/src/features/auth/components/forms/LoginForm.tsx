@@ -16,14 +16,14 @@ function LoginForm() {
   const { login } = useAuth();
 
   function handleOnSubmit(data: LoginData) {
-    return login(data);
+    login(data);
   }
 
   return (
     <Auth_UserAccountForm
       formMethods={formMethods}
       handleOnSubmit={handleOnSubmit}
-      submitButtonText={AUTH_CONTENT.login.submitButtonText}
+      submitButton={AUTH_CONTENT.login.submitButtonText}
       content={AUTH_CONTENT.login.mainContent}
     >
       <InputField

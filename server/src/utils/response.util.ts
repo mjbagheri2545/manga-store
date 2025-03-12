@@ -98,3 +98,16 @@ export function notFound({
     message: notFoundMessage(entityName, entityInfo),
   });
 }
+
+type FailedOperationOptions = {
+  res: Response;
+  message: string;
+};
+
+export function failedOperation({ res, message }: FailedOperationOptions) {
+  return failedResponse({
+    res,
+    code: STATUS_CODES.internalServerError,
+    message: SHARED_MESSAGES.failed(message),
+  });
+}

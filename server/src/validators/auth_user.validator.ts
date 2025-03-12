@@ -7,7 +7,7 @@ import { isLength, string, uniquenessValidator } from ".";
 export function emailValidator() {
   return string("email")
     .isEmail()
-    .withMessage(AUTH_USER_MESSAGES.validation.email.invalid);
+    .withMessage(AUTH_USER_MESSAGES.email.invalid);
 }
 
 export function currentPasswordValidator(
@@ -23,7 +23,7 @@ export function currentPasswordValidator(
 export function newPasswordValidator(field = "password", label = "رمز عبور") {
   return string(field)
     .matches(PASSWORD_CONFIG.regex)
-    .withMessage(AUTH_USER_MESSAGES.validation.password.new(label));
+    .withMessage(AUTH_USER_MESSAGES.password.new(label));
 }
 
 export function newPasswordConfirmationValidator(
@@ -32,7 +32,7 @@ export function newPasswordConfirmationValidator(
 ) {
   return string(`${field}Confirmation`)
     .custom((value, { req }) => value === req.body[field])
-    .withMessage(AUTH_USER_MESSAGES.validation.password.confirmation(label));
+    .withMessage(AUTH_USER_MESSAGES.password.confirmation(label));
 }
 
 export function fullNameValidator() {
@@ -42,5 +42,5 @@ export function fullNameValidator() {
 export function emailNotInUseValidator() {
   return emailValidator()
     .custom(uniquenessValidator(sharedUserService.getByEmail))
-    .withMessage(AUTH_USER_MESSAGES.validation.email.inUse);
+    .withMessage(AUTH_USER_MESSAGES.email.inUse);
 }

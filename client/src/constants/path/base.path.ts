@@ -7,6 +7,7 @@ function createBasePath() {
     category: "/categories",
     tag: "/tags",
     productStatus: "/product-statuses",
+    product: "/products",
   } as const;
 }
 

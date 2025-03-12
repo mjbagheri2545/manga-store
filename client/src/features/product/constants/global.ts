@@ -1,0 +1,1 @@
+export const PRODUCTS_PAGE_QUERY_TAKE = 10;

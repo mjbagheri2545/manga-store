@@ -1,4 +1,4 @@
-import React, { ComponentProps } from "react";
+import React, { ComponentProps, PropsWithChildren } from "react";
 
 import { cn } from "@/utils";
 
@@ -8,36 +8,43 @@ function isOption(child: unknown): child is React.ReactElement {
   return React.isValidElement(child) && child.type === "option";
 }
 
-type SelectFieldProps = Omit<FormFieldProps, "children"> & {
-  fieldProps?: ComponentProps<"select">;
-};
+type SelectFieldProps = Omit<FormFieldProps, "children" | "controllerName"> &
+  PropsWithChildren & {
+    fieldProps?: ComponentProps<"select">;
+    controllerName?: string;
+  };
 
-export function SelectField({ fieldProps, ...restProps }: SelectFieldProps) {
+export function SelectField({
+  fieldProps,
+  children,
+  ...restProps
+}: SelectFieldProps) {
   return (
     <FormField {...restProps}>
       {(formFieldChildrenProps) => (
         <SelectFieldChildren
           {...formFieldChildrenProps}
           fieldProps={fieldProps}
-        />
+        >
+          {children}
+        </SelectFieldChildren>
       )}
     </FormField>
   );
 }
 
-type SelectFieldChildrenProps = FormFieldChildrenProps & {
-  fieldProps?: ComponentProps<"select">;
-};
+type SelectFieldChildrenProps = FormFieldChildrenProps &
+  PropsWithChildren & {
+    fieldProps?: ComponentProps<"select">;
+  };
 
-function SelectFieldChildren({
-  isFullWidth,
-  isError,
-  id,
-  label,
-  onChange,
-  fieldProps,
-  ...restChildrenProps
-}: SelectFieldChildrenProps) {
+const SelectFieldChildren = React.forwardRef<
+  HTMLSelectElement,
+  SelectFieldChildrenProps
+>(function SelectFieldChildren(
+  { isFullWidth, isError, id, fieldProps, children, controllerProps },
+  ref
+) {
   const className = cn(
     "select rounded placeholder-white/40 focus:outline-none bg-dark-body",
     isFullWidth && "w-full",
@@ -46,18 +53,20 @@ function SelectFieldChildren({
   );
 
   function handleOnChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    onChange(e);
+    controllerProps?.onChange(e);
     fieldProps?.onChange?.(e);
   }
 
   return (
     <select
       {...fieldProps}
-      {...restChildrenProps}
+      {...controllerProps}
+      ref={ref}
       className={className}
+      id={id}
       onChange={handleOnChange}
     >
-      {React.Children.map(fieldProps?.children, (child) => {
+      {React.Children.map(children, (child) => {
         if (isOption(child)) {
           const newProps = { ...child.props, className: "bg-dark" };
 
@@ -68,4 +77,4 @@ function SelectFieldChildren({
       })}
     </select>
   );
-}
+});

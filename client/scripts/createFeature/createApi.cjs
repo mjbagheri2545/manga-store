@@ -16,15 +16,17 @@ async function createApi(featureDirPath, name, capitalizedName) {
 
     type GetAll${capitalizedName}Response = {${name}s: ${capitalizedName}[]}
 
-    class ${capitalizedName}Api {
-    }
-
-    const ${name}CrudApi = new CrudApi<
+    class ${capitalizedName}Api extends CrudApi<
         GetAll${capitalizedName}Response,
         ${capitalizedName}Response,
         Create${capitalizedName}Data
-    >("${name}");
-
+    > {
+      constructor() {
+        super("${name}")
+      }
+    }
+    
+    const ${name}Api = new ${capitalizedName}Api()
 
     export default ${name}Api;
   `;

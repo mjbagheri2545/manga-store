@@ -7,6 +7,7 @@ import helmet from "helmet";
 import path from "path";
 
 import env from "@/constants/env";
+import { PUBLIC_FOLDER_NAME } from "@/constants/global/general.global";
 import { morganMiddleware } from "@/middlewares";
 
 function useGeneralMiddlewares(app: express.Express) {
@@ -16,7 +17,7 @@ function useGeneralMiddlewares(app: express.Express) {
     cookieParser(),
     json(),
     urlencoded({ extended: true }),
-    express.static(path.join(__dirname, "../public")),
+    express.static(path.join(__dirname, `../../${PUBLIC_FOLDER_NAME}`)),
     morganMiddleware,
   ].forEach((middleware) => app.use(middleware));
 }

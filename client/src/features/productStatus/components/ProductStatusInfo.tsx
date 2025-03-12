@@ -1,5 +1,5 @@
 import { EntityInfo } from "@/components/ui/crud";
-import { PRODUCT_GROUP_PAGE_INFO } from "@/constants/global/features/productGroup.global";
+import { PRODUCT_GROUP_INFO_ITEMS } from "@/components/ui/productGroup/ProductGroupInfoItems";
 
 import productStatusApi from "../api";
 
@@ -8,8 +8,8 @@ function ProductStatusInfo() {
     <EntityInfo
       entityKey="productStatus"
       getByIdMethod={productStatusApi.getById}
-      getEntityFromResult={(data) => data.productStatus}
-      info={PRODUCT_GROUP_PAGE_INFO}
+      getEntityFromData={(data) => data.productStatus}
+      info={PRODUCT_GROUP_INFO_ITEMS}
     />
   );
 }

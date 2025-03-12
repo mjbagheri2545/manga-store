@@ -22,7 +22,7 @@ const alertStyles = cva("rounded", {
 });
 
 export type AlertProps = VariantProps<typeof alertStyles> &
-  PropsWithContainer<"div", false> & {
+  PropsWithContainer & {
     children: React.ReactNode;
   } & PropsWithOptionalIcon;
 
@@ -35,7 +35,7 @@ export function Alert({
   const isIconProvided = "Icon" in restProps;
 
   const className = cn(
-    "px-4 py-3",
+    "px-4 py-3 w-full",
     alertStyles({ type }),
     isIconProvided && "flex",
     containerProps?.className

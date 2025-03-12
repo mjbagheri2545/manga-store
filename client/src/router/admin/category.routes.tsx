@@ -1,10 +1,11 @@
 import { Route, Routes } from "react-router-dom";
 
-import { AdminProductGroupProvider } from "@/components/ui/productGroup";
+import { EntitiesProvider } from "@/components/ui/crud";
 import CategoriesPage from "@/pages/admin/items/category/CategoriesPage";
 import CategoryInfoPage from "@/pages/admin/items/category/CategoryInfoPage";
 import CreateCategoryPage from "@/pages/admin/items/category/CreateCategoryPage";
 import UpdateCategoryPage from "@/pages/admin/items/category/UpdateCategoryPage";
+import { ProductGroup } from "@/types";
 
 import AdminCrudRoutes from "./crud.routes";
 
@@ -15,7 +16,7 @@ function CategoryRoutes() {
         <Route
           path="*"
           element={
-            <AdminProductGroupProvider>
+            <EntitiesProvider<ProductGroup>>
               <AdminCrudRoutes
                 routes={{
                   EntityInfo: CategoryInfoPage,
@@ -24,7 +25,7 @@ function CategoryRoutes() {
                   EntitiesPage: CategoriesPage,
                 }}
               />
-            </AdminProductGroupProvider>
+            </EntitiesProvider>
           }
         />
       </Routes>

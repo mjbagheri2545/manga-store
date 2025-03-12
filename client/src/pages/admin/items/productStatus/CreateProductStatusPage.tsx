@@ -1,15 +1,15 @@
+import { Section } from "@/components/ui/layout";
 import CreateProductStatusForm from "@/features/productStatus/components/CreateProductStatusForm";
 
-import AdminSection from "../../components/section";
 import { ProductStatusPageHeader } from "./ProductStatusPageHeader";
 
 function CreateProductStatusPage() {
   return (
     <>
       <ProductStatusPageHeader title="افزودن وضعیت محصول جدید" />
-      <AdminSection>
+      <Section>
         <CreateProductStatusForm />
-      </AdminSection>
+      </Section>
     </>
   );
 }

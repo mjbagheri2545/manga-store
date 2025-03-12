@@ -1,9 +1,9 @@
 import createBasePath from "./base.path";
 
 function createHomePath() {
-  const { home: homePath } = createBasePath();
+  const { home: homePath, tag } = createBasePath();
 
-  return { landingPage: homePath } as const;
+  return { landingPage: homePath, tagsPage: tag } as const;
 }
 
 export default createHomePath;

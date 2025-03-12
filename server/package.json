@@ -10,14 +10,14 @@
     "lint:unusedExports": "eslint . --fix --c .eslintrc.pre-push.json",
     "format": "prettier . --write",
     "pre:commit": "lint-staged -c lint-staged.pre-commit.json",
-    "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
-    "db:seed": "dotenv -e .env.development.local -- npx prisma db seed",
     "deps:check": "madge src --circular",
     "deps:graph": "node ./scripts/depsGraph.js",
     "husky:prepare": "cd .. && husky server/.husky",
     "init": "node ./scripts/init.js",
     "postinstall": "npm run init",
-    "create-feature": "node ./scripts/createFeature"
+    "create-feature": "node ./scripts/createFeature",
+    "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
+    "db:seed": "dotenv -e .env.development.local -- npx prisma db seed"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -27,6 +27,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@faker-js/faker": "^9.5.1",
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",

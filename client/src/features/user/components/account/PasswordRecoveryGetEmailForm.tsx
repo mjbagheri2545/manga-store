@@ -25,7 +25,7 @@ function PasswordRecoveryGetEmailForm() {
     <Auth_UserAccountForm
       formMethods={formMethods}
       handleOnSubmit={handleOnSubmit}
-      submitButtonText={
+      submitButton={
         USER_CONTENT.account.password.recovery.getEmail.submitButtonText
       }
       content={USER_CONTENT.account.password.recovery.mainContent}

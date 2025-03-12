@@ -1,19 +1,14 @@
-import { Context, createContext } from "react";
+import { createContext } from "react";
 
 import { useContextValue } from "@/hooks";
 import { State } from "@/types";
 
-export type TEntitiesContext<T> = {
-  entities: T[];
-  setEntities: State<T[]>[1];
-};
+export type TEntitiesContext<T> = State<T[]>;
 
-export function createEntitiesContext<T>() {
-  return createContext<TEntitiesContext<T> | null>(null);
-}
+export const EntitiesContext = createContext<TEntitiesContext<any> | null>(
+  null
+);
 
-export function useEntities<T>(
-  EntitiesContext: Context<TEntitiesContext<T> | null>
-) {
-  return useContextValue(EntitiesContext);
+export function useEntities<T>() {
+  return useContextValue(EntitiesContext) as TEntitiesContext<T>;
 }

@@ -5,9 +5,10 @@ export const ENTITY_NAMES = {
   productStatus: "وضعیت محصول",
   tag: "ژانر",
   user: "کاربر",
+  product: "محصول",
 } as const satisfies Record<EntityKey, string>;
 
-export const DEFAULT_TAKE = 8;
+export const DEFAULT_QUERY_TAKE = 8;
 
 export const STRING_MIN_LENGTH = 2;
 

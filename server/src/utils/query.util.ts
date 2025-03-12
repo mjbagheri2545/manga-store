@@ -14,11 +14,22 @@ type OrderByCreatedAt = {
   createdAt: Prisma.SortOrder;
 };
 
+function getCreatedAtSort(sort?: string) {
+  switch (sort) {
+    case "newest":
+      return "desc";
+    case "oldest":
+      return "asc";
+    default:
+      return "desc";
+  }
+}
+
 export function parseQueryWithSort(query: PaginateQueryWithSort) {
   return {
     ...paginate(query),
     orderBy: {
-      createdAt: query.sort ?? "desc",
+      createdAt: getCreatedAtSort(query.sort),
     } as OrderByCreatedAt,
   };
 }

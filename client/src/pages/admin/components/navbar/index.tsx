@@ -1,6 +1,6 @@
 import { LogOutIcon } from "lucide-react";
 
-import { Button } from "@/components/utility";
+import { Button, Tooltip } from "@/components/utility";
 import IconWrapper from "@/components/utility/IconWrapper";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -16,9 +16,11 @@ function Navbar() {
     >
       <MenuButton />
       <h2 className="text-xl font-bold">پیشخوان ادمین</h2>
-      <Button variant="icon" onClick={logout}>
-        <IconWrapper Icon={LogOutIcon} />
-      </Button>
+      <Tooltip title="خروج از حساب" className="tooltip-bottom">
+        <Button variant="icon" onClick={logout}>
+          <IconWrapper Icon={LogOutIcon} />
+        </Button>
+      </Tooltip>
     </nav>
   );
 }

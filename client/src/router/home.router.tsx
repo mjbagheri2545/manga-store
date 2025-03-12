@@ -1,13 +1,17 @@
 import { Route, Routes } from "react-router-dom";
 
-import CreateCategoryForm from "@/features/category/components/CreateCategoryForm";
+import PATH from "@/constants/path";
 import LandingPage from "@/pages/home/LandingPage";
+import TagsPage from "@/pages/home/TagsPage";
 
 function HomeRouter() {
   return (
     <Routes>
       <Route index element={<LandingPage />} />
-      <Route path="test" element={<CreateCategoryForm />} />
+      <Route
+        path={PATH.getPathForRoute(PATH.base.tag)}
+        element={<TagsPage />}
+      />
     </Routes>
   );
 }

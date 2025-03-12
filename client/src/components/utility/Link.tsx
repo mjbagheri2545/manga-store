@@ -11,7 +11,7 @@ const linkStyles = cva("link transition no-underline", {
   variants: {
     variant: {
       default: "text-sky-500 hover:text-sky-600",
-      navigation: "text-white hover:text-white/60",
+      navigation: "text-white hover:text-primary hover:bg-primary/15 rounded",
     },
   },
   defaultVariants: {

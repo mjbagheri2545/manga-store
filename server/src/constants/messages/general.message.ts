@@ -1,7 +1,9 @@
 const generalMessages = {
   unexpectedError: "متأسفیم! مشکلی پیش آمده، لطفاً دوباره تلاش کنید.",
-  invalidFile: (fileTypes: string) =>
-    `فایل نامعتیر است، فقط ${fileTypes} مجاز است.`,
+  invalidFileType: (fileType: string) =>
+    `فایل نامعتیر است، فقط تایپ ${fileType} مجاز است.`,
+  tooLargeFile: (fileSizeLimitMessage: string) =>
+    `سایز فایل نباید بیشتر از ${fileSizeLimitMessage} باشد.`,
 
   sendEmail: {
     failed:

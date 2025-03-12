@@ -1,18 +1,13 @@
 import React from "react";
 
-import { InputField, SelectField, TextareaField } from "@/components/form";
+import { InputField } from "@/components/form";
 
-export function isFormField(
+export function isInputField(
   element: React.ReactNode
 ): element is React.JSX.Element {
-  return (
-    React.isValidElement(element) &&
-    (element.type === InputField ||
-      element.type === SelectField ||
-      element.type === TextareaField)
-  );
+  return React.isValidElement(element) && element.type === InputField;
 }
 
-export function labelToPlaceholder(label: string) {
-  return `${label} را وارد کنید`;
+export function labelToPlaceholder(label?: string) {
+  return label != null ? `${label} را وارد کنید` : "";
 }

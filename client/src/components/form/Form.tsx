@@ -9,16 +9,16 @@ import {
 import { twMerge } from "tailwind-merge";
 
 import { PropsWithContainer } from "@/types";
-import { isFormField } from "@/utils";
+import { isInputField } from "@/utils";
 
-import { Button } from "../utility";
+import { SubmitButton } from "./SubmitButton";
 
 export type FormProps<T extends FieldValues> = PropsWithChildren &
-  PropsWithContainer<"form", false> & {
+  PropsWithContainer<"form"> & {
     formMethods: UseFormReturn<T>;
-    handleOnSubmit: (data: T) => Promise<void>;
+    handleOnSubmit: (data: T) => Promise<void> | void;
     handleOnFailure?: (error: FieldErrors) => void;
-    submitButtonText: string;
+    submitButton: React.JSX.Element | string;
   };
 
 export function Form<T extends FieldValues>({
@@ -26,43 +26,29 @@ export function Form<T extends FieldValues>({
   handleOnSubmit: onSubmit,
   handleOnFailure: onFailure = console.log,
   children,
-  submitButtonText,
   containerProps,
+  submitButton,
 }: FormProps<T>) {
-  const {
-    formState: { isDirty, isValid, submitCount, isSubmitting },
-    handleSubmit,
-  } = formMethods;
-
-  async function handleOnSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleOnSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    await handleSubmit(onSubmit, onFailure)(e);
+    formMethods.handleSubmit(onSubmit, onFailure)(e);
   }
-
-  const childrenLength = React.Children.count(children);
 
   return (
     <FormProvider {...formMethods}>
-      <form onSubmit={handleOnSubmit} noValidate {...containerProps}>
+      <form
+        onSubmit={handleOnSubmit}
+        noValidate
+        {...containerProps}
+        className={twMerge("space-y-4", containerProps?.className)}
+      >
         {React.Children.map(children, (child, index) => {
-          const isFirstFormField = isFormField(child) && index === 0;
+          const isFirstInputField = isInputField(child) && index === 0;
 
-          if (isFirstFormField) {
+          if (isFirstInputField) {
             const newProps = {
               ...child.props,
-              fieldProps: { ...child.props.fieldProps, autoFocus: true },
-            };
-
-            return React.cloneElement(child, newProps);
-          }
-
-          const isLastChild =
-            React.isValidElement(child) && index === childrenLength - 1;
-
-          if (isLastChild && "className" in child.props) {
-            const newProps = {
-              ...child.props,
-              className: twMerge(child.props.className, "mb-0"),
+              fieldProps: { autoFocus: true, ...child.props.fieldProps },
             };
 
             return React.cloneElement(child, newProps);
@@ -70,14 +56,11 @@ export function Form<T extends FieldValues>({
 
           return child;
         })}
-        <Button
-          type="submit"
-          disabled={isDirty && !isValid && submitCount > 0}
-          isLoading={isSubmitting}
-          className="btn-block mt-10"
-        >
-          {submitButtonText}
-        </Button>
+        {typeof submitButton === "string" ? (
+          <SubmitButton>{submitButton}</SubmitButton>
+        ) : (
+          submitButton
+        )}
       </form>
     </FormProvider>
   );

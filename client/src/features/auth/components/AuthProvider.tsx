@@ -11,9 +11,11 @@ function AuthProvider({ children: App }: PropsWithChildren) {
   const { userState, ...restState } = useAuthProvider();
 
   if (!restState.isLoggedIn) {
-    <AuthContext.Provider value={restState as TAuthContext}>
-      {App}
-    </AuthContext.Provider>;
+    return (
+      <AuthContext.Provider value={restState as TAuthContext}>
+        {App}
+      </AuthContext.Provider>
+    );
   }
 
   return (

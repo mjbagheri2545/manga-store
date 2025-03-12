@@ -1,5 +1,8 @@
 const fs = require("fs/promises");
 const path = require("path");
+const { exec } = require("child_process");
+const { promisify } = require("util");
+const promisifiedExec = promisify(exec);
 
 const createComponents = require("./createComponents.cjs");
 const createApi = require("./createApi.cjs");
@@ -20,6 +23,7 @@ async function createFeature() {
 
   const capitalizedName = name[0].toUpperCase() + name.slice(1);
   const upperCasedName = name.toUpperCase();
+  // path.resolve because project names may have space
   const featureDirPath = path.join(__dirname, `../../src/features/${name}`);
 
   await fs.mkdir(featureDirPath);
@@ -35,6 +39,16 @@ async function createFeature() {
   promises.push(createHooks(...commonArgs));
 
   await Promise.all(promises);
+
+  // i use try catch because eslint throw error during fix
+  try {
+    await Promise.all([
+      promisifiedExec(
+        `npx eslint "${featureDirPath}" --fix --rule "simple-import-sort/imports: error"`
+      ),
+      promisifiedExec(`npx prettier "${featureDirPath}" --write`),
+    ]);
+  } catch (error) {}
 }
 
 createFeature();

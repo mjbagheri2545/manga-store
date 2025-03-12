@@ -19,3 +19,17 @@ export type ProductGroup = {
   slug: string;
   name: string;
 };
+
+export type Product = {
+  id: string;
+  persianName: string;
+  name: string;
+  slug: string;
+  designer: string;
+  writer: string;
+  releaseYear: number;
+  summary: string;
+  priceInRials: number;
+  productImage: string;
+  createdAt: string;
+};

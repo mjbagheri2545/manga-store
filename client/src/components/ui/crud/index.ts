@@ -1,4 +1,5 @@
 export { CrudForm, type CrudFormProps } from "./CrudForm";
 export { CrudTable, type CrudTableProps } from "./CrudTable";
-export { EntityInfo } from "./EntityInfo";
-export { EntityInfoList } from "./EntityInfoList";
+export { EntitiesProvider } from "./EntitiesProvider";
+export { EntityInfo } from "./entityInfo";
+export { type TEntityInfo } from "./entityInfo/EntityInfoList";

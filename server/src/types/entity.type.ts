@@ -41,12 +41,11 @@ export type ProductGroupModelUniquenessCheckOptions = {
 };
 
 export interface IProductGroupModelService<T extends ProductGroupModel> {
-  getAll: (query: PaginateQuery) => Prisma.PrismaPromise<T[]>;
+  getAll: (query: PaginateQuery) => Promise<[T[], number]>;
   getById: (id: string) => Prisma.PrismaPromise<T | null>;
   uniquenessCheck: (
     options: ProductGroupModelUniquenessCheckOptions
   ) => Prisma.PrismaPromise<T | null>;
-  count: () => Prisma.PrismaPromise<number>;
   create: (data: ProductGroupModelCreateInput) => Prisma.PrismaPromise<T>;
   update: (
     id: string,

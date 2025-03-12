@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { jwtAuthorization } from "@/middlewares";
+import { idAuthorization, jwtAuthorization } from "@/middlewares";
 import { getAllEntities } from "@/middlewares/crud.middleware";
 import { slugValidation } from "@/validators";
 
@@ -15,18 +15,28 @@ import productService from "../services";
 
 function createGetProductsRoutes(router: Router) {
   const {
+    getAllProductGroups,
+    getProduct,
     getProductBySlug,
     getProductsByCategory,
     getProductsByTag,
-    getProductsByStatus,
   } = new GetProductController();
 
   const getAllProducts = getAllEntities({
-    service: productService,
+    getAll: productService.getAll,
     entitiesKey: "products",
   });
 
+  router.get("/product-groups", jwtAuthorization, getAllProductGroups);
+
   router.get("/", jwtAuthorization, getAllProducts);
+
+  const getProductById = idAuthorization({
+    getByIdQuery: productService.getById,
+    entityKey: "product",
+  });
+
+  router.get("/:id", jwtAuthorization, getProductById, getProduct);
 
   router.get(
     PRODUCT_PATH.getBySlug,
@@ -47,12 +57,6 @@ function createGetProductsRoutes(router: Router) {
     slugValidation("tag", "ژانر مورد نظر"),
     jwtAuthorization,
     getProductsByTag
-  );
-  router.get(
-    PRODUCT_PATH.getByStatus,
-    slugValidation("status", "وضعیت مورد نظر"),
-    jwtAuthorization,
-    getProductsByStatus
   );
 }
 

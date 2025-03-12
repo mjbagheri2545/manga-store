@@ -49,6 +49,11 @@ async function createFeature() {
       promises.push(createLib(featureDirPath, capitalizedName, upperCasedName));
     }
 
+    promises.push(promisifiedExec(`npx prettier ${featureDirPath} --write`));
+    promises.push(
+      promisifiedExec(`npx eslint ${featureDirPath} --c .eslintrc.json --fix`)
+    );
+
     await Promise.all(promises);
     console.log(`Feature '${name}' created successfully!`);
   } catch (error) {

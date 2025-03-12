@@ -1,9 +1,9 @@
+import { Section } from "@/components/ui/layout";
 import { Button } from "@/components/utility";
 import PATH from "@/constants/path";
-import ProductStatusTable from "@/features/productStatus/components/ProductStatusTable";
+import ProductStatusesTable from "@/features/productStatus/components/ProductStatusesTable";
 
 import AdminPageHeader from "../../components/PageHeader";
-import AdminSection from "../../components/section";
 
 function ProductStatusesPage() {
   return (
@@ -13,9 +13,9 @@ function ProductStatusesPage() {
           افزودن وضعیت محصول
         </Button>
       </AdminPageHeader>
-      <AdminSection>
-        <ProductStatusTable />
-      </AdminSection>
+      <Section>
+        <ProductStatusesTable />
+      </Section>
     </>
   );
 }

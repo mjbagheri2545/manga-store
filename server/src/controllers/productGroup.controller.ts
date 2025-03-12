@@ -80,7 +80,7 @@ class ProductGroupModelController<T extends ProductGroupModel> {
       PRODUCT_GROUP_MESSAGES.crud(entity, this.entityName)
     );
 
-    successfulResponse({ res, message, data: { [this.entityKey]: entity } });
+    successfulResponse({ res, message, data: { id: entity.id } });
   }
 
   async updateEntity(req: Request, res: Response) {
@@ -119,7 +119,7 @@ class ProductGroupModelController<T extends ProductGroupModel> {
     successfulResponse({
       res,
       message,
-      data: { [this.entityKey]: updatedEntity },
+      data: { id: updatedEntity.id },
     });
   }
 }

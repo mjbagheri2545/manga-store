@@ -1,10 +1,8 @@
-import { Context } from "react";
 import { FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
 import PATH from "@/constants/path";
-import { TEntitiesContext, useEntities } from "@/contexts/EntitiesContext";
-import { EntityKey, ICrudApi, WithId } from "@/types";
+import { EntityKey, ICrudApi } from "@/types";
 import { getEntityName, parseApiResponse } from "@/utils";
 
 import { CrudForm, CrudFormProps } from "../crud";
@@ -12,40 +10,40 @@ import { CrudForm, CrudFormProps } from "../crud";
 type CreateEntityFormProps<
   TFieldValues extends FieldValues,
   TEntityResponse,
-  TEntity,
-> = Omit<CrudFormProps<TFieldValues>, "handleOnSubmit" | "submitButtonText"> & {
-  createApi: ICrudApi<unknown, TEntityResponse, TFieldValues>["create"];
+> = Omit<CrudFormProps<TFieldValues>, "handleOnSubmit" | "submitButton"> & {
+  createMethod: ICrudApi<
+    unknown,
+    unknown,
+    TFieldValues,
+    TEntityResponse
+  >["create"];
   entityKey: EntityKey;
   // example usage of getEntityFromData:
   // (data: UserResponse) => user
-  getEntityFromData: (data: TEntityResponse) => TEntity;
-  EntitiesContext: Context<TEntitiesContext<TEntity> | null>;
+  getIdFromData: (data: TEntityResponse) => string;
   navigatePath?: string;
+  submitButton?: CrudFormProps<TFieldValues>["submitButton"];
 };
 
 export function CreateEntityForm<
   TFieldValues extends FieldValues,
   TEntityResponse,
-  TEntity extends WithId,
 >({
-  createApi,
+  createMethod,
   entityKey,
   navigatePath,
-  getEntityFromData,
-  EntitiesContext,
+  getIdFromData,
   ...restProps
-}: CreateEntityFormProps<TFieldValues, TEntityResponse, TEntity>) {
+}: CreateEntityFormProps<TFieldValues, TEntityResponse>) {
   const navigate = useNavigate();
-  const { setEntities } = useEntities(EntitiesContext);
 
   async function handleOnSubmit(data: TFieldValues) {
-    const response = await createApi({ data });
+    const response = await createMethod({ data });
 
     parseApiResponse(response, (result) => {
-      const entity = getEntityFromData(result.data);
-      setEntities((current) => [...current, entity]);
-
-      navigate(navigatePath ?? PATH.admin.info(entityKey, entity.id));
+      navigate(
+        navigatePath ?? PATH.admin.info(entityKey, getIdFromData(result.data))
+      );
     });
   }
 
@@ -54,8 +52,8 @@ export function CreateEntityForm<
   return (
     <CrudForm
       {...restProps}
+      submitButton={restProps.submitButton ?? `افزودن ${entityName}`}
       handleOnSubmit={handleOnSubmit}
-      submitButtonText={`افزودن ${entityName}`}
     />
   );
 }

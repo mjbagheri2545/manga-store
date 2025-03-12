@@ -2,6 +2,7 @@ import slugify from "@/lib/slugify";
 import { AutoBind } from "@/utils";
 import {
   createValidation,
+  customExpressValidator,
   isLength,
   required,
   slugValidator,
@@ -10,6 +11,8 @@ import {
 
 import PRODUCT_MESSAGES from "../constants/messages";
 import productService from "../services";
+
+const MAX_RELEASE_YEAR = 10000;
 
 class ProductMutationValidator extends AutoBind {
   private getLabel(label: string) {
@@ -26,17 +29,20 @@ class ProductMutationValidator extends AutoBind {
       required("managerId", { label: this.getLabel("مدیر") }),
       required("categoryId", { label: this.getLabel("دسته بندی") }),
       required("statusId", { label: this.getLabel("وضعیت") }),
+      required("priceInRials", { label: this.getLabel("قیمت") }),
+      customExpressValidator
+        .body("tagsId")
+        .custom((tagsId) => Array.isArray(tagsId) && tagsId.length > 0)
+        .withMessage(PRODUCT_MESSAGES.minTagsId),
     ];
   }
 
   createProductValidation() {
-    const priceInRials = required("priceInRials", {
-      label: this.getLabel("قیمت"),
-    }).toInt();
-
     const releaseYear = required("releaseYear", {
       label: this.getLabel("سال انتشار"),
-    }).toInt();
+    })
+      .custom((releaseYear) => parseInt(releaseYear) < MAX_RELEASE_YEAR)
+      .withMessage(PRODUCT_MESSAGES.maxReleaseYear);
 
     const slug = required("slug", {
       label: this.getLabel("آدرس اینترنتی"),
@@ -47,7 +53,6 @@ class ProductMutationValidator extends AutoBind {
 
     return createValidation([
       ...this.getCreateProductValidation(),
-      priceInRials,
       releaseYear,
       slug,
     ]);
@@ -58,32 +63,37 @@ class ProductMutationValidator extends AutoBind {
       (validationChain) => validationChain.optional()
     );
 
-    const priceInRials = required("priceInRials", {
-      label: this.getLabel("قیمت"),
-    })
-      .optional()
-      .ifExists()
-      .toInt();
     const releaseYear = required("releaseYear", {
-      label: this.getLabel("قیمت"),
+      label: this.getLabel("سال انتشار"),
     })
       .optional()
       .ifExists()
-      .toDate();
+      .custom((releaseYear) => parseInt(releaseYear) < MAX_RELEASE_YEAR)
+      .withMessage(PRODUCT_MESSAGES.maxReleaseYear);
+
     const slug = required("slug", {
       label: this.getLabel("آدرس اینترنتی"),
     })
       .optional()
       .ifExists()
-      .customSanitizer((slug) => slugify(slug));
+      .customSanitizer((slug) => slugify(slug))
+      .custom(uniquenessValidator(productService.getBySlug))
+      .withMessage(PRODUCT_MESSAGES.alreadyExistsSlug);
 
     return createValidation([
       ...optionalFields,
       slugValidator(),
-      priceInRials,
       releaseYear,
       slug,
     ]);
+  }
+
+  updateProductRatingValidation() {
+    const rating = required("rating", { label: "ریتینگ" }).customSanitizer(
+      (rating) => parseInt(rating)
+    );
+
+    return createValidation([slugValidator("productId", "آیدی محصول"), rating]);
   }
 }
 export default ProductMutationValidator;

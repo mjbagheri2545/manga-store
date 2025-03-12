@@ -30,13 +30,8 @@ export type PropsWithIcon = { Icon: LucideIcon; iconProps?: LucideProps };
 
 export type PropsWithOptionalIcon = EmptyObject | PropsWithIcon;
 
-export type PropsWithContainer<
-  P extends keyof React.JSX.IntrinsicElements = "div",
-  ChildrenNeed extends boolean = true,
-> = {
+export type PropsWithContainer<P = "div"> = {
   containerProps?: P extends keyof React.JSX.IntrinsicElements
-    ? ChildrenNeed extends true
-      ? ComponentProps<P>
-      : Omit<ComponentProps<P>, "children">
+    ? Omit<ComponentProps<P>, "children">
     : P;
 };

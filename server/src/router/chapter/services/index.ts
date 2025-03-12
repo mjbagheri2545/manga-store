@@ -19,10 +19,6 @@ class ChapterService {
     });
   }
 
-  count() {
-    return prisma.chapter.count();
-  }
-
   getById(id: string) {
     return prisma.chapter.findUnique({
       where: { id },

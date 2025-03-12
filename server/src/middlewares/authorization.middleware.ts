@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { fromFile } from "file-type";
+import { fromBuffer } from "file-type";
 import { PrismaPromise } from "@prisma/client";
 
 import { ENTITY_NAMES } from "@/constants/global/general.global";
@@ -79,25 +79,45 @@ export function idAuthorization<T extends Model>({
   };
 }
 
-type AllowedType = {
-  name: string;
-  mime: string;
-};
+type FileTypeMimeChecker = (mime: string) => boolean;
 
-export function fileAuthorization(allowedTypes: AllowedType[]) {
+type FileAuthorizationOptions = {
+  invalidMessage: string;
+  mimeChecker: FileTypeMimeChecker;
+};
+export function fileAuthorization({
+  invalidMessage,
+  mimeChecker,
+}: FileAuthorizationOptions) {
   return async (req: Request, res: Response, next: NextFunction) => {
     if (req.file == null) return next();
 
-    const type = await fromFile(req.file.path);
+    const type = await fromBuffer(req.file.buffer);
 
-    const isAllowed =
-      type != null && allowedTypes.map((item) => item.mime).includes(type.mime);
+    const isAllowed = type != null && mimeChecker(type.mime);
 
     if (!isAllowed) {
-      const typesName = allowedTypes.map((item) => item.name);
-      const message = SHARED_MESSAGES.general.invalidFile(typesName.join(", "));
+      return badRequest(res, { isFullMessage: true, message: invalidMessage });
+    }
 
-      return badRequest(res, { isFullMessage: true, message });
+    next();
+  };
+}
+
+// "B", "PB" should never happen
+type FileSizeUnit = "B" | "KB" | "MB" | "GB" | "PB";
+
+export function fileSizeChecker(fileSizeLimit: number, unit: FileSizeUnit) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (req.file == null) return next();
+
+    if (req.file.buffer.byteLength > fileSizeLimit) {
+      return badRequest(res, {
+        isFullMessage: true,
+        message: SHARED_MESSAGES.general.tooLargeFile(
+          `${fileSizeLimit} ${unit}`
+        ),
+      });
     }
 
     next();

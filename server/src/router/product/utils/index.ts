@@ -1,8 +1,10 @@
 import { Request } from "express";
 
-import { Product } from "@prisma/client";
+import { Prisma, Product } from "@prisma/client";
 
-import { pick } from "@/utils";
+import { parseQueryWithSort, pick } from "@/utils";
+
+import { ProductQuery } from "../types";
 
 export function pickProductCreateData(req: Request) {
   return pick(req.body, [
@@ -28,4 +30,21 @@ export function getTagsData(tagsId: string[], productTags: { id: string }[]) {
 
 export function productLoggerData(product: Product) {
   return pick(product, ["name", "id", "managerId"]);
+}
+
+export function parseProductQuery(query: ProductQuery) {
+  let where: Prisma.ProductWhereInput | undefined = undefined;
+
+  if (query.name != null) {
+    where = { name: { contains: query.name } };
+  }
+
+  if (query.status != null) {
+    where = { ...where, status: { slug: query.status } };
+  }
+
+  return {
+    ...parseQueryWithSort(query),
+    where,
+  };
 }

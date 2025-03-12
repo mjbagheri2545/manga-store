@@ -25,9 +25,7 @@ export function Auth_UserAccountForm<T extends FieldValues>({
           className: "w-full px-[25px] flex flex-col mb-3",
         }}
         {...restProps}
-      >
-        {children}
-      </Form>
+      />
       {content.links.map((link) => (
         <Link key={link.to} to={link.to} className="mb-2">
           {link.text}

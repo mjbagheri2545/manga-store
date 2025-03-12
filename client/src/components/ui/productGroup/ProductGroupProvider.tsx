@@ -6,7 +6,7 @@ import ApiComponent from "../ApiComponent";
 
 type ProductGroupProviderProps<GetAll> = PropsWithChildren & {
   Context: Context<ProductGroup[] | null>;
-  getAllMethod: ICrudApi<GetAll, unknown, unknown>["getAll"];
+  getAllMethod: ICrudApi<GetAll>["getAll"];
   getEntitiesFromData: (
     result: ApiResult<TGetAllResponse<GetAll>>
   ) => ProductGroup[];
@@ -19,7 +19,7 @@ export function ProductGroupProvider<GetAll>({
   getEntitiesFromData,
 }: ProductGroupProviderProps<GetAll>) {
   return (
-    <ApiComponent apiMethod={getAllMethod}>
+    <ApiComponent apiMethod={() => getAllMethod(undefined)}>
       {(result) => (
         <Context.Provider value={getEntitiesFromData(result)}>
           {children}

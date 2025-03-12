@@ -17,7 +17,7 @@ export const registrationSchema = z
     passwordConfirmation: newPasswordConfirmationValidator(),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
-    message: AUTH_USER_MESSAGES.validation.password.confirmation("رمز عبور"),
+    message: AUTH_USER_MESSAGES.password.confirmation("رمز عبور"),
     path: ["passwordConfirmation"],
   });
 

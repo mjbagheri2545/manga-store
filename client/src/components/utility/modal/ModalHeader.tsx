@@ -6,7 +6,7 @@ import { PropsWithContainer, PropsWithOptionalIcon } from "@/types";
 
 type ModalHeaderProps = PropsWithOptionalIcon &
   PropsWithChildren &
-  PropsWithContainer<"div", false>;
+  PropsWithContainer;
 
 export function ModalHeader({
   children,

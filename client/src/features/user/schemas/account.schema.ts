@@ -18,7 +18,7 @@ const changePasswordBaseSchema = z.object({
 });
 
 const passwordConfirmationValidationOptions = {
-  message: AUTH_USER_MESSAGES.validation.password.confirmation("رمز عبور جدید"),
+  message: AUTH_USER_MESSAGES.password.confirmation("رمز عبور جدید"),
   path: ["newPasswordConfirmation"],
 };
 

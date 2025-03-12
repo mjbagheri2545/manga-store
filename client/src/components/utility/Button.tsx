@@ -12,7 +12,7 @@ const buttonStyles = cva("btn disabled:bg-slate-500/15 min-h-0", {
   variants: {
     variant: {
       default: "text-[1rem] px-6 rounded btn-primary",
-      icon: "p-0 size-12 bg-transparent hover:bg-slate-50/10 border-none rounded-full opacity-100",
+      icon: "p-0 size-12 bg-transparent hover:bg-slate-50/10 border-none rounded-full opacity-100 text-white",
     },
     iconType: {
       info: "[&_svg]:text-info hover:bg-sky-500/15",
@@ -40,6 +40,10 @@ export type ButtonProps = VariantProps<typeof buttonStyles> &
   ButtonComponents & {
     isWide?: boolean;
   };
+
+export type ButtonComponentProps = ButtonProps & {
+  isLinkComponent?: false;
+};
 
 export function Button({
   children,

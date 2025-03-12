@@ -1,15 +1,15 @@
+import { Section } from "@/components/ui/layout";
 import TagInfo from "@/features/tag/components/TagInfo";
 
-import AdminSection from "../../components/section";
 import { TagPageHeader } from "./TagPageHeader";
 
 function TagInfoPage() {
   return (
     <>
       <TagPageHeader title="اطلاعات ژانر" />
-      <AdminSection>
+      <Section>
         <TagInfo />
-      </AdminSection>
+      </Section>
     </>
   );
 }

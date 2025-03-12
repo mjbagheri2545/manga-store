@@ -52,10 +52,12 @@ export function parseApiResponse<T = any>(
 
 export class CrudApi<
   GetAllResponse,
-  GetResponse,
+  GetByIdResponse,
   CreateData,
+  EntityResponse = { id: string },
   Q extends PaginateQuery = PaginateQuery,
-> implements ICrudApi<GetAllResponse, GetResponse, CreateData, Q>
+> implements
+    ICrudApi<GetAllResponse, GetByIdResponse, CreateData, EntityResponse, Q>
 {
   private entityPath: (typeof PATH)["base"][EntityKey];
 
@@ -64,7 +66,7 @@ export class CrudApi<
     this.entityPath = PATH.base[entityKey];
   }
 
-  private pathWithId(id: string) {
+  private pathEntity(id: string) {
     return `${this.entityPath}/${id}`;
   }
 
@@ -75,19 +77,19 @@ export class CrudApi<
   }
 
   getById({ id }: { id: string }) {
-    return HTTP.get<GetResponse>(this.pathWithId(id));
+    return HTTP.get<GetByIdResponse>(this.pathEntity(id));
   }
 
   create({ data }: { data: CreateData }) {
-    return HTTP.post<GetResponse>(this.entityPath, { data });
+    return HTTP.post<EntityResponse>(this.entityPath, { data });
   }
 
   update({ id, data }: { id: string; data: Partial<CreateData> }) {
-    return HTTP.put<GetResponse>(this.pathWithId(id), { data });
+    return HTTP.put<EntityResponse>(this.pathEntity(id), { data });
   }
 
   delete({ id }: { id: string }) {
-    return HTTP.delete(this.pathWithId(id));
+    return HTTP.delete<{ id: string }>(this.pathEntity(id));
   }
 }
 

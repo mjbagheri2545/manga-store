@@ -1,14 +1,14 @@
 import React from "react";
 
-import { WithId } from "@/types";
+import { Entity } from "@/types";
 
 import { Table, TableColumn, TableProps } from "./Table";
 
-type TableWithActionsProps<TEntity extends WithId> = TableProps<TEntity> & {
+type TableWithActionsProps<TEntity extends Entity> = TableProps<TEntity> & {
   children: (id: string) => React.ReactNode;
 };
 
-export function TableWithActions<TEntity extends WithId>({
+export function TableWithActions<TEntity extends Entity>({
   columns,
   children,
   ...restProps

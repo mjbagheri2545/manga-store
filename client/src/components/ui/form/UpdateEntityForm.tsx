@@ -1,4 +1,4 @@
-import { Context } from "react";
+import React from "react";
 import { DefaultValues, FieldValues, FormState } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
@@ -6,8 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Alert } from "@/components/utility/Alert";
 import SHARED_MESSAGES from "@/constants/messages";
 import PATH from "@/constants/path";
-import { TEntitiesContext, useEntities } from "@/contexts/EntitiesContext";
-import { ApiResult, EntityKey, ICrudApi, WithId } from "@/types";
+import { EntityKey, ICrudApi } from "@/types";
 import { getEntityName, getUpdatedFields, parseApiResponse } from "@/utils";
 
 import ApiComponent from "../ApiComponent";
@@ -15,93 +14,67 @@ import { CrudForm, CrudFormProps } from "../crud";
 
 type UpdateEntityFormProps<
   TFieldValues extends FieldValues,
-  TEntityResponse,
-  TEntity,
-> = Omit<CrudFormProps<TFieldValues>, "handleOnSubmit" | "submitButtonText"> & {
-  api: Pick<
-    ICrudApi<unknown, TEntityResponse, TFieldValues>,
-    "getById" | "update"
-  >;
+  TGetByIdResponse,
+> = Omit<
+  CrudFormProps<TFieldValues>,
+  "handleOnSubmit" | "submitButtonText" | "children"
+> & {
   entityKey: EntityKey;
   getFieldsDefaultValues: (
-    data: TEntityResponse
+    data: TGetByIdResponse
   ) => DefaultValues<TFieldValues>;
-  getEntityFromData: (data: TEntityResponse) => TEntity;
-  EntitiesContext: Context<TEntitiesContext<TEntity> | null>;
   navigatePath?: string;
+  api: Pick<
+    ICrudApi<unknown, TGetByIdResponse, TFieldValues>,
+    "getById" | "update"
+  >;
+  children: React.ReactNode | ((data: TGetByIdResponse) => React.ReactNode);
 };
 
 export function UpdateEntityForm<
   TFieldValues extends FieldValues,
-  TEntityResponse,
-  TEntity extends WithId,
->({
-  entityKey,
-  ...restProps
-}: UpdateEntityFormProps<TFieldValues, TEntityResponse, TEntity>) {
+  TGetByIdResponse,
+>(props: UpdateEntityFormProps<TFieldValues, TGetByIdResponse>) {
   const { id } = useParams();
 
-  const entityName = getEntityName(entityKey);
-
   if (id == null) {
+    const entityName = getEntityName(props.entityKey);
+
     return <Alert type="error">{`آیدی ${entityName} یافت نشد`}</Alert>;
   }
 
   return (
     <ApiComponent
-      apiMethod={restProps.api.getById}
-      apiOptions={{ params: { id }, dependencies: [id] }}
+      apiMethod={() => props.api.getById({ id })}
+      apiMethodOptions={{ dependencies: [id] }}
     >
-      {(result) => (
-        <UpdateEntityFormChildren
-          data={result.data}
-          entityKey={entityKey}
-          updateMethod={restProps.api.update}
-          id={id}
-          entityName={entityName}
-          {...restProps}
-        />
-      )}
+      {(result) => <UpdateEntityFormChildren data={result.data} {...props} />}
     </ApiComponent>
   );
 }
 
 type UpdateEntityFormChildrenProps<
   TFieldValues extends FieldValues,
-  TEntityResponse,
-  TEntity,
-> = Omit<
-  UpdateEntityFormProps<TFieldValues, TEntityResponse, TEntity>,
-  "api"
-> & {
-  updateMethod: UpdateEntityFormProps<
-    TFieldValues,
-    TEntityResponse,
-    TEntity
-  >["api"]["update"];
-  data: ApiResult<TEntityResponse>["data"];
-  entityName: string;
-  id: string;
+  TGetByIdResponse,
+> = UpdateEntityFormProps<TFieldValues, TGetByIdResponse> & {
+  data: TGetByIdResponse;
 };
 
 function UpdateEntityFormChildren<
   TFieldValues extends FieldValues,
-  TEntityResponse,
-  TEntity extends WithId,
+  TGetByIdResponse,
 >({
   data,
-  updateMethod,
+  api,
   entityKey,
   getFieldsDefaultValues,
-  id,
-  entityName,
   navigatePath,
-  getEntityFromData,
-  EntitiesContext,
+  children,
   ...restProps
-}: UpdateEntityFormChildrenProps<TFieldValues, TEntityResponse, TEntity>) {
+}: UpdateEntityFormChildrenProps<TFieldValues, TGetByIdResponse>) {
   const navigate = useNavigate();
-  const { entities, setEntities } = useEntities(EntitiesContext);
+
+  const { id } = useParams() as { id: string };
 
   async function handleOnSubmit(
     data: TFieldValues,
@@ -114,32 +87,24 @@ function UpdateEntityFormChildren<
       return;
     }
 
-    const response = await updateMethod({ id, data: dataToUpdate });
+    const response = await api.update({ id, data: dataToUpdate });
 
-    parseApiResponse(response, (result) => {
-      const newEntity = getEntityFromData(result.data);
-      const newEntities = entities.map((entity) => {
-        if (entity.id === newEntity.id) {
-          return newEntity;
-        }
-
-        return entity;
-      });
-
-      setEntities(newEntities);
-
+    parseApiResponse(response, () => {
       navigate(navigatePath ?? PATH.admin.index(entityKey));
     });
   }
 
   const defaultValues = getFieldsDefaultValues(data);
+  const entityName = getEntityName(entityKey);
 
   return (
     <CrudForm
       {...restProps}
       handleOnSubmit={handleOnSubmit}
-      submitButtonText={`به‌روزرسانی ${entityName}`}
+      submitButton={restProps.submitButton ?? `به‌روزرسانی ${entityName}`}
       useFormProps={{ defaultValues }}
-    />
+    >
+      {typeof children === "function" ? children(data) : children}
+    </CrudForm>
   );
 }

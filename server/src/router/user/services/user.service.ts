@@ -22,6 +22,10 @@ class UserService {
     });
   }
 
+  getManagers() {
+    return prisma.user.findMany({ where: { roles: { has: "manager" } } });
+  }
+
   count() {
     return prisma.user.count();
   }

@@ -14,6 +14,7 @@ function createUserPath() {
   return {
     getFullPath: (path: string) => createPath(path),
     getUserByToken: createPath("get-by-token"),
+    getManagers: createPath("managers"),
     account: {
       verification: createAccountPath("verification"),
       password: {

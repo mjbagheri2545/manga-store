@@ -1,5 +1,5 @@
-import { useApi, UseApiArgs, UseApiOptions } from "@/lib/api";
-import { ApiMethod, ApiResult, IsRequiredParam } from "@/types";
+import { useApi, UseApiOptions } from "@/lib/api";
+import { ApiMethod, ApiResult } from "@/types";
 import { toastApiResponseError } from "@/utils";
 
 import ApiErrorMessageList, {
@@ -15,29 +15,21 @@ type ErrorProps =
       errorMessageListProps?: Omit<ApiErrorMessageListProps, "error">;
     };
 
-type ApiOptionsProps<T, P> =
-  IsRequiredParam<P> extends true
-    ? { apiOptions: UseApiOptions<T, P> }
-    : { apiOptions?: UseApiOptions<T, P> };
-
-type ApiComponentProps<T, P> = {
+type ApiComponentProps<T> = {
   children: (result: ApiResult<T>) => React.ReactNode;
   spinnerContainerProps?: SpinnerContainerProps;
-  apiMethod: ApiMethod<T, P>;
-} & ApiOptionsProps<T, P> &
-  ErrorProps;
+  apiMethod: ApiMethod<T, void>;
+  apiMethodOptions?: UseApiOptions<T, void>;
+} & ErrorProps;
 
-function ApiComponent<T, P = void>({
+function ApiComponent<T>({
   children,
   spinnerContainerProps,
   apiMethod,
-  apiOptions,
+  apiMethodOptions,
   ...restProps
-}: ApiComponentProps<T, P>) {
-  const { error, result, status } = useApi(
-    apiMethod,
-    ...([{ dependencies: [apiMethod], ...apiOptions }] as UseApiArgs<T, P>)
-  );
+}: ApiComponentProps<T>) {
+  const { error, result, status } = useApi(apiMethod, apiMethodOptions);
 
   if (status === "pending") {
     return <SpinnerContainer {...spinnerContainerProps} />;

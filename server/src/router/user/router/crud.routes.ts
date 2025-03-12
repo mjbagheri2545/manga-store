@@ -5,6 +5,7 @@
 
 import { Router } from "express";
 
+import multer from "multer";
 import { User } from "@prisma/client";
 
 import SHARED_MESSAGES from "@/constants/messages";
@@ -18,7 +19,6 @@ import {
 import { getAllEntities } from "@/middlewares/crud.middleware";
 import { imageAuthorization } from "@/middlewares/features/user_product.middleware";
 import sharedUserService from "@/services/user.service";
-import { createUploader } from "@/utils";
 import { userLoggerData } from "@/utils/features/auth_user.util";
 import { slugValidation } from "@/validators";
 
@@ -30,12 +30,15 @@ import { hasUserPermission } from "../lib/permissions";
 import userService from "../services/user.service";
 import UserCrudValidator from "../validators/crud.validator";
 
-function createUserCrudRoutes(router: Router) {
-  const avatarImageUploader = createUploader(
-    "../../../../uploads/avatarImage/"
-  );
+// 10 MB
+const AVATAR_IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
-  const { getUser, createUser, updateUser, editProfile } =
+function createUserCrudRoutes(router: Router) {
+  const avatarImageUploader = multer({
+    storage: multer.memoryStorage(),
+    limits: { files: 1, fileSize: AVATAR_IMAGE_SIZE_LIMIT },
+  });
+  const { getUser, getAllManagers, createUser, updateUser, editProfile } =
     new UserCrudController();
 
   const { createUserValidation, updateUserValidation, editProfileValidation } =
@@ -51,6 +54,8 @@ function createUserCrudRoutes(router: Router) {
   });
 
   router.get("/", jwtAuthorization, viewPermission, getAllUsers);
+
+  router.get(USER_PATH.getManagers, jwtAuthorization, getAllManagers);
 
   router.get(USER_PATH.getByToken, jwtAuthorization, getUser);
   router.get(

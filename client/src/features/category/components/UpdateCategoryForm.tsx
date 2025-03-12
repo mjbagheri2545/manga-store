@@ -1,6 +1,5 @@
 import { UpdateEntityForm } from "@/components/ui/form";
 import { ProductGroupFormFields } from "@/components/ui/productGroup";
-import { AdminProductGroupContext } from "@/contexts/AdminProductGroupContext";
 import createProductGroupSchema from "@/schemas/productGroup.schema";
 
 import categoryApi from "../api";
@@ -15,7 +14,6 @@ function UpdateCategoryForm() {
         name: data.category.name,
         slug: data.category.slug,
       })}
-      EntitiesContext={AdminProductGroupContext}
       getEntityFromData={(data) => data.category}
     >
       <ProductGroupFormFields />

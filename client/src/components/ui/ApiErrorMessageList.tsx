@@ -9,7 +9,9 @@ import { List, ListProps } from "../utility/list";
 export type ApiErrorMessageListProps = {
   error: IApiError;
   containerProps?: ListProps;
-  messageListItemProps?: AlertProps | ((index: number) => AlertProps);
+  messageListItemProps?:
+    | Omit<AlertProps, "children">
+    | ((index: number) => Omit<AlertProps, "children">);
 };
 
 function ApiErrorMessageList({

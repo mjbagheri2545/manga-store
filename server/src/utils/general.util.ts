@@ -1,10 +1,9 @@
 import autoBind from "auto-bind";
 import fs from "fs/promises";
-import multer from "multer";
-import path from "path";
+import { v4 as uuidV4 } from "uuid";
 import { User } from "@prisma/client";
 
-import { TIME } from "@/constants/global/general.global";
+import { PUBLIC_FOLDER_NAME, TIME } from "@/constants/global/general.global";
 import {
   Model,
   Permissions,
@@ -69,30 +68,44 @@ export function hasPermission<T>(
   });
 }
 
-export function createUploader(uploadPath: string) {
-  const storage = multer.diskStorage({
-    destination: async (_req, _file, cb) => {
-      const finalUploadPath = path.join(__dirname, uploadPath);
+function getFileName(file: Express.Multer.File) {
+  const uuid = uuidV4();
+  return `${uuid}-${file.originalname}`;
+}
 
-      const [error] = await withCatch(fs.access(finalUploadPath));
-      if (error) {
-        await fs.mkdir(finalUploadPath, { recursive: true });
-      }
+type GetFilePathOptions = {
+  uploadPath: string;
+  file: Express.Multer.File;
+  isPublic?: boolean;
+};
 
-      cb(null, finalUploadPath);
-    },
-    filename: (_, file, cb) => {
-      const fileName = `${Date.now()}-${file.originalname}`;
+export async function getFilePath({
+  uploadPath,
+  file,
+  isPublic = true,
+}: GetFilePathOptions) {
+  const finalPath = isPublic
+    ? `${PUBLIC_FOLDER_NAME}/${uploadPath}`
+    : uploadPath;
 
-      cb(null, fileName);
-    },
-  });
+  const [error] = await withCatch(fs.access(finalPath));
 
-  const uploader = multer({
-    storage,
-  });
+  if (error != null) {
+    await fs.mkdir(finalPath, { recursive: true });
+  }
 
-  return uploader;
+  return `${finalPath}${getFileName(file)}`;
+}
+
+export function getFilePathForDb(path: string) {
+  return path.split(`${PUBLIC_FOLDER_NAME}/`)[1];
+}
+
+export function getFilePathFromDbFilePath(
+  path: string,
+  { isPublic = true }: { isPublic?: boolean } = {}
+) {
+  return isPublic ? `${PUBLIC_FOLDER_NAME}/${path}` : path;
 }
 
 export function newModelConnectionWithId(id: string | undefined, key: string) {
@@ -100,9 +113,29 @@ export function newModelConnectionWithId(id: string | undefined, key: string) {
   return { [key]: { connect: { id } } };
 }
 
-export async function removeFile(path: string) {
-  await fs.access(path);
-  await fs.unlink(path);
+export async function removeFile(
+  path: string,
+  retry = 3
+): Promise<Error | undefined> {
+  const [error] = await withCatch(
+    Promise.all([fs.access(path), fs.unlink(path)])
+  );
+
+  if (error != null) {
+    return retry > 1 ? removeFile(path, retry - 1) : error;
+  }
+}
+
+export async function writeFile(
+  path: string,
+  data: Parameters<typeof fs.writeFile>[1],
+  retry = 3
+): Promise<Error | undefined> {
+  const [error] = await withCatch(fs.writeFile(path, data));
+
+  if (error != null) {
+    return retry > 1 ? writeFile(path, data, retry - 1) : error;
+  }
 }
 
 export abstract class AutoBind {

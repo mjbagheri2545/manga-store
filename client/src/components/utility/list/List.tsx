@@ -32,8 +32,8 @@ export function List({
   ...restProps
 }: ListProps) {
   const listClassName = cn(
-    "flex gap-4",
-    !isDirectionRow && "flex-col",
+    "flex gap-4 flex-col",
+    isDirectionRow && "flex-row",
     isItemsCenter && "items-center",
     isJustifyCenter && "justify-center",
     isWrap && "flex-wrap",

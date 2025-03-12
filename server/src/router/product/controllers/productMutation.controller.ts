@@ -5,10 +5,16 @@ import { Prisma, Product } from "@prisma/client";
 import SHARED_MESSAGES from "@/constants/messages";
 import { EmptyObject, UserAuthorizedReq } from "@/types";
 import {
+  failedOperation,
+  getFilePath,
+  getFilePathForDb,
+  getFilePathFromDbFilePath,
   newModelConnectionWithId,
   removeFile,
   successfulResponse,
   updatedEntityFields,
+  withCatch,
+  writeFile,
 } from "@/utils";
 
 import productLogger from "../constants/logger";
@@ -24,8 +30,8 @@ type CreateProductReqBody = Pick<
   Prisma.ProductCreateInput,
   "name" | "persianName" | "writer" | "designer" | "summary" | "slug"
 > & {
-  priceInRials: number;
-  releaseYear: number;
+  priceInRials: string;
+  releaseYear: string;
   tagsId: string[];
   statusId: string;
   categoryId: string;
@@ -60,7 +66,18 @@ class ProductMutationController {
 
     const data = pickProductCreateData(req);
 
-    const finalData = { ...data, productImage: req.file?.path as string };
+    const productImagePath = await getFilePath({
+      uploadPath: "uploads/productImage/",
+      file: req.file!,
+    });
+
+    data.priceInRials = parseInt(data.priceInRials);
+    data.releaseYear = parseInt(data.releaseYear);
+
+    const finalData = {
+      ...data,
+      productImage: getFilePathForDb(productImagePath),
+    };
 
     const createOptions = {
       data: finalData,
@@ -70,7 +87,22 @@ class ProductMutationController {
       managerId,
     };
 
-    const product = await productService.create(createOptions);
+    const [error, product] = await withCatch(
+      productService.create(createOptions)
+    );
+
+    if (error != null) {
+      return failedOperation({
+        res,
+        message: "ایجاد محصول",
+      });
+    }
+
+    const writeFileError = await writeFile(productImagePath, req.file!.buffer);
+
+    if (writeFileError != null) {
+      await removeFile(productImagePath);
+    }
 
     productLogger.logMessage("Product created.", {
       metaData: { product: productLoggerData(product) },
@@ -80,7 +112,7 @@ class ProductMutationController {
 
     const message = createMessage(PRODUCT_MESSAGES.crud(product));
 
-    successfulResponse({ res, message, data: { product } });
+    successfulResponse({ res, message, data: { id: product.id } });
   }
 
   async updateProduct(req: UpdateProductReq, res: Response) {
@@ -93,6 +125,13 @@ class ProductMutationController {
     const statusConnection = newModelConnectionWithId(statusId, "status");
 
     const data = pickProductCreateData(req);
+    if (data.priceInRials != null) {
+      data.priceInRials = parseInt(data.priceInRials);
+    }
+
+    if (data.releaseYear != null) {
+      data.releaseYear = parseInt(data.releaseYear);
+    }
 
     const finalData: Prisma.ProductUpdateInput = {
       ...data,
@@ -103,13 +142,43 @@ class ProductMutationController {
     };
 
     if (req.file != null) {
-      finalData.productImage = req.file.path;
+      const productImagePath = await getFilePath({
+        uploadPath: "uploads/productImage/",
+        file: req.file!,
+      });
+
+      finalData.productImage = getFilePathForDb(productImagePath);
     }
 
-    const [updatedProduct] = await Promise.all([
-      productService.update(product.id, finalData),
-      removeFile(product.productImage),
-    ]);
+    const [error, updatedProduct] = await withCatch(
+      productService.update(product.id, finalData)
+    );
+
+    if (error != null) {
+      return failedOperation({ res, message: "به‌روزرسانی محصول" });
+    }
+
+    if (req.file != null) {
+      const writeFileError = await writeFile(
+        getFilePathFromDbFilePath(String(finalData.productImage)),
+        req.file.buffer
+      );
+
+      if (writeFileError != null) {
+        return failedOperation({ res, message: "به‌روزرسانی محصول" });
+      }
+
+      const removeFileError = await removeFile(
+        getFilePathFromDbFilePath(product.productImage)
+      );
+
+      if (removeFileError != null) {
+        await removeFile(
+          getFilePathFromDbFilePath(String(finalData.productImage))
+        );
+        return failedOperation({ res, message: "به‌روزرسانی محصول" });
+      }
+    }
 
     productLogger.logMessage("Product updated.", {
       metaData: updatedEntityFields(product, updatedProduct),
@@ -119,7 +188,7 @@ class ProductMutationController {
 
     const message = updateMessage(PRODUCT_MESSAGES.crud(updatedProduct));
 
-    successfulResponse({ res, message, data: { product: updatedProduct } });
+    successfulResponse({ res, message, data: { id: updatedProduct.id } });
   }
 
   async updateProductRating(req: UpdateRatingReq, res: Response) {
@@ -144,6 +213,7 @@ class ProductMutationController {
     successfulResponse({
       res,
       message: PRODUCT_MESSAGES.updateRating,
+      data: { product: updatedProduct },
     });
   }
 }

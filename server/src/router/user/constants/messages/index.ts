@@ -5,7 +5,7 @@ import userAccountMessages from "./account.message";
 
 const USER_MESSAGES = {
   account: userAccountMessages,
-  editProfile: "پروفایل شما با موفقیت بروز رسانی شد.",
+  editProfile: "پروفایل شما با موفقیت به‌روزرسانی شد.",
   crud: {
     action: (user: User) =>
       `کاربر با ایمیل ${user.email} و نام و نام خانوادگی ${user.fullName}`,

@@ -4,21 +4,19 @@ async function createComponents(featureDirPath, capitalizedName) {
   const componentsDirPath = `${featureDirPath}/components`;
   await fs.mkdir(componentsDirPath);
 
-  const contextProviderComponentPath = `${componentsDirPath}/${capitalizedName}Context.tsx`;
+  const contextProviderComponentPath = `${componentsDirPath}/${capitalizedName}Provider.tsx`;
   const contextProviderComponentData = `
   import { PropsWithChildren } from "react";
-
-  import { ${capitalizedName}Context } from "../contexts";
-  import useCreate${capitalizedName}ContextValue from "../hooks/useCreate${capitalizedName}ContextValue";
   
+  import { ${capitalizedName}Context } from "../contexts";
+  import useCreateProductContextValue from "../hooks/useCreateProductContextValue";
+
   function ${capitalizedName}Provider({ children }: PropsWithChildren) {
-  const contextValue = useCreate${capitalizedName}ContextValue()
+    const contextValue = useCreate${capitalizedName}ContextValue();
 
-    return (
-      <${capitalizedName}Context.Provider value={contextValue}>{children}</${capitalizedName}Context.Provider>
-    );
+    return <${capitalizedName}Context.Provider value={contextValue}>{children}</${capitalizedName}Context.Provider>;
   }
-
+  
   export default ${capitalizedName}Provider;
   `;
 

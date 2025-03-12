@@ -8,6 +8,8 @@ const SHARED_MESSAGES = {
   crud: crudMessages,
   statusCode: statusCodeMessages,
   general: generalMessages,
+  failed: (message: string) =>
+    `${message} موفقیت آمیز نبود، لطفا دوباره امتحان کنید.`,
 } as const;
 
 export default SHARED_MESSAGES;

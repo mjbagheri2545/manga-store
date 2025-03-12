@@ -53,7 +53,7 @@ export type EventsOptions<T> = {
   onError?: (error: ApiError) => void;
 };
 
-type Options<T> = RetryOptions & SignalOptions & EventsOptions<T>;
+export type Options<T> = RetryOptions & SignalOptions & EventsOptions<T>;
 
 export type UseApiCallbackArgs<T, P, O extends Options<T> = Options<T>> =
   IsRequiredParam<P> extends true

@@ -1,61 +1,44 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-import { DEFAULT_TAKE } from "@/constants/global/general.global";
-import { ICrudApi, State, TGetAllResponse } from "@/types";
+import { DEFAULT_QUERY_TAKE } from "@/constants/global/general.global";
+import { ApiMethod, PaginateQuery, TGetAllResponse } from "@/types";
 
 import { useExecuteApi } from "./useApi";
 
-type UseInfiniteApiOptions<T, R> = {
-  entities: State<T[]>[0];
-  setEntities: State<T[]>[1];
-  getAll: ICrudApi<TGetAllResponse<R>>["getAll"];
-  getEntitiesFromData: (data: TGetAllResponse<R>) => T[];
+type UseInfiniteApiOptions<GetAllResponse> = {
+  getAll: ApiMethod<TGetAllResponse<GetAllResponse>, PaginateQuery | undefined>;
   initialTotalCount?: number;
+  onSuccess: (data: TGetAllResponse<GetAllResponse>) => void;
+  entitiesLength: number;
 };
 
-export function useInfiniteApi<T, R>({
-  entities,
-  setEntities,
+export function useInfiniteApi<GetAllResponse>({
   initialTotalCount = 0,
   getAll,
-  getEntitiesFromData,
-}: UseInfiniteApiOptions<T, R>) {
+  onSuccess,
+  entitiesLength,
+}: UseInfiniteApiOptions<GetAllResponse>) {
   const [totalEntitiesCount, setTotalEntitiesCount] =
     useState(initialTotalCount);
 
   const { execute, refetch, ...restState } = useExecuteApi(getAll, {
     onSuccess: (result) => {
       setTotalEntitiesCount(result.data.count);
-      setEntities((current) => [
-        ...current,
-        ...getEntitiesFromData(result.data),
-      ]);
+      onSuccess(result.data);
     },
   });
 
   const hasMore = useMemo(
-    () => totalEntitiesCount > entities.length,
-    [entities.length, totalEntitiesCount]
+    () => totalEntitiesCount > entitiesLength,
+    [entitiesLength, totalEntitiesCount]
   );
 
-  async function loadMoreEntities() {
+  const loadMoreEntities = useCallback(() => {
     if (!hasMore) return;
     execute({
-      params: { skip: entities.length, take: DEFAULT_TAKE },
+      params: { skip: entitiesLength, take: DEFAULT_QUERY_TAKE },
     });
-  }
-
-  useEffect(() => {
-    if (entities.length === 0) return;
-
-    refetch({
-      params: { skip: 0, take: entities.length },
-      onSuccess: (result) => {
-        setTotalEntitiesCount(result.data.count);
-        setEntities(getEntitiesFromData(result.data));
-      },
-    });
-  }, []);
+  }, [entitiesLength, execute, hasMore]);
 
   return {
     totalEntitiesCount,

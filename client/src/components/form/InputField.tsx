@@ -4,8 +4,12 @@ import { cn, labelToPlaceholder } from "@/utils";
 
 import { FormField, FormFieldChildrenProps, FormFieldProps } from "./formField";
 
-export type InputFieldProps = Omit<FormFieldProps, "children"> & {
+export type InputFieldProps = Omit<
+  FormFieldProps,
+  "children" | "controllerName"
+> & {
   fieldProps?: ComponentProps<"input">;
+  controllerName?: string;
 };
 
 export function InputField({ fieldProps, ...restProps }: InputFieldProps) {
@@ -25,15 +29,13 @@ type InputFieldChildrenProps = FormFieldChildrenProps & {
   fieldProps?: ComponentProps<"input">;
 };
 
-function InputFieldChildren({
-  isFullWidth,
-  isError,
-  id,
-  label,
-  onChange,
-  fieldProps,
-  ...restChildrenProps
-}: InputFieldChildrenProps) {
+const InputFieldChildren = React.forwardRef<
+  HTMLInputElement,
+  InputFieldChildrenProps
+>(function InputFieldChildren(
+  { isFullWidth, isError, id, label, fieldProps, controllerProps },
+  ref
+) {
   const className = cn(
     "input rounded placeholder-white/40 border-none pb-[0.7rem] bg-[#FFFFFF17]",
     isFullWidth && "w-full",
@@ -44,7 +46,7 @@ function InputFieldChildren({
   const placeholder = fieldProps?.placeholder ?? labelToPlaceholder(label);
 
   function handleOnChange(e: React.ChangeEvent<HTMLInputElement>) {
-    onChange(e);
+    controllerProps?.onChange(e);
     fieldProps?.onChange?.(e);
   }
 
@@ -52,10 +54,12 @@ function InputFieldChildren({
     <input
       type="text"
       {...fieldProps}
-      {...restChildrenProps}
+      {...controllerProps}
+      ref={ref}
+      id={id}
       placeholder={placeholder}
       className={className}
       onChange={handleOnChange}
     />
   );
-}
+});

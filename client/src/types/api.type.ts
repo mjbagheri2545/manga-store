@@ -44,17 +44,22 @@ export type ApiMethodWrapper<P = void> = (
 
 export type PaginateQuery = { skip?: number; take?: number };
 
+export type QueryWithSort = { sort?: string };
+
+export type PaginateQueryWithSort = PaginateQuery & QueryWithSort;
+
 export type TGetAllResponse<T> = T & { count: number };
 
 export interface ICrudApi<
   GetAllResponse = unknown,
-  GetResponse = unknown,
+  GetByIdResponse = unknown,
   CreateData = unknown,
+  EntityResponse = { id: string },
   Q extends PaginateQuery = PaginateQuery,
 > {
   getAll: ApiMethod<TGetAllResponse<GetAllResponse>, Q | undefined>;
-  getById: ApiMethod<GetResponse, { id: string }>;
-  create: ApiMethod<GetResponse, { data: CreateData }>;
-  update: ApiMethod<GetResponse, { id: string; data: Partial<CreateData> }>;
-  delete: ApiMethod<unknown, { id: string }>;
+  getById: ApiMethod<GetByIdResponse, { id: string }>;
+  create: ApiMethod<EntityResponse, { data: CreateData }>;
+  update: ApiMethod<EntityResponse, { id: string; data: Partial<CreateData> }>;
+  delete: ApiMethod<{ id: string }, { id: string }>;
 }

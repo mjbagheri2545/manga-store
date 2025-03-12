@@ -32,7 +32,8 @@ function SidebarItem({
 
   const linkClassName = cn(
     "flex items-center px-5 py-4 h-16 transition relative z-10",
-    isActive ? "bg-dark-body" : "hover:bg-gray-700/60"
+    isActive ? "bg-dark-body" : "hover:bg-gray-700/60",
+    !isOpened && "justify-center"
   );
 
   return (

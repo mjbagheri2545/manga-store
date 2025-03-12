@@ -16,14 +16,14 @@ function RegistrationForm() {
   const { register } = useAuth();
 
   function handleOnSubmit(data: RegistrationData) {
-    return register(data);
+    register(data);
   }
 
   return (
     <Auth_UserAccountForm
       formMethods={formMethods}
       handleOnSubmit={handleOnSubmit}
-      submitButtonText={AUTH_CONTENT.registration.submitButtonText}
+      submitButton={AUTH_CONTENT.registration.submitButtonText}
       content={AUTH_CONTENT.registration.mainContent}
     >
       <InputField controllerName="fullName" label="نام و نام خانوادگی" />

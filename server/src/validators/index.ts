@@ -10,8 +10,8 @@ import { Prisma } from "@prisma/client";
 import { STRING_MIN_LENGTH } from "@/constants/global/general.global";
 import SHARED_MESSAGES from "@/constants/messages";
 import STATUS_CODES from "@/constants/statusCodes";
-import { MiddlewareParams, TypeOrTypeArray } from "@/types";
-import { failedResponse, parseTypeOrTypeArray } from "@/utils";
+import { MiddlewareParams } from "@/types";
+import { failedResponse } from "@/utils";
 
 type CustomLocation =
   | Exclude<Location, "cookies" | "headers" | "params">
@@ -26,7 +26,7 @@ type IsLengthOptions = RequiredOptions & {
   max?: number;
 };
 
-const customExpressValidator = new ExpressValidator({
+export const customExpressValidator = new ExpressValidator({
   ifExists(value: unknown) {
     return value != null;
   },
@@ -94,11 +94,11 @@ export function slugValidation(field = "id", label = "با آیدی مورد ن�
   return createValidation([slugValidator(field, label)]);
 }
 
-export function createValidation(validationChains: CustomValidationChain[]) {
+export function createValidation(validations: CustomValidationChain[]) {
   return async (...params: MiddlewareParams) => {
     const [req, res] = params;
 
-    const checkExactResult = await checkExact(validationChains, {
+    const checkExactResult = await checkExact(validations, {
       message: (fields) =>
         SHARED_MESSAGES.validation.unknownFields(
           fields.map((field) => field.path).join(", ")
@@ -118,30 +118,43 @@ export function createValidation(validationChains: CustomValidationChain[]) {
         message: msg,
       });
     }
-    return [...createSafeValidations(validationChains), validate(...params)];
+    return [...createSafeValidations(validations), validate(...params)];
   };
 }
 
-function createSafeValidations(
-  validations: TypeOrTypeArray<CustomValidationChain>
-) {
-  return parseTypeOrTypeArray(validations).map((validation) =>
-    validation.escape()
-  );
+function createSafeValidations(validations: CustomValidationChain[]) {
+  return validations.map((validation) => validation.escape());
 }
 
 function validate(req: Request, res: Response, next: NextFunction) {
   const result = validationResult(req);
 
   if (!result.isEmpty()) {
-    const messages = result
-      .array({ onlyFirstError: true })
+    const messages = result.array({ onlyFirstError: true });
+
+    const MAXIMUM_MESSAGES = 3;
+
+    const finalMessages = messages
+      .slice(0, MAXIMUM_MESSAGES)
       .map((error) => error.msg);
+
+    const extraFieldsPath = messages
+      .map((error) => {
+        if (error.type === "field") return error.path;
+      })
+      .filter(Boolean)
+      .slice(MAXIMUM_MESSAGES) as string[];
+
+    if (messages.length > finalMessages.length) {
+      finalMessages.push(
+        SHARED_MESSAGES.validation.tooManyInvalidField(extraFieldsPath)
+      );
+    }
 
     return failedResponse({
       res,
       code: STATUS_CODES.badRequest,
-      message: messages,
+      message: finalMessages,
     });
   }
 

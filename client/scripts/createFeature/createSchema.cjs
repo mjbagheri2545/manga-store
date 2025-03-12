@@ -8,7 +8,7 @@ async function createSchema(featureDirPath, capitalizedName, upperCasedName) {
   const schemaData = `
     import { z } from "zod";
 
-    const create${capitalizedName}Schema = z.object({});
+    export const create${capitalizedName}Schema = z.object({});
 
     export type Create${capitalizedName}Data = z.infer<typeof create${capitalizedName}Schema>
   `;

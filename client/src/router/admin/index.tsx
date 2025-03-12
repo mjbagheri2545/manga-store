@@ -4,6 +4,7 @@ import PATH from "@/constants/path";
 import AdminLayout from "@/pages/admin/components/Layout";
 
 import CategoryRoutes from "./category.routes";
+import ProductRoutes from "./product.routes";
 import ProductStatusRoutes from "./productStatus.routes";
 import TagRoutes from "./tag.routes";
 
@@ -23,6 +24,10 @@ function AdminRouter() {
           <Route
             path={`${PATH.getPathForRoute(PATH.base.productStatus)}/*`}
             element={<ProductStatusRoutes />}
+          />
+          <Route
+            path={`${PATH.getPathForRoute(PATH.base.product)}/*`}
+            element={<ProductRoutes />}
           />
           <Route
             path="*"

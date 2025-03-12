@@ -2,12 +2,10 @@ import { twMerge } from "tailwind-merge";
 
 import { FormField_FieldProps } from ".";
 
-type LabelProps = Pick<
-  FormField_FieldProps,
-  "labelProps" | "isRequired" | "label"
-> & {
+type LabelProps = Pick<FormField_FieldProps, "labelProps" | "isRequired"> & {
   isError: boolean;
   id: string;
+  label: string;
 };
 
 function Label({ label, labelProps, isRequired, isError, id }: LabelProps) {

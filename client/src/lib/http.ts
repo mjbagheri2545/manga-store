@@ -13,7 +13,7 @@ import {
 import { ApiError, withCatch } from "@/utils";
 
 const http = axios.create({
-  baseURL: env.VITE_API_END_POINT,
+  baseURL: `${env.VITE_API_END_POINT}/api`,
   headers: { "Content-Type": "application/json" },
   timeout: env.VITE_REQUEST_TIMEOUT,
 });

@@ -3,7 +3,7 @@ import React, { ComponentProps } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { InputFieldProps } from "@/components/form/InputField";
-import { isFormField } from "@/utils";
+import { isInputField } from "@/utils";
 
 type FormFieldsContainerProps = ComponentProps<"div">;
 
@@ -18,7 +18,7 @@ export function FormFieldsContainer({
       className={twMerge("flex flex-wrap gap-6 md:gap-4", className)}
     >
       {React.Children.map(children, (child) => {
-        if (isFormField(child)) {
+        if (isInputField(child)) {
           const newProps: InputFieldProps = {
             ...child.props,
             isMarginBottom: false,

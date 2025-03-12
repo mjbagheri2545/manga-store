@@ -10,7 +10,10 @@ import { paginate } from "@/utils";
 
 class CategoryService implements IProductGroupModelService<Category> {
   getAll(query: PaginateQuery) {
-    return prisma.category.findMany(paginate(query));
+    return Promise.all([
+      prisma.category.findMany(paginate(query)),
+      prisma.category.count(),
+    ]);
   }
 
   getById(id: string) {
@@ -19,10 +22,6 @@ class CategoryService implements IProductGroupModelService<Category> {
 
   uniquenessCheck({ name, slug }: ProductGroupModelUniquenessCheckOptions) {
     return prisma.category.findFirst({ where: { OR: [{ name }, { slug }] } });
-  }
-
-  count() {
-    return prisma.category.count();
   }
 
   create(data: Prisma.CategoryCreateInput) {

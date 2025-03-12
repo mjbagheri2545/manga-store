@@ -1,12 +1,13 @@
 import { FieldValues, FormState } from "react-hook-form";
 
+import { AxiosProgressEvent } from "axios";
 import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import tailwindTheme from "tailwindcss/defaultTheme";
 
 import { ENTITY_NAMES } from "@/constants/global/general.global";
 import SHARED_MESSAGES from "@/constants/messages";
-import { EntityKey, TypeOrTypeArray } from "@/types";
+import { EntityKey, State, TypeOrTypeArray } from "@/types";
 
 export function parseTypeOrTypeArray<T>(data: TypeOrTypeArray<T>): T[] {
   return Array.isArray(data) ? data : [data];
@@ -48,23 +49,6 @@ export function getUpdatedFields<T extends FieldValues>(
   }, {} as FieldValues) as Partial<T>;
 }
 
-type GetFieldsDefaultValueFormResultData<T, E> = {
-  [Key in keyof T]: Key extends keyof E ? E[Key] : never;
-};
-
-export function getFieldsDefaultValueFormResultData<
-  T extends FieldValues,
-  E extends object,
->(fieldValues: T, entity: E): GetFieldsDefaultValueFormResultData<T, E> {
-  return Object.keys(fieldValues).reduce((accumulator, key) => {
-    if (key in entity) {
-      accumulator[key] = entity[key as keyof E];
-    }
-
-    return accumulator;
-  }, {} as any) as GetFieldsDefaultValueFormResultData<T, E>;
-}
-
 type TailwindScreen = "2xl" | "xl" | "lg" | "md" | "sm";
 
 // i'm using default screen because of this
@@ -85,4 +69,35 @@ export function formatSingularEntityName(entityName: string) {
 
 export function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// i know i can use Set but remember in this project there is no
+// large array to compare so there is no concern
+export function isStringArraysEquals(firstArr: string[], secondArr: string[]) {
+  return firstArr.every((item) => secondArr.includes(item));
+}
+
+export function createOnUploadProgress(setProgress: State<number>[1]) {
+  return (progressEvent: AxiosProgressEvent) => {
+    const percent =
+      progressEvent.total != null
+        ? Math.round((progressEvent.loaded / progressEvent.total) * 100)
+        : 0;
+
+    setProgress(percent);
+  };
+}
+
+export function pick<T extends object, K extends keyof T>(
+  obj: T,
+  keys: K[]
+): Pick<T, K> {
+  const result = {} as Partial<T>;
+  keys.forEach((key) => {
+    if (key in obj) {
+      result[key] = obj[key];
+    }
+  });
+
+  return result as Pick<T, K>;
 }

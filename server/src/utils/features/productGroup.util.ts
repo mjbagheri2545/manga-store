@@ -46,7 +46,10 @@ export function createProductGroupModelRouter<T extends ProductGroupModel>(
     new ProductGroupModelValidator(entityKey);
 
   const entitiesKey = getPluralName(entityKey);
-  const getAllProductGroupEntities = getAllEntities({ service, entitiesKey });
+  const getAllProductGroupEntities = getAllEntities({
+    getAll: service.getAll,
+    entitiesKey,
+  });
 
   router.get("/", jwtAuthorization, getAllProductGroupEntities);
 

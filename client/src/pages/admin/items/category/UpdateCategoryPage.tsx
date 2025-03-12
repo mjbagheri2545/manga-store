@@ -1,15 +1,15 @@
+import { Section } from "@/components/ui/layout";
 import UpdateCategoryForm from "@/features/category/components/UpdateCategoryForm";
 
-import AdminSection from "../../components/section";
 import { CategoryPageHeader } from "./CategoryPageHeader";
 
 function UpdateCategoryPage() {
   return (
     <>
       <CategoryPageHeader title="به‌روزرسانی دسته بندی" />
-      <AdminSection>
+      <Section>
         <UpdateCategoryForm />
-      </AdminSection>
+      </Section>
     </>
   );
 }

@@ -1,57 +1,52 @@
-import { Context, useEffect } from "react";
+import { useEffect } from "react";
 
 import {
   TableActions,
   TableColumn,
   TableWithActions,
 } from "@/components/utility/table";
-import { DEFAULT_TAKE } from "@/constants/global/general.global";
-import { TEntitiesContext, useEntities } from "@/contexts/EntitiesContext";
+import { DEFAULT_QUERY_TAKE } from "@/constants/global/general.global";
+import { useEntities } from "@/contexts/EntitiesContext";
 import { useInfiniteApi } from "@/lib/api";
-import { EntityKey, ICrudApi, TGetAllResponse, WithId } from "@/types";
+import { Entity, EntityKey, ICrudApi, TGetAllResponse } from "@/types";
 import { formatSingularEntityName, getEntityName } from "@/utils";
 
-import { Button } from "../../utility";
 import { Alert } from "../../utility/Alert";
 import ApiComponent from "../ApiComponent";
 import ApiErrorMessageList from "../ApiErrorMessageList";
+import LoadMoreButton from "../LoadMoreButton";
 
-export type CrudTableProps<TEntity extends WithId, TGetAllEntitiesResponse> = {
+export type CrudTableProps<TEntity extends Entity, TGetAllEntitiesResponse> = {
   entityKey: EntityKey;
   columns: TableColumn<TEntity>[];
-  api: ICrudApi<TGetAllEntitiesResponse, any, any>;
+  api: Pick<ICrudApi<TGetAllEntitiesResponse>, "getAll" | "delete">;
   // example usage of getEntitiesFromData:
   // (data: GetAllUsersResponse) => users
   getEntitiesFromData: (
     data: TGetAllResponse<TGetAllEntitiesResponse>
   ) => TEntity[];
-  Context: Context<TEntitiesContext<TEntity> | null>;
 };
 
-export function CrudTable<TEntity extends WithId, TGetAllEntitiesResponse>({
-  api,
-  ...restProps
-}: CrudTableProps<TEntity, TGetAllEntitiesResponse>) {
+export function CrudTable<TEntity extends Entity, TGetAllEntitiesResponse>(
+  props: CrudTableProps<TEntity, TGetAllEntitiesResponse>
+) {
   return (
     <ApiComponent
-      apiMethod={api.getAll}
-      apiOptions={{ params: { skip: 0, take: DEFAULT_TAKE } }}
+      apiMethod={() => props.api.getAll({ skip: 0, take: DEFAULT_QUERY_TAKE })}
     >
-      {(result) => (
-        <CrudTableChildren api={api} data={result.data} {...restProps} />
-      )}
+      {(result) => <CrudTableChildren data={result.data} {...props} />}
     </ApiComponent>
   );
 }
 
 type CrudTableChildrenProps<
-  TEntity extends WithId,
+  TEntity extends Entity,
   TGetAllEntitiesResponse,
 > = CrudTableProps<TEntity, TGetAllEntitiesResponse> & {
   data: TGetAllResponse<TGetAllEntitiesResponse>;
 };
 
-function CrudTableChildren<TEntity extends WithId, TGetAllEntitiesResponse>({
+function CrudTableChildren<TEntity extends Entity, TGetAllEntitiesResponse>({
   entityKey,
   api,
   columns,
@@ -60,7 +55,6 @@ function CrudTableChildren<TEntity extends WithId, TGetAllEntitiesResponse>({
 }: CrudTableChildrenProps<TEntity, TGetAllEntitiesResponse>) {
   const {
     error,
-    entities,
     status,
     hasMore,
     totalEntitiesCount,
@@ -68,9 +62,10 @@ function CrudTableChildren<TEntity extends WithId, TGetAllEntitiesResponse>({
     loadMoreEntities,
   } = useCrudTableChildren({
     data,
-    getAll: api.getAll,
+    api,
     ...restProps,
   });
+  const [entities] = useEntities<TEntity>();
 
   const entityName = getEntityName(entityKey);
   if (entities.length === 0) {
@@ -80,63 +75,57 @@ function CrudTableChildren<TEntity extends WithId, TGetAllEntitiesResponse>({
   }
   // 192 is sum of all paddings, margins, and height of navbar
   return (
-    <div className="overflow-hidden h-[calc(100dvh-192px)]">
-      <div className="overflow-y-auto h-full" dir="ltr">
-        <TableWithActions
-          rows={entities}
-          columns={columns}
-          isLoading={status === "pending"}
-          containerProps={{ dir: "rtl" }}
-        >
-          {(id) => {
-            return (
-              <TableActions
-                deleteMethod={api.delete}
-                entityKey={entityKey}
-                id={id}
-                onSuccessfulDelete={handleOnSuccessfulDelete}
-              />
-            );
-          }}
-        </TableWithActions>
-        <div className="ml-auto pl-2 mt-1 mb-2 text-lg">
-          {`${entities.length}/${totalEntitiesCount} ${entityName}`}
-        </div>
-        {error != null && <ApiErrorMessageList error={error} />}
-        {hasMore && (
-          <div className="mt-4 flex">
-            <Button
-              onClick={loadMoreEntities}
-              className="btn-wide mx-auto"
-              isLoading={status === "pending"}
-            >
-              بارگیری بیشتر
-            </Button>
-          </div>
-        )}
+    <>
+      <TableWithActions
+        rows={entities}
+        columns={columns}
+        isLoading={status === "pending"}
+        containerProps={{ className: "h-[calc(100dvh-192px)]" }}
+      >
+        {(id) => {
+          return (
+            <TableActions
+              deleteMethod={api.delete}
+              entityKey={entityKey}
+              id={id}
+              onSuccessfulDelete={handleOnSuccessfulDelete}
+            />
+          );
+        }}
+      </TableWithActions>
+      <div className="ml-auto pl-2 mt-1 mb-2 text-lg">
+        {`${entities.length}/${totalEntitiesCount} ${entityName}`}
       </div>
-    </div>
+      {error != null && <ApiErrorMessageList error={error} />}
+      {hasMore && (
+        <LoadMoreButton
+          buttonProps={{
+            onClick: loadMoreEntities,
+            isLoading: status === "pending",
+          }}
+        />
+      )}
+    </>
   );
 }
 
 type UseCrudTableChildrenOptions<
-  TEntity extends WithId,
+  TEntity extends Entity,
   TGetAllEntitiesResponse,
 > = Pick<
   CrudTableProps<TEntity, TGetAllEntitiesResponse>,
-  "getEntitiesFromData" | "Context"
+  "getEntitiesFromData"
 > & {
-  getAll: CrudTableProps<TEntity, TGetAllEntitiesResponse>["api"]["getAll"];
+  api: CrudTableProps<TEntity, TGetAllEntitiesResponse>["api"];
   data: CrudTableChildrenProps<TEntity, TGetAllEntitiesResponse>["data"];
 };
 
-function useCrudTableChildren<TEntity extends WithId, TGetAllEntitiesResponse>({
+function useCrudTableChildren<TEntity extends Entity, TGetAllEntitiesResponse>({
   data,
-  getAll,
+  api,
   getEntitiesFromData,
-  Context,
 }: UseCrudTableChildrenOptions<TEntity, TGetAllEntitiesResponse>) {
-  const { entities, setEntities } = useEntities(Context);
+  const [entities, setEntities] = useEntities<TEntity>();
 
   const {
     status,
@@ -145,19 +134,34 @@ function useCrudTableChildren<TEntity extends WithId, TGetAllEntitiesResponse>({
     totalEntitiesCount,
     setTotalEntitiesCount,
     loadMoreEntities,
+    refetch,
   } = useInfiniteApi({
-    entities,
-    setEntities,
-    getAll,
-    getEntitiesFromData,
+    entitiesLength: entities.length,
+    getAll: api.getAll,
     initialTotalCount: data.count,
+    onSuccess: (data) =>
+      setEntities((current) => [...current, ...getEntitiesFromData(data)]),
   });
 
+  // set initial entities
   useEffect(() => {
     if (entities.length !== 0) return;
 
     setEntities(getEntitiesFromData(data));
-  }, [entities.length, getEntitiesFromData, data, setEntities]);
+  }, []);
+
+  // simple entities refetching on remount
+  useEffect(() => {
+    if (entities.length === 0) return;
+
+    refetch({
+      params: { skip: 0, take: entities.length },
+      onSuccess: (result) => {
+        setTotalEntitiesCount(result.data.count);
+        setEntities(getEntitiesFromData(result.data));
+      },
+    });
+  }, []);
 
   function handleOnSuccessfulDelete(id: string) {
     if (entities.length === 0) return;
@@ -170,7 +174,6 @@ function useCrudTableChildren<TEntity extends WithId, TGetAllEntitiesResponse>({
   return {
     error,
     status,
-    entities,
     handleOnSuccessfulDelete,
     loadMoreEntities,
     hasMore,

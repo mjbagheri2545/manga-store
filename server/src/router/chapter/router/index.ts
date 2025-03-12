@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import multer from "multer";
 import { Chapter } from "@prisma/client";
 
 import SHARED_MESSAGES from "@/constants/messages";
@@ -12,7 +13,6 @@ import {
   specificResourcePermission,
 } from "@/middlewares";
 import { PermissionChapter } from "@/types";
-import { createUploader } from "@/utils";
 import { slugValidation } from "@/validators";
 
 import chapterLogger from "../constants/logger";
@@ -23,13 +23,16 @@ import chapterService from "../services";
 import { chapterLoggerData } from "../utils";
 import ChapterValidator from "../validators";
 
+// 50 MB
+const CHAPTER_FILE_SIZE_LIMIT = 50 * 1024 * 1024;
+
 function createChapterRouter() {
   const router = Router();
 
-  const chapterFileUploader = createUploader(
-    "../../../../uploads/chapterFile/"
-  );
-
+  const chapterFileUploader = multer({
+    storage: multer.memoryStorage(),
+    limits: { files: 1, fileSize: CHAPTER_FILE_SIZE_LIMIT },
+  });
   const { getAllChapters, getChapter, createChapter, updateChapter } =
     new ChapterController();
 
