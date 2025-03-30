@@ -10,26 +10,22 @@ export function paginate(query: PaginateQuery) {
   };
 }
 
-type OrderByCreatedAt = {
-  createdAt: Prisma.SortOrder;
-};
-
-function getCreatedAtSort(sort?: string) {
+export function parseQuerySort(
+  sort?: string
+): { createdAt: Prisma.SortOrder } | undefined {
   switch (sort) {
     case "newest":
-      return "desc";
+      return { createdAt: "desc" };
     case "oldest":
-      return "asc";
+      return { createdAt: "asc" };
     default:
-      return "desc";
+      return { createdAt: "desc" };
   }
 }
 
-export function parseQueryWithSort(query: PaginateQueryWithSort) {
+export function parsePaginateQueryWithSort(query: PaginateQueryWithSort) {
   return {
     ...paginate(query),
-    orderBy: {
-      createdAt: getCreatedAtSort(query.sort),
-    } as OrderByCreatedAt,
+    orderBy: parseQuerySort(query.sort),
   };
 }

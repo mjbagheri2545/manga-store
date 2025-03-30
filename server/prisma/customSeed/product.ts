@@ -4,7 +4,6 @@ import { fakerFA as faker } from "@faker-js/faker";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 import createSeed from "./createSeed";
-import { Promises } from "./types";
 import { randomDate, randomIndex, randomInt } from "./utils";
 
 const words = [
@@ -58,7 +57,7 @@ const suffixes = [
   { en: "Gekitou", fa: "نبرد شدید" },
 ];
 
-const PRODUCTS_NUMBER = 200;
+const PRODUCTS_COUNT = 200;
 
 function getRandomUniqueWords() {
   const nameWordsNumber = randomInt({ max: 5 });
@@ -79,10 +78,16 @@ function getRandomUniqueWords() {
 
 async function createProductsSeedFunction(prisma: PrismaClient) {
   const [managers, tags, statuses, categories] = await Promise.all([
-    prisma.user.findMany({ where: { roles: { has: "manager" } } }),
-    prisma.tag.findMany(),
-    prisma.productStatus.findMany(),
-    prisma.category.findMany(),
+    prisma.user.findMany({
+      where: { roles: { has: "manager" } },
+      select: { id: true },
+    }),
+    prisma.tag.findMany({ select: { id: true } }),
+    prisma.productStatus.findMany({ select: { id: true } }),
+    prisma.category.findMany({
+      where: { slug: { not: "peaky-blinders" } },
+      select: { id: true },
+    }),
   ]);
 
   const managersLength = managers.length;
@@ -96,8 +101,8 @@ async function createProductsSeedFunction(prisma: PrismaClient) {
 
   const productImageSeedsLength = productImageSeeds.length;
 
-  const promises: Promises = [];
-  for (let i = 0; i < PRODUCTS_NUMBER; i++) {
+  console.log("Creating Products ...");
+  for (let i = 0; i < PRODUCTS_COUNT; i++) {
     const data: Partial<Prisma.ProductCreateInput> = {};
 
     data.category = {
@@ -139,8 +144,8 @@ async function createProductsSeedFunction(prisma: PrismaClient) {
     data.name = name;
     data.persianName = persianName;
 
-    data.priceInRials = parseInt(
-      faker.commerce.price({ min: 1000, max: 30000 })
+    data.oneChapterPriceInToman = parseInt(
+      faker.commerce.price({ min: 300, max: 3000 })
     );
     data.releaseYear = randomInt({ min: 2010, max: 2024 });
 
@@ -155,15 +160,12 @@ async function createProductsSeedFunction(prisma: PrismaClient) {
     data.summary = faker.word.words(randomInt({ min: 25, max: 50 }));
     data.createdAt = randomDate();
 
-    promises.push(
-      prisma.product.create({ data: data as Prisma.ProductCreateInput })
-    );
+    await prisma.product.create({ data: data as Prisma.ProductCreateInput });
   }
-
-  await Promise.all(promises);
 }
 
 async function deleteProductsSeedFunction(prisma: PrismaClient) {
+  console.log("Deleting Products ...");
   await prisma.product.deleteMany();
 }
 

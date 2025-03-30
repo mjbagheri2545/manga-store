@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 
+import RenderItems from "@/components/ui/RenderItems";
 import { List } from "@/components/utility/list";
-import RenderItems from "@/components/utility/RenderItems";
 
 import { SIDEBAR_ITEMS } from "../../constants";
 import SidebarItem from "./SidebarItem";

@@ -49,7 +49,7 @@ type GetByIdOptions<T> = {
 } & ({ entityKey: string; entityName: string } | { entityKey: EntityKey });
 
 function getEntityName(name: string) {
-  return name === "دسته بندی" ? name + " ای" : "ی";
+  return name === "دسته بندی" ? name + " ای" : name + "ی";
 }
 
 export function idAuthorization<T extends Model>({

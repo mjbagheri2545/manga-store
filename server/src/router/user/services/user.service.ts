@@ -6,24 +6,34 @@ import { paginate } from "@/utils";
 
 class UserService {
   getAll(query: PaginateQuery) {
-    const userSelect = {
-      id: true,
-      fullName: true,
-      email: true,
-      avatarImage: true,
-      createdAt: true,
-      roles: true,
-      isVerified: true,
-    };
-
-    return prisma.user.findMany({
-      ...paginate(query),
-      select: userSelect,
-    });
+    return Promise.all([
+      prisma.user.findMany({
+        ...paginate(query),
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          createdAt: true,
+          isVerified: true,
+          walletBalanceInToman: true,
+        },
+      }),
+      prisma.user.count(),
+    ]);
   }
 
   getManagers() {
-    return prisma.user.findMany({ where: { roles: { has: "manager" } } });
+    return prisma.user.findMany({
+      where: { roles: { has: "manager" } },
+      select: { id: true, fullName: true },
+    });
+  }
+
+  getTranslators() {
+    return prisma.user.findMany({
+      where: { roles: { has: "translator" } },
+      select: { id: true, fullName: true },
+    });
   }
 
   count() {

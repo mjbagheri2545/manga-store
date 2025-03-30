@@ -1,47 +1,33 @@
+import { ComponentProps } from "react";
+
 import { twMerge } from "tailwind-merge";
 
-import { Link } from "@/components/utility";
-import { LinkProps } from "@/components/utility/Link";
+export type SectionTitleProps = ComponentProps<"div"> & {
+  title: string;
+};
 
-export type SectionTitleProps =
-  | {
-      title?: string;
-    }
-  | {
-      title: string;
-      linkProps: LinkProps;
-    };
-
-function SectionTitle(props: SectionTitleProps) {
+export function SectionTitle({
+  title,
+  className,
+  children,
+  ...restProps
+}: SectionTitleProps) {
   // with discriminated union types we sure title is string
-  if ("linkProps" in props) {
-    return (
-      <div className="flex justify-between">
-        <SectionTitleChildren {...props} />
+  return (
+    <div
+      {...restProps}
+      className={twMerge(
+        "flex justify-between mb-5 px-3 flex-wrap gap-4",
+        className
+      )}
+    >
+      <div className="flex gap-3 h-fit max-sm:w-full">
+        <span className="block w-1 rounded-lg bg-primary" />
+        <h4 className="text-lg font-semibold">{title}</h4>
       </div>
-    );
-  }
-
-  return <SectionTitleChildren {...props} />;
+      {children}
+    </div>
+  );
 }
 
 export default SectionTitle;
-
-function SectionTitleChildren({ title, ...restProps }: SectionTitleProps) {
-  return (
-    <>
-      {title != null ? (
-        <div className="mb-5 flex gap-3 h-fit">
-          <span className="block w-1 rounded-lg bg-primary" />
-          <h4 className="text-lg font-semibold">{title}</h4>
-        </div>
-      ) : null}
-      {"linkProps" in restProps ? (
-        <Link
-          {...restProps.linkProps}
-          className={twMerge("ml-3", restProps.linkProps.className)}
-        />
-      ) : null}
-    </>
-  );
-}

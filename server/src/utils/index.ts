@@ -1,6 +1,7 @@
 export * from "./compileHandlebarsTemplate.util";
 export * from "./email.util";
 export * from "./error.util";
+export * from "./file.util";
 export * from "./general.util";
 export * from "./jwt.util";
 export * from "./logger.util";

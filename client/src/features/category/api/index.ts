@@ -1,3 +1,4 @@
+import PATH from "@/constants/path";
 import { CreateProductGroupData } from "@/schemas/productGroup.schema";
 import { ProductGroup } from "@/types";
 import { CrudApi } from "@/utils";
@@ -10,6 +11,6 @@ const categoryApi = new CrudApi<
   GetAllCategoryResponse,
   CategoryResponse,
   CreateProductGroupData
->("category");
+>(PATH.base.productGroup(PATH.base.category));
 
 export default categoryApi;

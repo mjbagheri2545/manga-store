@@ -9,17 +9,20 @@ import {
   newPasswordValidator,
 } from "@/validators/auth_user.validator";
 
-export const registrationSchema = z
-  .object({
-    fullName: minLength({ label: "نام و نام خانوادگی" }),
-    email: emailValidator(),
-    password: newPasswordValidator(),
-    passwordConfirmation: newPasswordConfirmationValidator(),
-  })
-  .refine((data) => data.password === data.passwordConfirmation, {
+export const baseRegistrationSchema = z.object({
+  fullName: minLength({ label: "نام و نام خانوادگی" }),
+  email: emailValidator(),
+  password: newPasswordValidator(),
+  passwordConfirmation: newPasswordConfirmationValidator(),
+});
+
+export const registrationSchema = baseRegistrationSchema.refine(
+  (data) => data.password === data.passwordConfirmation,
+  {
     message: AUTH_USER_MESSAGES.password.confirmation("رمز عبور"),
     path: ["passwordConfirmation"],
-  });
+  }
+);
 
 export type RegistrationData = z.infer<typeof registrationSchema>;
 

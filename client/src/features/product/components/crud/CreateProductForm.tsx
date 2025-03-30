@@ -1,11 +1,11 @@
-import ApiComponent from "@/components/ui/ApiComponent";
+import { ApiComponent } from "@/components/ui/api";
 import { CreateEntityForm } from "@/components/ui/form";
 import { useProductGroups } from "@/contexts/ProductGroupsContext";
 import { useProgress } from "@/contexts/ProgressContext";
 import { createOnUploadProgress } from "@/utils";
 
 import productApi, { ManagersResponse } from "../../api";
-import { createProductSchema } from "../../schema";
+import { createProductSchema } from "../../schemas";
 import ProductFormFields from "./productFormField";
 
 function CreateProductForm() {

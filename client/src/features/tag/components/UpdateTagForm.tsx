@@ -1,20 +1,26 @@
 import { UpdateEntityForm } from "@/components/ui/form";
 import { ProductGroupFormFields } from "@/components/ui/productGroup";
 import createProductGroupSchema from "@/schemas/productGroup.schema";
+import { ProductGroup } from "@/types";
 
 import tagApi from "../api";
 
-function UpdateTagForm() {
+type UpdateTagFormProps = {
+  tag: ProductGroup;
+};
+
+function UpdateTagForm({ tag }: UpdateTagFormProps) {
   return (
     <UpdateEntityForm
       entityKey="tag"
-      api={tagApi}
+      updateMethod={tagApi.update}
       schema={createProductGroupSchema}
-      getFieldsDefaultValues={(data) => ({
-        name: data.tag.name,
-        slug: data.tag.slug,
-      })}
-      getEntityFromData={(data) => data.tag}
+      useFormProps={{
+        defaultValues: {
+          name: tag.name,
+          slug: tag.slug,
+        },
+      }}
     >
       <ProductGroupFormFields />
     </UpdateEntityForm>

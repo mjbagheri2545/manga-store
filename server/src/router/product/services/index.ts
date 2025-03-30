@@ -1,11 +1,16 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, Product } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { StrictOmit } from "@/types";
-import { AutoBind } from "@/utils";
+import { PaginateQueryWithSort, ProductGroupModel, StrictOmit } from "@/types";
+import { AutoBind, paginate, parseQuerySort } from "@/utils";
 
 import { ProductQuery } from "../types";
-import { parseProductQuery } from "../utils";
+import {
+  MappedProduct,
+  parseProductQuery,
+  setCountKey,
+  setCountKeyWithTotalCount,
+} from "../utils";
 
 type CreateProductOptions = {
   data: StrictOmit<Prisma.ProductCreateInput, "manager" | "category" | "tags">;
@@ -15,12 +20,30 @@ type CreateProductOptions = {
   tagsId: string[];
 };
 
-type UpdateRatingOptions = {
+type RateOptions = {
   productId: string;
   ratedById: string;
-  rating: number;
+  ratingNumber: number;
 };
 
+export type GetByIdOptions = Omit<Prisma.ProductFindUniqueArgs, "where">;
+
+type ProductSelectBase = Pick<
+  Product,
+  | "id"
+  | "name"
+  | "oneChapterPriceInToman"
+  | "productImage"
+  | "slug"
+  | "summary"
+  | "releaseYear"
+> & {
+  status: ProductGroupModel;
+  tags: ProductGroupModel[];
+  _count: { chapters: number; views: number };
+};
+
+const TRANSLATOR_LIMIT = 10;
 class ProductService extends AutoBind {
   create({
     data,
@@ -46,12 +69,14 @@ class ProductService extends AutoBind {
     return {
       status: true,
       name: true,
-      priceInRials: true,
+      oneChapterPriceInToman: true,
       productImage: true,
       slug: true,
       id: true,
-      _count: { select: { chapters: true } },
+      _count: { select: { chapters: true, views: true } },
       tags: true,
+      summary: true,
+      releaseYear: true,
     };
   }
 
@@ -63,67 +88,153 @@ class ProductService extends AutoBind {
     ]);
   }
 
-  getAll(query: ProductQuery) {
+  private async getByRating(
+    query: ProductQuery
+  ): Promise<[MappedProduct<ProductSelectBase>[], number]> {
     const parsedQuery = parseProductQuery(query);
 
-    return Promise.all([
-      prisma.product.findMany({
-        ...parsedQuery,
-        select: {
-          manager: { select: { fullName: true } },
-          category: true,
-          ...this.productSelectBase(),
-        },
-      }),
-      prisma.product.count({ where: parsedQuery.where }),
-    ]);
+    const items = await prisma.productRating.groupBy({
+      by: ["productId"],
+      _avg: { rating: true },
+      where: {
+        product: parsedQuery.where,
+      },
+      orderBy: { _avg: { rating: "desc" } },
+      skip: parsedQuery.skip,
+      take: parsedQuery.take,
+    });
+
+    const productIds = items.map((item) => item.productId);
+
+    const [products, totalCount] = await setCountKeyWithTotalCount(
+      Promise.all([
+        prisma.product.findMany({
+          where: { id: { in: productIds } },
+          select: this.productSelectBase(),
+        }),
+        prisma.product.count(),
+      ])
+    );
+
+    const sortedProducts = productIds.map((id) =>
+      products.find((product) => product.id === id)
+    ) as typeof products;
+
+    return [sortedProducts, totalCount];
   }
 
-  getById(id: string) {
+  getAll(query: ProductQuery) {
+    if (query.sort === "high-rated") {
+      return this.getByRating(query);
+    }
+
+    const parsedQuery = parseProductQuery(query);
+
+    return setCountKeyWithTotalCount(
+      Promise.all([
+        prisma.product.findMany({
+          ...parsedQuery,
+          select: {
+            manager: { select: { fullName: true } },
+            category: true,
+            ...this.productSelectBase(),
+          },
+        }),
+        prisma.product.count({ where: parsedQuery.where }),
+      ])
+    );
+  }
+
+  getById(id: string, options: GetByIdOptions = { select: { id: true } }) {
     return prisma.product.findUnique({
       where: { id },
-      include: {
-        tags: { select: { id: true } },
-        category: { select: { id: true } },
-        status: { select: { id: true } },
-        manager: { select: { id: true } },
-      },
+      ...options,
     });
   }
 
-  getBySlug(slug: string) {
-    return prisma.product.findUnique({
-      where: { slug },
-      include: {
-        averageRating: { select: { rating: true } },
-        chapters: {
-          select: {
-            translator: {
-              select: { fullName: true },
+  uniquenessValidationBySlug(slug: string) {
+    return prisma.product.findUnique({ where: { slug }, select: { id: true } });
+  }
+
+  getBySlug(slug: string, viewerId: string) {
+    return Promise.all([
+      prisma.$transaction(async (trx) => {
+        const product = await trx.product.findUnique({
+          where: { slug },
+          include: {
+            ratings: { select: { rating: true, ratedById: true } },
+            chapters: {
+              select: {
+                episode: true,
+                id: true,
+              },
+              take: 4,
+              orderBy: { createdAt: "desc" },
             },
-            episode: true,
-            id: true,
+            category: true,
+            tags: true,
+            status: true,
+            _count: { select: { chapters: true, ratings: true, views: true } },
+          },
+        });
+
+        if (product == null) {
+          return;
+        }
+
+        const view = await trx.productView.findUnique({
+          where: {
+            productId_viewerId: {
+              viewerId,
+              productId: product.id,
+            },
+          },
+        });
+
+        if (view == null) {
+          await trx.productView.create({
+            data: { productId: product.id, viewerId },
+          });
+
+          return {
+            ...product,
+            _count: { ...product._count, views: product._count.views + 1 },
+          };
+        }
+
+        return product;
+      }),
+      prisma.user.findMany({
+        where: { translatedChapters: { some: { product: { slug } } } },
+        select: {
+          fullName: true,
+          id: true,
+          _count: {
+            select: {
+              translatedChapters: { where: { product: { slug } } },
+            },
           },
         },
-        category: true,
-        tags: true,
-        status: true,
-      },
-    });
+        skip: 0,
+        take: 4,
+      }),
+    ]);
   }
 
   getByCategory(categorySlug: string, query: ProductQuery) {
     const parsedQuery = parseProductQuery(query);
     const where = { category: { slug: categorySlug }, ...parsedQuery.where };
 
-    return Promise.all([
-      prisma.product.findMany({
-        ...parsedQuery,
-        where,
-        select: this.productSelectBase(),
-      }),
-      prisma.product.count({ where }),
-    ]);
+    return setCountKeyWithTotalCount(
+      Promise.all([
+        prisma.product.findMany({
+          ...parsedQuery,
+          where,
+          select: this.productSelectBase(),
+        }),
+        prisma.product.count({ where }),
+      ])
+    );
   }
 
   getByTag(tagSlug: string, query: ProductQuery) {
@@ -133,14 +244,112 @@ class ProductService extends AutoBind {
       ...parsedQuery.where,
     };
 
-    return Promise.all([
-      prisma.product.findMany({
-        ...parsedQuery,
+    return setCountKeyWithTotalCount(
+      Promise.all([
+        prisma.product.findMany({
+          ...parsedQuery,
+          where,
+          select: this.productSelectBase(),
+        }),
+        prisma.product.count({ where }),
+      ])
+    );
+  }
+
+  async getRelatedProducts(categoryId: string, tagsId: string[]) {
+    const products = await prisma.product.findMany({
+      where: {
+        OR: [
+          { category: { id: categoryId } },
+          { tags: { some: { id: { in: tagsId } } } },
+        ],
+      },
+      take: 10,
+      select: this.productSelectBase(),
+    });
+
+    return setCountKey(products);
+  }
+
+  async getRelatedTranslators(
+    productSlug: string,
+    query: PaginateQueryWithSort
+  ) {
+    const where = {
+      translatedChapters: { some: { product: { slug: productSlug } } },
+    };
+
+    const countDbQuery = prisma.user.count({ where });
+    const parsedPaginateQuery = paginate(query);
+
+    if (query.sort === "most-translated-chapters-count") {
+      const dbQuery = prisma.$queryRaw`
+        WITH chapters_count AS (
+          SELECT
+            c."translatorId",
+            COUNT(c.id) AS translated_chapters_count
+          FROM "Chapter" c
+          JOIN "Product" p ON c."productId" = p."id"
+          WHERE p."slug" = ${productSlug}
+          GROUP BY c."translatorId"
+        )
+        SELECT
+          u."id",
+          u."fullName",
+          cc.translated_chapters_count
+        FROM "User" u
+        JOIN chapters_count cc
+          ON u.id = cc."translatorId"
+        ORDER BY cc.translated_chapters_count DESC NULLS LAST
+        LIMIT ${parsedPaginateQuery.take ?? TRANSLATOR_LIMIT} OFFSET ${parsedPaginateQuery.skip ?? 0};
+        `;
+
+      const [relatedTranslators, count] = (await Promise.all([
+        dbQuery,
+        countDbQuery,
+      ])) as [
+        { id: string; fullName: string; translated_chapters_count: bigint }[],
+        number,
+      ];
+
+      const finalRelatedTranslators = relatedTranslators.map(
+        ({ translated_chapters_count, ...restData }) => ({
+          ...restData,
+          translatedChaptersCount: Number(translated_chapters_count),
+        })
+      );
+
+      return [finalRelatedTranslators, count];
+    }
+
+    const parsedQuerySort = parseQuerySort(query.sort);
+
+    const [relatedTranslators, count] = await Promise.all([
+      prisma.user.findMany({
         where,
-        select: this.productSelectBase(),
+        select: {
+          id: true,
+          fullName: true,
+          _count: {
+            select: {
+              translatedChapters: { where: { product: { slug: productSlug } } },
+            },
+          },
+        },
+        ...parsedPaginateQuery,
+        orderBy: parsedQuerySort,
       }),
-      prisma.product.count({ where }),
+      countDbQuery,
     ]);
+
+    const finalRelatedTranslators = relatedTranslators.map(
+      ({ _count, ...restData }) => ({
+        ...restData,
+        translatedChaptersCount: _count.translatedChapters,
+      })
+    );
+
+    return [finalRelatedTranslators, count];
   }
 
   update(id: string, data: Prisma.ProductUpdateInput = {}) {
@@ -150,19 +359,19 @@ class ProductService extends AutoBind {
     });
   }
 
-  updateRating({ productId, ratedById, rating }: UpdateRatingOptions) {
-    return prisma.product.update({
-      where: { id: productId },
-      data: {
-        averageRating: {
-          upsert: {
-            where: { productId, ratedById },
-            create: { ratedById, rating },
-            update: { rating },
+  async rate({ productId, ratedById, ratingNumber }: RateOptions) {
+    return prisma.productRating.upsert({
+      where: { productId_ratedById: { productId, ratedById } },
+      create: { productId, ratedById, rating: ratingNumber },
+      update: { rating: ratingNumber },
+      select: {
+        product: {
+          select: {
+            _count: { select: { ratings: true } },
+            ratings: { select: { rating: true, ratedById: true } },
           },
         },
       },
-      include: { averageRating: { select: { rating: true } } },
     });
   }
 

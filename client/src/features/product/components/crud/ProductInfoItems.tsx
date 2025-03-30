@@ -2,6 +2,7 @@ import {
   CalendarIcon,
   CalendarPlusIcon,
   DollarSignIcon,
+  IdCardIcon,
   LinkIcon,
   NotebookPenIcon,
   NotebookTextIcon,
@@ -10,8 +11,10 @@ import {
 } from "lucide-react";
 
 import { TEntityInfo } from "@/components/ui/crud";
-import Image from "@/components/utility/Image";
+import TextWithIcon from "@/components/ui/TextWithIcon";
+import { Image } from "@/components/utility";
 import { Product } from "@/types";
+import { NUMBER_FORMATTER } from "@/utils";
 
 const PRODUCT_INFO_ITEMS = {
   productImage: {
@@ -24,6 +27,10 @@ const PRODUCT_INFO_ITEMS = {
         />
       </div>
     ),
+  },
+  id: {
+    keyName: "آیدی کاربر",
+    Icon: IdCardIcon,
   },
   name: {
     keyName: "نام",
@@ -49,26 +56,25 @@ const PRODUCT_INFO_ITEMS = {
     keyName: "سال انتشار",
     Icon: CalendarIcon,
   },
-  priceInRials: {
-    keyName: "قیمت به ریال",
-    Icon: DollarSignIcon,
+  oneChapterPriceInToman: {
+    renderItem: (oneChapterPriceInToman: number) => (
+      <TextWithIcon Icon={DollarSignIcon}>
+        قیمت هر فصل: {NUMBER_FORMATTER.format(oneChapterPriceInToman)} تومان
+      </TextWithIcon>
+    ),
   },
   createdAt: {
-    keyName: "زمان ایجاد",
-    Icon: CalendarPlusIcon,
     renderItem: (createdAt: string) => (
-      <span className="block">
+      <TextWithIcon Icon={CalendarPlusIcon}>
         زمان ایجاد: {new Date(createdAt).toLocaleString("fa")}
-      </span>
+      </TextWithIcon>
     ),
   },
   summary: {
-    keyName: "خلاصه",
-    Icon: NotebookTextIcon,
     renderItem: (summary: string) => (
-      <div className="col-span-full">
-        <p>خلاصه: {summary}</p>
-      </div>
+      <TextWithIcon Icon={NotebookTextIcon} className="col-span-full">
+        <p className="flex-1">خلاصه: {summary}</p>
+      </TextWithIcon>
     ),
   },
 } as TEntityInfo<Product>;

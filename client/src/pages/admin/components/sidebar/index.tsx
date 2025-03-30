@@ -14,7 +14,7 @@ function Sidebar() {
     isMaxWidthLg
       ? "absolute top-0 right-0 translate-x-[100%] h-full"
       : "h-full",
-    !isOpened && "w-28",
+    !isOpened && "w-24",
     isMaxWidthLg && isOpened && "translate-x-0"
   );
 

@@ -7,7 +7,7 @@ node_modules
 dist
 *.local
 dependencyGraphs
-uploads
+private
 
 # Editor directories and files
 .vscode/*

@@ -9,7 +9,7 @@ import { EntityKey, ICrudApi, State } from "@/types";
 import { getEntityName, parseApiResponse } from "@/utils";
 
 import { Button } from "../Button";
-import IconWrapper from "../IconWrapper";
+import { IconWrapper } from "../IconWrapper";
 import { Tooltip } from "../Tooltip";
 
 export type TableActionsProps = {
@@ -17,11 +17,13 @@ export type TableActionsProps = {
   deleteMethod: ICrudApi["delete"];
   onSuccessfulDelete: (id: string) => void;
   entityKey: EntityKey;
+  entityPath?: string;
 };
 
 export function TableActions({
   id,
   entityKey,
+  entityPath,
   ...restProps
 }: TableActionsProps) {
   const [isOpened, setIsOpened] = useState(false);
@@ -32,7 +34,11 @@ export function TableActions({
         <Button
           variant="icon"
           isLinkComponent
-          to={PATH.admin.info(entityKey, id)}
+          to={
+            entityPath != null
+              ? `${entityPath}/${id}`
+              : PATH.admin.info(entityKey, id)
+          }
         >
           <IconWrapper Icon={ClipboardListIcon} />
         </Button>
@@ -41,7 +47,11 @@ export function TableActions({
         <Button
           variant="icon"
           isLinkComponent
-          to={PATH.admin.update(entityKey, id)}
+          to={
+            entityPath != null
+              ? `${entityPath}/edit/${id}`
+              : PATH.admin.update(entityKey, id)
+          }
         >
           <IconWrapper Icon={PencilIcon} />
         </Button>

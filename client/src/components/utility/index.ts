@@ -1,6 +1,10 @@
+export { Alert, type AlertProps } from "./Alert";
 export * from "./Button";
+export { Divider } from "./Divider";
 export { Dropdown } from "./Dropdown";
-export { Link } from "./Link";
+export { IconWrapper } from "./IconWrapper";
+export { Image } from "./Image";
+export { Link, type LinkProps } from "./Link";
 export { Spinner, type SpinnerProps } from "./Spinner";
 export { ToastContainer } from "./toastContainer";
 export { Tooltip } from "./Tooltip";

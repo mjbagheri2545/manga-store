@@ -20,6 +20,8 @@ function createGetProductsRoutes(router: Router) {
     getProductBySlug,
     getProductsByCategory,
     getProductsByTag,
+    getRelatedProducts,
+    getRelatedTranslators,
   } = new GetProductController();
 
   const getAllProducts = getAllEntities({
@@ -32,7 +34,15 @@ function createGetProductsRoutes(router: Router) {
   router.get("/", jwtAuthorization, getAllProducts);
 
   const getProductById = idAuthorization({
-    getByIdQuery: productService.getById,
+    getByIdQuery: (id) =>
+      productService.getById(id, {
+        include: {
+          tags: { select: { id: true } },
+          category: { select: { id: true } },
+          manager: { select: { id: true } },
+          status: { select: { id: true } },
+        },
+      }),
     entityKey: "product",
   });
 
@@ -40,23 +50,38 @@ function createGetProductsRoutes(router: Router) {
 
   router.get(
     PRODUCT_PATH.getBySlug,
-    slugValidation("slug", "محصول مورد نظر"),
+    slugValidation("slug", "آدرس اینترنتی محصول"),
     jwtAuthorization,
     getProductBySlug
   );
 
   router.get(
     PRODUCT_PATH.getByCategory,
-    slugValidation("category", "دسته بندی مورد نظر"),
+    slugValidation("category", "دسته بندی"),
     jwtAuthorization,
     getProductsByCategory
   );
 
   router.get(
     PRODUCT_PATH.getByTag,
-    slugValidation("tag", "ژانر مورد نظر"),
+    slugValidation("tag", "ٖژانز"),
     jwtAuthorization,
     getProductsByTag
+  );
+
+  router.get(
+    PRODUCT_PATH.getRelatedProducts,
+    slugValidation(),
+    getProductById,
+    jwtAuthorization,
+    getRelatedProducts
+  );
+
+  router.get(
+    PRODUCT_PATH.getRelatedTranslators,
+    slugValidation("slug", "آدرس اینترنتی محصول"),
+    jwtAuthorization,
+    getRelatedTranslators
   );
 }
 

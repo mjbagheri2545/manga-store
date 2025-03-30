@@ -11,7 +11,7 @@ export type User = {
   roles: UserRole[];
   isVerified: boolean;
   bio?: string;
-  walletBalance: number;
+  walletBalanceInToman: number;
 };
 
 export type ProductGroup = {
@@ -29,7 +29,15 @@ export type Product = {
   writer: string;
   releaseYear: number;
   summary: string;
-  priceInRials: number;
+  oneChapterPriceInToman: number;
   productImage: string;
+  createdAt: string;
+  views: number;
+};
+
+export type Chapter = {
+  id: string;
+  episode: number;
+  chapterFile: string;
   createdAt: string;
 };

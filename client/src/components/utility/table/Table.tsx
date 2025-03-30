@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge";
 
 import { PropsWithContainer } from "@/types";
 
-import RenderItems from "../RenderItems";
+import RenderItems from "../../ui/RenderItems";
 import { Spinner } from "../Spinner";
 
 type CellProps = ComponentProps<"th" | "td">;

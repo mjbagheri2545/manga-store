@@ -10,11 +10,16 @@ import {
   UserAuthorizedReq,
 } from "@/types";
 import {
+  failedOperation,
+  getFilePath,
+  getFilePathForDb,
   newModelConnectionWithId,
-  pick,
   removeFile,
   successfulResponse,
   updatedEntityFields,
+  updateFile,
+  withCatch,
+  writeFile,
 } from "@/utils";
 
 import chapterLogger from "../constants/logger";
@@ -29,13 +34,15 @@ type GetAllChapterReq = UserAuthorizedReq<
 >;
 
 type CreateChapterReqBody = {
-  episode: number;
-  chapterFile: string;
-  productId: string;
+  episode: string;
   translatorId: string;
 };
 
-type CreateChapterReq = UserAuthorizedReq<CreateChapterReqBody>;
+type CreateChapterReq = UserAuthorizedReq<
+  CreateChapterReqBody,
+  EmptyObject,
+  { productId: string }
+>;
 
 type UpdateChapterReq = UserAuthorizedReq<
   Partial<CreateChapterReqBody> & { chapter: PermissionChapter }
@@ -47,10 +54,7 @@ class ChapterController {
       params: { productId },
     } = req;
 
-    const [chapters, count] = await Promise.all([
-      chapterService.getAll(productId, query),
-      chapterService.count(),
-    ]);
+    const [chapters, count] = await chapterService.getAll(productId, query);
 
     successfulResponse({ res, data: { chapters, count } });
   }
@@ -61,19 +65,51 @@ class ChapterController {
   ) {
     const { chapter } = req.body;
 
-    const chapterData = pick(chapter, ["chapterFile", "episode", "id"]);
-
-    successfulResponse({ res, data: { chapter: chapterData } });
+    successfulResponse({ res, data: { chapter } });
   }
 
   async createChapter(req: CreateChapterReq, res: Response) {
-    const { productId, translatorId, episode } = req.body;
+    const {
+      body: { translatorId, episode },
+      params: { productId },
+    } = req;
 
-    const chapter = await chapterService.create({
-      data: { chapterFile: req.file?.path as string, episode },
-      productId,
-      translatorId,
+    const chapterFilePath = await getFilePath({
+      uploadPath: "private/uploads/chapterFile",
+      file: req.file!,
+      isPublic: false,
     });
+
+    const [error, chapter] = await withCatch(
+      chapterService.create({
+        data: {
+          episode: parseInt(episode),
+          chapterFile: getFilePathForDb(chapterFilePath),
+        },
+        translatorId,
+        productId,
+      })
+    );
+
+    if (error != null) {
+      return failedOperation({
+        res,
+        message: "افزودن فصل",
+      });
+    }
+
+    const writeFileError = await writeFile(chapterFilePath, req.file!.buffer);
+
+    if (writeFileError != null) {
+      // remove chunks of file that has been written to server
+      // and then delete already created product
+      await removeFile(chapterFilePath);
+      await chapterService.delete(chapter.id);
+      return failedOperation({
+        res,
+        message: "افزودن فصل",
+      });
+    }
 
     chapterLogger.logMessage("Chapter created.", {
       metaData: { chapter: chapterLoggerData(chapter) },
@@ -83,32 +119,55 @@ class ChapterController {
 
     const message = createMessage(CHAPTER_MESSAGES.crud(chapter));
 
-    successfulResponse({ res, message, data: { chapter } });
+    successfulResponse({ res, message, data: { id: chapter.id } });
   }
 
   async updateChapter(req: UpdateChapterReq, res: Response) {
-    const { chapter, productId, translatorId, episode } = req.body;
+    const { chapter, translatorId, episode } = req.body;
 
-    const productConnection = newModelConnectionWithId(productId, "product");
     const translatorConnection = newModelConnectionWithId(
       translatorId,
       "translator"
     );
 
     const data: Prisma.ChapterUpdateInput = {
-      episode,
-      ...productConnection,
       ...translatorConnection,
     };
 
-    if (req.file != null) {
-      data.chapterFile = req.file.path;
+    if (episode != null) {
+      data.episode = parseInt(episode);
     }
 
-    const [updatedChapter] = await Promise.all([
-      chapterService.update(chapter.id, data),
-      removeFile(chapter.chapterFile),
-    ]);
+    if (req.file != null) {
+      const chapterFilePath = await getFilePath({
+        uploadPath: "private/uploads/chapterFile",
+        file: req.file!,
+        isPublic: false,
+      });
+
+      data.chapterFile = getFilePathForDb(chapterFilePath);
+    }
+
+    const [error, updatedChapter] = await withCatch(
+      chapterService.update(chapter.id, data)
+    );
+
+    if (error != null) {
+      return failedOperation({ res, message: "به‌روزرسانی فصل" });
+    }
+
+    if (req.file != null) {
+      const updateChapterFileError = await updateFile({
+        file: req.file,
+        newFilePath: data.chapterFile,
+        oldFilePath: chapter.chapterFile,
+        isPublic: false,
+      });
+
+      if (updateChapterFileError != null) {
+        return failedOperation({ res, message: "به‌روزرسانی محصول" });
+      }
+    }
 
     chapterLogger.logMessage("Chapter updated.", {
       metaData: updatedEntityFields(chapter, updatedChapter),
@@ -118,7 +177,7 @@ class ChapterController {
 
     const message = updateMessage(CHAPTER_MESSAGES.crud(updatedChapter));
 
-    successfulResponse({ res, message, data: { chapter: updatedChapter } });
+    successfulResponse({ res, message, data: { id: updatedChapter.id } });
   }
 }
 

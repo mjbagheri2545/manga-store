@@ -1,21 +1,25 @@
 import { useParams } from "react-router-dom";
 
-import { Alert } from "@/components/utility/Alert";
+import { Alert } from "@/components/utility";
+import { useProductGroups } from "@/contexts/ProductGroupsContext";
 import productApi from "@/features/product/api";
-import ProductListSection from "@/features/product/components/productListSection";
+import ProductsListSection from "@/features/product/components/productsListSection";
 
 function ProductsByCategoryPage() {
   const { category } = useParams();
+
+  const { categories } = useProductGroups();
 
   if (category == null) {
     return <Alert type="error">دسته بندی مورد نظر یافت نشد</Alert>;
   }
 
+  const fullCategory = categories.find((item) => item.slug === category);
+
   return (
-    <ProductListSection
-      getAllMethod={(query) => {
-        return productApi.getByCategory({ query, category });
-      }}
+    <ProductsListSection
+      title={fullCategory!.name}
+      getAllMethod={(query) => productApi.getByCategory({ query, category })}
     />
   );
 }

@@ -13,7 +13,6 @@ export type Auth_UserFormProps<T extends FieldValues> = FormProps<T> & {
 };
 
 export function Auth_UserAccountForm<T extends FieldValues>({
-  children,
   content,
   ...restProps
 }: Auth_UserFormProps<T>) {

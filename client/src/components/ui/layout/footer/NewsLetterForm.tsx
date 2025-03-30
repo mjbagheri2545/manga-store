@@ -12,7 +12,7 @@ function NewsletterForm() {
       <Form
         formMethods={formMethods}
         handleOnSubmit={() => {}}
-        submitButton={<SubmitButton className="mt-5">عضویت</SubmitButton>}
+        submitButton={<SubmitButton className="!mt-5">عضویت</SubmitButton>}
       >
         <InputField
           controllerName="email"

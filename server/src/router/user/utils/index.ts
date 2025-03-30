@@ -4,11 +4,20 @@ import { v4 as uuidV4 } from "uuid";
 
 import { TIME } from "@/constants/global/general.global";
 import { EmptyObject, IdentityVerificationReq } from "@/types";
-import { badRequest, getExpirationTime, isExpired, pick } from "@/utils";
+import {
+  badRequest,
+  getExpirationTime,
+  isExpired,
+  pick,
+  removeFile,
+  updateFile,
+  writeFile,
+} from "@/utils";
 
 import USER_CONFIG from "../constants/config";
 import USER_MESSAGES from "../constants/messages";
 import tokenService from "../services/token.service";
+import userService from "../services/user.service";
 
 export async function generateVerificationToken(userId: string) {
   const uuid = uuidV4();
@@ -77,7 +86,44 @@ export function pickUserCreateData(req: Request) {
     "avatarImage",
     "role",
     "bio",
-    "walletBalance",
-    "userToUpdate",
+    "walletBalanceInToman",
   ]);
+}
+
+type UpdateAvatarImageOptions = {
+  file: Express.Multer.File;
+  newAvatarImagePath: string;
+  oldAvatarImagePath: string | null;
+  userId: string;
+};
+
+export async function updateAvatarImage({
+  file,
+  newAvatarImagePath,
+  oldAvatarImagePath,
+  userId,
+}: UpdateAvatarImageOptions) {
+  if (oldAvatarImagePath != null) {
+    const updateProductImageError = await updateFile({
+      file,
+      newFilePath: newAvatarImagePath,
+      oldFilePath: oldAvatarImagePath,
+      isPublic: false,
+    });
+
+    if (updateProductImageError != null) {
+      return updateProductImageError;
+    }
+  } else {
+    const writeFileError = await writeFile(newAvatarImagePath, file.buffer);
+
+    if (writeFileError != null) {
+      // remove chunks of file that has been written to server
+      // and then delete already created product
+      await removeFile(newAvatarImagePath);
+      await userService.delete(userId);
+
+      return writeFileError;
+    }
+  }
 }

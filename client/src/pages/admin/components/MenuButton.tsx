@@ -1,7 +1,6 @@
 import { MenuIcon } from "lucide-react";
 
-import { Button } from "@/components/utility";
-import IconWrapper from "@/components/utility/IconWrapper";
+import { Button, IconWrapper } from "@/components/utility";
 
 import { useSidebar } from "../contexts/SidebarContext";
 

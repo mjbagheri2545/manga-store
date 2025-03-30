@@ -1,8 +1,10 @@
 const PRODUCT_PATH = {
-  getBySlug: "/:slug",
+  getBySlug: "/by-slug/:slug",
   getByCategory: "/category/:category",
   getByTag: "/tag/:tag",
-  updateRating: "/:id/update-rating",
+  rate: "/:id/rate",
+  getRelatedProducts: "/:id/related-products",
+  getRelatedTranslators: "/:slug/related-translators",
 } as const;
 
 export default PRODUCT_PATH;

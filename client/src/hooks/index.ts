@@ -1,8 +1,9 @@
+export { useClickOutside } from "./useClickOutside";
 export { useContextValue } from "./useContextValue";
 export { useExecuteAsync } from "./useExecuteAsync";
+export { useInView } from "./useInView";
 export { useLocalStorage } from "./useLocalStorage";
 export { useMaxWidth } from "./useMaxWidth";
 export { useMediaQuery } from "./useMediaQuery";
+export { useQuerySort } from "./useQuerySort";
 export { useToggleState } from "./useToggleState";
-
-export const test = "Asdasdasdasd";

@@ -20,12 +20,14 @@ function Label({ label, labelProps, isRequired, isError, id }: LabelProps) {
       {isRequired ? (
         <span className={`label-text text-base ${errorClassName}`}>
           {label}
-          <span className="text-error mr-1 inline-block text-lg translate-y-0.5">
+          <span className="text-error mr-1 inline-block text-base text-[18px] translate-y-0.5">
             *
           </span>
         </span>
       ) : (
-        <span className={`label-text ${errorClassName}`}>{label}</span>
+        <span className={`label-text text-base ${errorClassName}`}>
+          {label}
+        </span>
       )}
     </label>
   );

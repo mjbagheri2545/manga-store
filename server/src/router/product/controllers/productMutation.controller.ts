@@ -3,16 +3,16 @@ import { Response } from "express";
 import { Prisma, Product } from "@prisma/client";
 
 import SHARED_MESSAGES from "@/constants/messages";
-import { EmptyObject, UserAuthorizedReq } from "@/types";
+import { UserAuthorizedReq } from "@/types";
 import {
   failedOperation,
   getFilePath,
   getFilePathForDb,
-  getFilePathFromDbFilePath,
   newModelConnectionWithId,
   removeFile,
   successfulResponse,
   updatedEntityFields,
+  updateFile,
   withCatch,
   writeFile,
 } from "@/utils";
@@ -21,6 +21,7 @@ import productLogger from "../constants/logger";
 import PRODUCT_MESSAGES from "../constants/messages";
 import productService from "../services";
 import {
+  calculateAverageProductRating,
   getTagsData,
   pickProductCreateData,
   productLoggerData,
@@ -30,7 +31,7 @@ type CreateProductReqBody = Pick<
   Prisma.ProductCreateInput,
   "name" | "persianName" | "writer" | "designer" | "summary" | "slug"
 > & {
-  priceInRials: string;
+  oneChapterPriceInToman: string;
   releaseYear: string;
   tagsId: string[];
   statusId: string;
@@ -52,13 +53,12 @@ type UpdateProductReqBody = Partial<CreateProductReqBody> & {
 
 type UpdateProductReq = UserAuthorizedReq<UpdateProductReqBody>;
 
-type UpdateRatingReq = UserAuthorizedReq<
-  {
-    rating: number;
-  },
-  EmptyObject,
-  { productId: string }
->;
+type UpdateRatingReq = UserAuthorizedReq<{
+  ratingNumber: number;
+  product: {
+    id: string;
+  };
+}>;
 
 class ProductMutationController {
   async createProduct(req: CreateProductReq, res: Response) {
@@ -67,11 +67,11 @@ class ProductMutationController {
     const data = pickProductCreateData(req);
 
     const productImagePath = await getFilePath({
-      uploadPath: "uploads/productImage/",
+      uploadPath: "uploads/productImage",
       file: req.file!,
     });
 
-    data.priceInRials = parseInt(data.priceInRials);
+    data.oneChapterPriceInToman = parseInt(data.oneChapterPriceInToman);
     data.releaseYear = parseInt(data.releaseYear);
 
     const finalData = {
@@ -94,14 +94,21 @@ class ProductMutationController {
     if (error != null) {
       return failedOperation({
         res,
-        message: "ایجاد محصول",
+        message: "افزودن محصول",
       });
     }
 
     const writeFileError = await writeFile(productImagePath, req.file!.buffer);
 
     if (writeFileError != null) {
+      // remove chunks of file that has been written to server
+      // and then delete already created product
       await removeFile(productImagePath);
+      await productService.delete(product.id);
+      return failedOperation({
+        res,
+        message: "افزودن محصول",
+      });
     }
 
     productLogger.logMessage("Product created.", {
@@ -125,8 +132,8 @@ class ProductMutationController {
     const statusConnection = newModelConnectionWithId(statusId, "status");
 
     const data = pickProductCreateData(req);
-    if (data.priceInRials != null) {
-      data.priceInRials = parseInt(data.priceInRials);
+    if (data.oneChapterPriceInToman != null) {
+      data.oneChapterPriceInToman = parseInt(data.oneChapterPriceInToman);
     }
 
     if (data.releaseYear != null) {
@@ -143,7 +150,7 @@ class ProductMutationController {
 
     if (req.file != null) {
       const productImagePath = await getFilePath({
-        uploadPath: "uploads/productImage/",
+        uploadPath: "uploads/productImage",
         file: req.file!,
       });
 
@@ -159,23 +166,13 @@ class ProductMutationController {
     }
 
     if (req.file != null) {
-      const writeFileError = await writeFile(
-        getFilePathFromDbFilePath(String(finalData.productImage)),
-        req.file.buffer
-      );
+      const updateProductImageError = await updateFile({
+        file: req.file,
+        newFilePath: finalData.productImage,
+        oldFilePath: product.productImage,
+      });
 
-      if (writeFileError != null) {
-        return failedOperation({ res, message: "به‌روزرسانی محصول" });
-      }
-
-      const removeFileError = await removeFile(
-        getFilePathFromDbFilePath(product.productImage)
-      );
-
-      if (removeFileError != null) {
-        await removeFile(
-          getFilePathFromDbFilePath(String(finalData.productImage))
-        );
+      if (updateProductImageError != null) {
         return failedOperation({ res, message: "به‌روزرسانی محصول" });
       }
     }
@@ -193,27 +190,41 @@ class ProductMutationController {
 
   async updateProductRating(req: UpdateRatingReq, res: Response) {
     const {
-      body: { user, rating },
-      params: { productId },
+      body: { user, ratingNumber, product },
     } = req;
 
-    const updatedProduct = await productService.updateRating({
-      productId,
+    const productRating = await productService.rate({
+      productId: product.id,
       ratedById: user.id,
-      rating,
+      ratingNumber,
     });
+
+    const { ratings } = productRating.product;
+
+    const ratingsCount = productRating.product._count.ratings;
+    const averageRating = calculateAverageProductRating(ratings, ratingsCount);
+
+    const viewerRating = ratings.find((rating) => rating.ratedById === user.id);
+
+    const newRating = {
+      averageRating,
+      ratingsCount,
+      myRating: viewerRating?.rating,
+    };
 
     productLogger.logMessage("Product rating updated.", {
       metaData: {
-        rating,
-        newProductRating: updatedProduct.averageRating?.rating,
+        ratingNumber,
+        newProductRating: newRating,
       },
     });
 
     successfulResponse({
       res,
       message: PRODUCT_MESSAGES.updateRating,
-      data: { product: updatedProduct },
+      data: {
+        rating: newRating,
+      },
     });
   }
 }

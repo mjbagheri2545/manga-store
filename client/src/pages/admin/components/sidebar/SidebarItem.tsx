@@ -1,7 +1,6 @@
 import { LucideIcon } from "lucide-react";
 
-import { Link } from "@/components/utility";
-import IconWrapper from "@/components/utility/IconWrapper";
+import { IconWrapper, Link } from "@/components/utility";
 import { ListItem } from "@/components/utility/list";
 import PATH from "@/constants/path";
 import { cn } from "@/utils";
@@ -31,7 +30,7 @@ function SidebarItem({
   );
 
   const linkClassName = cn(
-    "flex items-center px-5 py-4 h-16 transition relative z-10",
+    "flex items-center w-full px-5 py-4 h-16 transition relative z-10",
     isActive ? "bg-dark-body" : "hover:bg-gray-700/60",
     !isOpened && "justify-center"
   );

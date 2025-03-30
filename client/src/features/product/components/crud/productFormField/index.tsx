@@ -5,15 +5,15 @@ import {
   TextareaField,
 } from "@/components/form";
 import { FormFieldsContainer } from "@/components/ui/form";
-import RenderItems from "@/components/utility/RenderItems";
+import RenderItems from "@/components/ui/RenderItems";
 import { useProductGroups } from "@/contexts/ProductGroupsContext";
 import { GetProductByIdResponse } from "@/features/product/api";
-import { User } from "@/types";
+import { MAX_SUMMARY_LENGTH } from "@/features/product/schemas";
 
 import TagFields from "./tagFields";
 
 type ProductFormFieldsProps = {
-  managers: User[];
+  managers: { id: string; fullName: string }[];
   product?: GetProductByIdResponse["product"];
 };
 
@@ -69,7 +69,10 @@ function ProductFormFields({ managers, product }: ProductFormFieldsProps) {
         </SelectField>
       </FormFieldsContainer>
       <FormFieldsContainer>
-        <InputField controllerName="priceInRials" label="قیمت به ریال" />
+        <InputField
+          controllerName="oneChapterPriceInToman"
+          label="قیمت هر فصل"
+        />
         <InputField controllerName="slug" label="آدرس اینترنتی" />
       </FormFieldsContainer>
       <FormFieldsContainer>
@@ -93,7 +96,7 @@ function ProductFormFields({ managers, product }: ProductFormFieldsProps) {
       <TextareaField
         controllerName="summary"
         label="خلاصه"
-        fieldProps={{ placeholder: "حداکثر ۱۰۰۰ حرف" }}
+        fieldProps={{ placeholder: `حداکثر ${MAX_SUMMARY_LENGTH} حرف` }}
       />
     </>
   );

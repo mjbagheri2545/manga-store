@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 
+import RenderItems from "@/components/ui/RenderItems";
 import { List, ListItem, ListItemLink } from "@/components/utility/list";
-import RenderItems from "@/components/utility/RenderItems";
 import PATH from "@/constants/path";
 import { useProductGroups } from "@/contexts/ProductGroupsContext";
 import { useToggleState } from "@/hooks";

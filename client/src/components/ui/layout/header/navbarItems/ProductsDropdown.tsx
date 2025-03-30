@@ -1,8 +1,8 @@
 import { Link as ReactRouterLink } from "react-router-dom";
 
+import RenderItems from "@/components/ui/RenderItems";
 import { Dropdown } from "@/components/utility";
 import { ListItem } from "@/components/utility/list";
-import RenderItems from "@/components/utility/RenderItems";
 import PATH from "@/constants/path";
 import { useProductGroups } from "@/contexts/ProductGroupsContext";
 

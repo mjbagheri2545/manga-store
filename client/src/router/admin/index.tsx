@@ -7,6 +7,7 @@ import CategoryRoutes from "./category.routes";
 import ProductRoutes from "./product.routes";
 import ProductStatusRoutes from "./productStatus.routes";
 import TagRoutes from "./tag.routes";
+import UserRoutes from "./user.routes";
 
 function AdminRouter() {
   return (
@@ -28,6 +29,10 @@ function AdminRouter() {
           <Route
             path={`${PATH.getPathForRoute(PATH.base.product)}/*`}
             element={<ProductRoutes />}
+          />
+          <Route
+            path={`${PATH.getPathForRoute(PATH.base.user)}/*`}
+            element={<UserRoutes />}
           />
           <Route
             path="*"

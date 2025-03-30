@@ -3,9 +3,8 @@ import {
   CustomValidationChain as ExpressValidatorCustomValidationChain,
   ExpressValidator,
   Location,
+  Meta,
 } from "express-validator";
-
-import { Prisma } from "@prisma/client";
 
 import { STRING_MIN_LENGTH } from "@/constants/global/general.global";
 import SHARED_MESSAGES from "@/constants/messages";
@@ -64,14 +63,23 @@ export function isLength(
   const finalMessage =
     "message" in restOptions
       ? restOptions.message
-      : SHARED_MESSAGES.validation.minLength(restOptions.label, finalMinLength);
+      : max != null
+        ? SHARED_MESSAGES.validation.minMaxLength(
+            restOptions.label,
+            finalMinLength,
+            max
+          )
+        : SHARED_MESSAGES.validation.minLength(
+            restOptions.label,
+            finalMinLength
+          );
 
   return string(field, location)
     .isLength({ min: finalMinLength, max })
     .withMessage(finalMessage);
 }
 
-export function slugValidator(field = "id", label = "آیدی مورد نظر") {
+export function slugValidator(field = "id", label = "آیدی") {
   return required(field, {
     location: "param",
     label,
@@ -79,14 +87,14 @@ export function slugValidator(field = "id", label = "آیدی مورد نظر") 
 }
 
 export function uniquenessValidator<T>(
-  service: (value: string) => Prisma.PrismaPromise<T | null>
+  service: (value: string, meta?: Meta) => Promise<T | null>
 ) {
-  return async (value: string) => {
-    const entity = await service(value);
+  return async (value: string, meta?: Meta) => {
+    const entity = await service(value, meta);
     if (entity != null) {
       throw new Error();
     }
-    return;
+    return true;
   };
 }
 
@@ -100,9 +108,11 @@ export function createValidation(validations: CustomValidationChain[]) {
 
     const checkExactResult = await checkExact(validations, {
       message: (fields) =>
-        SHARED_MESSAGES.validation.unknownFields(
-          fields.map((field) => field.path).join(", ")
-        ),
+        fields.length === 1
+          ? SHARED_MESSAGES.validation.unknownField(fields[0].path)
+          : SHARED_MESSAGES.validation.unknownFields(
+              fields.map((field) => field.path).join(", ")
+            ),
     }).run(req);
 
     if (!checkExactResult.isEmpty()) {

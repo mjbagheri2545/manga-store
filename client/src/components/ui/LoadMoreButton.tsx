@@ -13,7 +13,7 @@ function LoadMoreButton({ containerProps, buttonProps }: LoadMoreButtonProps) {
   return (
     <div
       {...containerProps}
-      className={twMerge("mt-4 flex w-full", containerProps?.className)}
+      className={twMerge("mt-5 flex w-full", containerProps?.className)}
     >
       <Button
         isWide

@@ -4,19 +4,27 @@ const { exec } = require("child_process");
 const { promisify } = require("util");
 const promisifiedExec = promisify(exec);
 
-const createComponents = require("./createComponents.cjs");
+const createComponents = require("./createComponents/index.cjs");
 const createApi = require("./createApi.cjs");
 const createContexts = require("./createContexts.cjs");
-const createHooks = require("./createHooks.cjs");
-const createSchema = require("./createSchema.cjs");
+const createSchemas = require("./createSchemas.cjs");
 
 async function createFeature() {
   const name = process.env.npm_config_name;
+  const entityName = process.env.npm_config_entityname;
 
   if (name == null) {
     const errorMessage = `
-      You must provide a name like this: npm run create-feature --name=invoice
+      You must provide a name like this: npm run create-feature --name=user
     `;
+
+    throw new Error(errorMessage);
+  }
+
+  if (entityName == null) {
+    const errorMessage = `
+    You must provide a entity name like this: npm run create-feature --name=user --entityName=کاربر
+  `;
 
     throw new Error(errorMessage);
   }
@@ -26,17 +34,34 @@ async function createFeature() {
   // path.resolve because project names may have space
   const featureDirPath = path.join(__dirname, `../../src/features/${name}`);
 
-  await fs.mkdir(featureDirPath);
+  // for easily overwrite existing feature
+  try {
+    await fs.access(featureDirPath);
+    console.log(`${name} feature directory is already available`);
+
+    try {
+      console.log(`recreating ${name} feature directory`);
+      await fs.rm(featureDirPath, { recursive: true });
+      await fs.mkdir(featureDirPath);
+    } catch (rmError) {
+      console.error(`Error in removing ${name} feature directory:`, rmError);
+    }
+  } catch (accessError) {
+    if (accessError?.code === "ENOENT") {
+      await fs.mkdir(featureDirPath);
+    } else {
+      throw accessError;
+    }
+  }
 
   const promises = [];
 
   const commonArgs = [featureDirPath, name, capitalizedName];
 
   promises.push(createApi(...commonArgs));
-  promises.push(createComponents(featureDirPath, capitalizedName));
+  promises.push(createComponents(...commonArgs, upperCasedName, entityName));
   promises.push(createContexts(...commonArgs));
-  promises.push(createSchema(featureDirPath, capitalizedName, upperCasedName));
-  promises.push(createHooks(...commonArgs));
+  promises.push(createSchemas(featureDirPath, capitalizedName));
 
   await Promise.all(promises);
 

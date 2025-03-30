@@ -1,5 +1,14 @@
+import { $Enums } from "@prisma/client";
+
+import { STRING_MIN_LENGTH } from "@/constants/global/general.global";
+import SHARED_MESSAGES from "@/constants/messages";
 import { AutoBind } from "@/utils";
-import { createValidation, required, slugValidator } from "@/validators";
+import {
+  createValidation,
+  required,
+  slugValidator,
+  string,
+} from "@/validators";
 import {
   emailNotInUseValidator,
   fullNameValidator,
@@ -9,28 +18,44 @@ import {
 
 import USER_MESSAGES from "../constants/messages";
 
+const MAX_BIO_LENGTH = 600;
+
 class UserCrudValidator extends AutoBind {
   private role() {
     return required("role", { label: "سطح دسترسی" })
       .custom((value) => {
-        const roles = ["admin", "manager", "translator", "user"];
-
-        if (!roles.includes(value)) {
+        if (!Object.values($Enums.Role).includes(value)) {
           throw new Error();
         }
-        return;
+        return true;
       })
       .withMessage(USER_MESSAGES.validation.role);
   }
 
-  private walletBalance() {
-    return required("walletBalance", {
-      label: "موجودی کیف پول",
-    });
+  private walletBalanceInToman() {
+    return string("walletBalanceInToman")
+      .optional()
+      .ifExists()
+      .custom((balance) => {
+        const parsedBalance = parseInt(balance);
+        return parsedBalance === 0 || parsedBalance > 0;
+      })
+      .withMessage(SHARED_MESSAGES.validation.minNumber("موجودی کیف پول", 1));
   }
 
   private bio() {
-    return required("bio", { label: "بیوگرافی" }).optional();
+    return string("bio")
+      .optional()
+      .ifExists()
+      .if((value) => value.length > 0)
+      .isLength({ max: MAX_BIO_LENGTH })
+      .withMessage(
+        SHARED_MESSAGES.validation.minMaxLength(
+          "بیوگرافی",
+          STRING_MIN_LENGTH,
+          MAX_BIO_LENGTH
+        )
+      );
   }
 
   private getCreateUserValidation() {
@@ -47,7 +72,7 @@ class UserCrudValidator extends AutoBind {
     return createValidation([
       ...this.getCreateUserValidation(),
       this.bio(),
-      this.walletBalance().toInt(),
+      this.walletBalanceInToman(),
     ]);
   }
 
@@ -56,13 +81,16 @@ class UserCrudValidator extends AutoBind {
       (validationChain) => validationChain.optional()
     );
 
-    const walletBalance = this.walletBalance().optional().ifExists().toInt();
+    const walletBalanceInToman = this.walletBalanceInToman()
+      .optional()
+      .ifExists()
+      .toInt();
 
     return createValidation([
       ...optionalFields,
       slugValidator(),
       this.bio(),
-      walletBalance,
+      walletBalanceInToman,
     ]);
   }
 

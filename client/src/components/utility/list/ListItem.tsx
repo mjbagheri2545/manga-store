@@ -3,7 +3,7 @@ import { PropsWithChildren } from "react";
 import { PropsWithContainer, PropsWithOptionalIcon } from "@/types";
 import { cn } from "@/utils";
 
-import IconWrapper from "../IconWrapper";
+import { IconWrapper } from "../IconWrapper";
 
 export type ListItemProps = PropsWithOptionalIcon &
   PropsWithContainer<"li"> &

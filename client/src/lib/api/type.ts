@@ -55,14 +55,20 @@ export type EventsOptions<T> = {
 
 export type Options<T> = RetryOptions & SignalOptions & EventsOptions<T>;
 
-export type UseApiCallbackArgs<T, P, O extends Options<T> = Options<T>> =
+export type UseApiCallbackArgs<
+  T,
+  P,
+  O extends SignalOptions & EventsOptions<T> = Options<T>,
+> =
   IsRequiredParam<P> extends true
     ? [options: { params: P } & O]
     : [options?: void extends P ? O : { params?: P } & O];
 
-export type UseApiCallback<T, P> = (
-  ...args: UseApiCallbackArgs<T, P>
-) => Promise<void | ApiResponse<T>>;
+export type UseApiCallback<
+  T,
+  P,
+  O extends SignalOptions & EventsOptions<T> = Options<T>,
+> = (...args: UseApiCallbackArgs<T, P, O>) => Promise<void | ApiResponse<T>>;
 
 export type IdleStatus = {
   status: "idle";
@@ -76,9 +82,13 @@ export type UseApiResultStatus<T> =
   | { status: "error"; error: IApiError; result: undefined }
   | { status: "success"; error: undefined; result: ApiResult<T> };
 
-export type UseApiResult<T, P> = {
-  execute: UseApiCallback<T, P>;
-  refetch: UseApiCallback<T, P>;
+export type UseApiResult<
+  T,
+  P,
+  O extends SignalOptions & EventsOptions<T> = Options<T>,
+> = {
+  execute: UseApiCallback<T, P, O>;
+  refetch: UseApiCallback<T, P, O>;
 } & UseApiResultStatus<T>;
 
 export type RequestStatus = UseApiResultStatus<any>["status"];

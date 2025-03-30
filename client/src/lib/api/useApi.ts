@@ -1,10 +1,15 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 import { ApiMethod } from "@/types";
+import { toastApiResponseError } from "@/utils";
 
 import {
+  EventsOptions,
   IdleStatus,
+  Options,
+  SignalOptions,
   UseApiArgs,
+  UseApiCallback,
   UseApiCallbackArgs,
   UseApiResult,
   UseApiResultStatus,
@@ -47,5 +52,31 @@ export function useExecuteApi<T, P = void>(
   apiMethod: ApiMethod<T, P>,
   options?: UseBaseApiOptions<T>
 ) {
-  return useBaseApi(apiMethod, options);
+  return useBaseApi<T, P>(apiMethod, options);
+}
+
+export function useMutation<T, P = void>(
+  apiMethod: ApiMethod<T, P>,
+  options?: UseBaseApiOptions<T>
+) {
+  const {
+    refetch: _,
+    execute,
+    ...state
+  } = useBaseApi<T, P>(apiMethod, {
+    onError: toastApiResponseError,
+    ...options,
+  });
+
+  const mutate: UseApiCallback<T, P, SignalOptions & EventsOptions<T>> =
+    useCallback(
+      (...args: UseApiCallbackArgs<T, P>) => {
+        const options = { ...args[0], isRetrying: false };
+
+        return execute(...([options] as UseApiCallbackArgs<T, P, Options<T>>));
+      },
+      [execute]
+    );
+
+  return { mutate, ...state };
 }

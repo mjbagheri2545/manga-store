@@ -10,7 +10,10 @@ export function ModalContent({
   return (
     <div
       {...restProps}
-      className={twMerge("modal-box max-[480px]:p-4", className)}
+      className={twMerge(
+        "modal-box max-[480px]:p-4 shadow-md shadow-slate-950/80 bg-slate-900",
+        className
+      )}
       role="dialog"
     >
       {children}

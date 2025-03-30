@@ -1,7 +1,7 @@
 import { Section } from "@/components/ui/layout";
 import TagInfo from "@/features/tag/components/TagInfo";
 
-import { TagPageHeader } from "./TagPageHeader";
+import TagPageHeader from "./TagPageHeader";
 
 function TagInfoPage() {
   return (

@@ -1,15 +1,13 @@
 import { Context, PropsWithChildren } from "react";
 
-import { ApiResult, ICrudApi, ProductGroup, TGetAllResponse } from "@/types";
+import { ICrudApi, ProductGroup, TGetAllResponse } from "@/types";
 
-import ApiComponent from "../ApiComponent";
+import { ApiComponent } from "../api";
 
 type ProductGroupProviderProps<GetAll> = PropsWithChildren & {
   Context: Context<ProductGroup[] | null>;
   getAllMethod: ICrudApi<GetAll>["getAll"];
-  getEntitiesFromData: (
-    result: ApiResult<TGetAllResponse<GetAll>>
-  ) => ProductGroup[];
+  getEntitiesFromData: (data: TGetAllResponse<GetAll>) => ProductGroup[];
 };
 
 export function ProductGroupProvider<GetAll>({
@@ -20,8 +18,8 @@ export function ProductGroupProvider<GetAll>({
 }: ProductGroupProviderProps<GetAll>) {
   return (
     <ApiComponent apiMethod={() => getAllMethod(undefined)}>
-      {(result) => (
-        <Context.Provider value={getEntitiesFromData(result)}>
+      {(data) => (
+        <Context.Provider value={getEntitiesFromData(data)}>
           {children}
         </Context.Provider>
       )}

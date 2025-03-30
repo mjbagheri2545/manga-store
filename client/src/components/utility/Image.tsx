@@ -1,16 +1,29 @@
 import { ComponentProps } from "react";
 
+import { twMerge } from "tailwind-merge";
+
 import env from "@/constants/env";
 
-function Image(props: ComponentProps<"img"> & { src: string }) {
+export function Image({
+  src,
+  alt,
+  className,
+  ...restProps
+}: ComponentProps<"img"> & { src: string }) {
+  // just for testing and for development purposes
+  // this should remove in production
+  const finalSrc =
+    src.includes("uploads") || src.includes("seed")
+      ? `${env.VITE_API_END_POINT}/${src}`
+      : src;
+
   return (
     <img
-      {...props}
-      src={`${env.VITE_API_END_POINT}/${props.src}`}
-      alt={props.alt}
+      {...restProps}
+      className={twMerge("max-h-fit", className)}
+      src={finalSrc}
+      alt={alt}
       crossOrigin="anonymous"
     />
   );
 }
-
-export default Image;

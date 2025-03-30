@@ -9,15 +9,16 @@ async function createApi(featureDirPath, name, capitalizedName) {
     import PATH from "@/constants/path"
     import { HTTP } from "@/lib/http";
     import { ${capitalizedName} } from "@/types"
-    import { Create${capitalizedName}Data } from "../schema";
+    import { Create${capitalizedName}Data } from "../schemas";
     import { CrudApi } from "@/utils";
 
     type ${capitalizedName}Response = {${name}: ${capitalizedName}}
 
-    type GetAll${capitalizedName}Response = {${name}s: ${capitalizedName}[]}
+    export type GetAll${capitalizedName}Base = ${capitalizedName}
+    export type GetAll${capitalizedName}sResponse = {${name}s: GetAll${capitalizedName}Base[]}
 
     class ${capitalizedName}Api extends CrudApi<
-        GetAll${capitalizedName}Response,
+        GetAll${capitalizedName}sResponse,
         ${capitalizedName}Response,
         Create${capitalizedName}Data
     > {

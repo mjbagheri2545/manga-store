@@ -1,8 +1,8 @@
-import React, { ComponentProps, useEffect, useRef } from "react";
+import React, { ComponentProps, useRef } from "react";
 
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-import { useToggleState } from "@/hooks";
+import { useClickOutside, useToggleState } from "@/hooks";
 import { cn } from "@/utils";
 
 import { List, ListProps } from "./list";
@@ -33,22 +33,7 @@ export function Dropdown({
   const [isOpened, toggleIsOpened, setIsOpened] = useToggleState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const handleOnMouseDown = (e: MouseEvent) => {
-      const isOutside =
-        dropdownRef.current != null &&
-        !dropdownRef.current.contains(e.target as Node);
-
-      if (isOutside) {
-        setIsOpened(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOnMouseDown);
-    return () => {
-      document.removeEventListener("mousedown", handleOnMouseDown);
-    };
-  }, [setIsOpened]);
+  useClickOutside(dropdownRef, () => setIsOpened(false));
 
   return (
     <div
@@ -65,7 +50,7 @@ export function Dropdown({
         tabIndex={0}
         role="button"
         className={cn(
-          "btn btn-block text-white",
+          "btn btn-block bg-dark-body text-white",
           dropdownButtonProps?.className
         )}
         onClick={toggleIsOpened}
@@ -82,7 +67,7 @@ export function Dropdown({
       <List
         {...contentProps}
         className={cn(
-          "dropdown-content gap-2 bg-base-100 mt-1 menu rounded z-[1] w-52 shadow-lg shadow-slate-900",
+          "dropdown-content gap-2 bg-base-100 mt-1 menu rounded z-20 w-52 shadow-lg shadow-slate-900",
           contentProps?.className
         )}
       >

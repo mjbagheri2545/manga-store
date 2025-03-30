@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { STRING_MIN_LENGTH } from "@/constants/global/general.global";
 import SHARED_MESSAGES from "@/constants/messages";
 
 type MessageOptions = { label: string } | { message: string };
@@ -9,6 +8,9 @@ type MinMaxOptions = MinOptions & { max: number };
 type LengthOptions = MessageOptions & {
   length: number;
 };
+
+export const STRING_MIN_LENGTH = 2;
+export const NUMBER_MIN_VALUE = 1;
 
 export function string(label?: string) {
   return z
@@ -69,13 +71,13 @@ export function number(label?: string) {
 
 export const minNumber = createMinValidator({
   typeLabel: "مقدار",
-  defaultMin: 1,
+  defaultMin: NUMBER_MIN_VALUE,
   validator: number,
 });
 
 export const minMaxNumber = createMinMaxValidator({
   typeLabel: "مقدار",
-  defaultMin: 1,
+  defaultMin: NUMBER_MIN_VALUE,
   validator: number,
 });
 

@@ -4,22 +4,22 @@ import { useContextValue } from "@/hooks";
 import { ApiMethodWrapper } from "@/types";
 
 import {
-  AccountVerificationVerifyData,
-  PasswordRecoveryGetEmailData,
+  GetEmailData,
   PasswordRecoveryRecoverData,
   PasswordResetData,
-} from "../api/account.api";
+  VerificationData,
+} from "../schemas/account.schema";
 
 export type TUserAccountContext = {
   verification: {
     getEmail: ApiMethodWrapper;
-    verify: ApiMethodWrapper<AccountVerificationVerifyData>;
+    verify: ApiMethodWrapper<VerificationData>;
   };
   password: {
     recovery: {
-      getEmail: ApiMethodWrapper<PasswordRecoveryGetEmailData>;
+      getEmail: ApiMethodWrapper<GetEmailData>;
       recover: ApiMethodWrapper<PasswordRecoveryRecoverData>;
-      getEmailData?: PasswordRecoveryGetEmailData;
+      getEmailData?: GetEmailData;
     };
     reset: ApiMethodWrapper<PasswordResetData>;
   };

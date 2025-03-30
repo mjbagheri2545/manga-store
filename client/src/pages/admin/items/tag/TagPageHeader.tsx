@@ -1,14 +1,13 @@
-import { Link } from "@/components/utility";
+import { PageHeader, PageHeaderProps } from "@/components/ui/layout";
+import LinkWithArrow from "@/components/ui/LinkWithArrow";
 import PATH from "@/constants/path";
 
-import AdminPageHeader, {
-  AdminPageHeaderProps,
-} from "../../components/PageHeader";
-
-export function TagPageHeader({ title }: AdminPageHeaderProps) {
+function TagPageHeader({ title }: PageHeaderProps) {
   return (
-    <AdminPageHeader title={title}>
-      <Link to={PATH.admin.index("tag")}>ژانر ها</Link>
-    </AdminPageHeader>
+    <PageHeader title={title}>
+      <LinkWithArrow to={PATH.admin.index("tag")}>ژانر ها</LinkWithArrow>
+    </PageHeader>
   );
 }
+
+export default TagPageHeader;

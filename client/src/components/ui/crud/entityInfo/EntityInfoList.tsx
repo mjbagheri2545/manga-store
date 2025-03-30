@@ -1,18 +1,21 @@
 import { LucideIcon } from "lucide-react";
 
-import RenderItems from "@/components/utility/RenderItems";
-import { Entity, StrictOmit } from "@/types";
+import RenderItems from "@/components/ui/RenderItems";
+import { Entity } from "@/types";
+
+import TextWithIcon from "../../TextWithIcon";
 
 export type KeyInfo<TEntity> =
   | {
       keyName: string;
       Icon: LucideIcon;
     }
-  | { renderItem: (value: TEntity[keyof TEntity]) => React.ReactNode };
+  | { renderItem: (value?: TEntity[keyof TEntity]) => React.ReactNode };
 
-export type TEntityInfo<TEntity extends Entity> = {
-  [Key in keyof StrictOmit<TEntity, "id">]: KeyInfo<TEntity>;
-};
+export type TEntityInfo<TEntity extends Entity> = Record<
+  string,
+  KeyInfo<TEntity>
+>;
 
 type EntityInfoListProps<TEntity extends Entity> = {
   entity: TEntity;
@@ -25,24 +28,24 @@ export function EntityInfoList<TEntity extends Entity>({
 }: EntityInfoListProps<TEntity>) {
   return (
     <>
-      <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(250px,1fr))]">
+      <div className="grid gap-5 grid-cols-[repeat(auto-fill,minmax(250px,1fr))]">
         <RenderItems
           items={Object.entries<KeyInfo<TEntity>>(info)}
           renderItem={([key, keyInfo]) => {
             const entityInfo = entity[key as keyof TEntity];
+
             if (entityInfo == null) return;
 
             if ("renderItem" in keyInfo) {
               return keyInfo.renderItem(entityInfo);
             }
 
+            // i use ` ` because i want to pass string
+            // then automatically it wrapped by span with flex-1
             return (
-              <div className="flex items-center gap-2">
-                <keyInfo.Icon className="size-5" />
-                <span>
-                  {keyInfo.keyName}: {String(entityInfo)}
-                </span>
-              </div>
+              <TextWithIcon Icon={keyInfo.Icon}>
+                {`${keyInfo.keyName}: ${String(entityInfo)}`}
+              </TextWithIcon>
             );
           }}
         />

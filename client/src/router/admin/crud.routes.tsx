@@ -10,14 +10,15 @@ type TAdminCrudRoutes = {
 
 type AdminCrudRoutesProps = {
   routes: TAdminCrudRoutes;
+  pathParams?: string;
 };
 
-function AdminCrudRoutes({ routes }: AdminCrudRoutesProps) {
+function AdminCrudRoutes({ routes, pathParams = ":id" }: AdminCrudRoutesProps) {
   return (
     <Routes>
       <Route index element={<routes.EntitiesPage />} />
       <Route path="create" element={<routes.CreateEntityPage />} />
-      <Route path=":id" element={<routes.EntityInfo />} />
+      <Route path={pathParams} element={<routes.EntityInfo />} />
       <Route path="edit/:id" element={<routes.UpdateEntityPage />} />
     </Routes>
   );

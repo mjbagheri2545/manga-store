@@ -1,7 +1,6 @@
 import { LogOutIcon } from "lucide-react";
 
-import { Button, Tooltip } from "@/components/utility";
-import IconWrapper from "@/components/utility/IconWrapper";
+import { Button, IconWrapper, Tooltip } from "@/components/utility";
 import { useAuth } from "@/contexts/AuthContext";
 
 import MenuButton from "../MenuButton";

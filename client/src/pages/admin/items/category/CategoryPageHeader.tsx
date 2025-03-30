@@ -1,14 +1,13 @@
+import { PageHeader, PageHeaderProps } from "@/components/ui/layout";
 import { Link } from "@/components/utility";
 import PATH from "@/constants/path";
 
-import AdminPageHeader, {
-  AdminPageHeaderProps,
-} from "../../components/PageHeader";
-
-export function CategoryPageHeader({ title }: AdminPageHeaderProps) {
+function CategoryPageHeader({ title }: PageHeaderProps) {
   return (
-    <AdminPageHeader title={title}>
+    <PageHeader title={title}>
       <Link to={PATH.admin.index("category")}>دسته بندی ها</Link>
-    </AdminPageHeader>
+    </PageHeader>
   );
 }
+
+export default CategoryPageHeader;

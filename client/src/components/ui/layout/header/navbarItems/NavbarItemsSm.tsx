@@ -1,7 +1,6 @@
-import { BellIcon, MenuIcon, UserIcon, XIcon } from "lucide-react";
+import { BellIcon, MenuIcon, XIcon } from "lucide-react";
 
-import { Button } from "@/components/utility";
-import Divider from "@/components/utility/Divider";
+import { Button, Divider } from "@/components/utility";
 import { List, ListItemLink } from "@/components/utility/list";
 import PATH from "@/constants/path";
 import { useToggleState } from "@/hooks";
@@ -9,6 +8,7 @@ import { cn } from "@/utils";
 
 import ProductLinks from "./ProductLinks";
 import SearchField from "./SearchField";
+import UserNavbarSm from "./UserNavbarSm";
 
 function NavbarItemsSm() {
   const [isOpened, toggleIsOpened] = useToggleState();
@@ -53,14 +53,7 @@ function NavbarItemsSm() {
           ژانر ها
         </ListItemLink>
         <Divider className={cn("mt-3 max-w-full w-auto", itemClassName)} />
-        <Button
-          to={PATH.auth.login}
-          isLinkComponent
-          className={cn("mx-[2%] mt-3 mb-8 text-lg", itemClassName)}
-        >
-          <UserIcon />
-          <span>ورود / ثبت نام</span>
-        </Button>
+        <UserNavbarSm itemClassName={itemClassName} />
       </List>
     </>
   );

@@ -1,7 +1,7 @@
 import { Section } from "@/components/ui/layout";
 import CreateTagForm from "@/features/tag/components/CreateTagForm";
 
-import { TagPageHeader } from "./TagPageHeader";
+import TagPageHeader from "./TagPageHeader";
 
 function CreateTagPage() {
   return (

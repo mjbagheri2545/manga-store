@@ -1,20 +1,28 @@
 import { UpdateEntityForm } from "@/components/ui/form";
 import { ProductGroupFormFields } from "@/components/ui/productGroup";
 import createProductGroupSchema from "@/schemas/productGroup.schema";
+import { ProductGroup } from "@/types";
 
 import productStatusApi from "../api";
 
-function UpdateProductStatusForm() {
+type UpdateProductStatusFormProps = {
+  productStatus: ProductGroup;
+};
+
+function UpdateProductStatusForm({
+  productStatus,
+}: UpdateProductStatusFormProps) {
   return (
     <UpdateEntityForm
       entityKey="productStatus"
-      api={productStatusApi}
+      updateMethod={productStatusApi.update}
       schema={createProductGroupSchema}
-      getFieldsDefaultValues={(data) => ({
-        name: data.productStatus.name,
-        slug: data.productStatus.slug,
-      })}
-      getEntityFromData={(data) => data.productStatus}
+      useFormProps={{
+        defaultValues: {
+          name: productStatus.name,
+          slug: productStatus.slug,
+        },
+      }}
     >
       <ProductGroupFormFields />
     </UpdateEntityForm>

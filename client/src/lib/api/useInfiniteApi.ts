@@ -6,7 +6,10 @@ import { ApiMethod, PaginateQuery, TGetAllResponse } from "@/types";
 import { useExecuteApi } from "./useApi";
 
 type UseInfiniteApiOptions<GetAllResponse> = {
-  getAll: ApiMethod<TGetAllResponse<GetAllResponse>, PaginateQuery | undefined>;
+  getAllMethod: ApiMethod<
+    TGetAllResponse<GetAllResponse>,
+    PaginateQuery | undefined
+  >;
   initialTotalCount?: number;
   onSuccess: (data: TGetAllResponse<GetAllResponse>) => void;
   entitiesLength: number;
@@ -14,14 +17,14 @@ type UseInfiniteApiOptions<GetAllResponse> = {
 
 export function useInfiniteApi<GetAllResponse>({
   initialTotalCount = 0,
-  getAll,
+  getAllMethod,
   onSuccess,
   entitiesLength,
 }: UseInfiniteApiOptions<GetAllResponse>) {
   const [totalEntitiesCount, setTotalEntitiesCount] =
     useState(initialTotalCount);
 
-  const { execute, refetch, ...restState } = useExecuteApi(getAll, {
+  const { execute, refetch, ...restState } = useExecuteApi(getAllMethod, {
     onSuccess: (result) => {
       setTotalEntitiesCount(result.data.count);
       onSuccess(result.data);

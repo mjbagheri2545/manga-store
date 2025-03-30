@@ -14,8 +14,13 @@ type MinValidationMessageOptions = {
 const validationMessages = {
   required: (label: string) => `${label} الزامی است`,
 
+  optional: (label: string, message: string) =>
+    `${label} اختیاری است ولی در صورت وجود ${message}`,
+
   min: ({ label, min, typeLabel }: MinValidationMessageOptions) =>
     `${typeLabel} ${label} باید حداقل ${min} باشد`,
+  maxLength: (label: string, maxLength: number) =>
+    `طول ${label} باید حداکثر ${maxLength} باشد`,
 
   invalidType: (label: string = "این فیلد") => `تایپ ${label} نامعتبر است`,
 

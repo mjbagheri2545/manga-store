@@ -1,5 +1,6 @@
 import React, { ComponentProps, SetStateAction } from "react";
 
+import { AxiosProgressEvent } from "axios";
 import { LucideIcon, LucideProps } from "lucide-react";
 
 export type TypeOrTypeArray<Type> = Type | Type[];
@@ -34,4 +35,8 @@ export type PropsWithContainer<P = "div"> = {
   containerProps?: P extends keyof React.JSX.IntrinsicElements
     ? Omit<ComponentProps<P>, "children">
     : P;
+};
+
+export type WithOnUploadProgress = {
+  onUploadProgress: (event: AxiosProgressEvent) => void;
 };

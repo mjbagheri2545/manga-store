@@ -2,7 +2,7 @@ import { twMerge } from "tailwind-merge";
 
 import { PropsWithIcon } from "@/types";
 
-function IconWrapper({ Icon, iconProps }: PropsWithIcon) {
+export function IconWrapper({ Icon, iconProps }: PropsWithIcon) {
   return (
     <Icon
       size={24}
@@ -11,5 +11,3 @@ function IconWrapper({ Icon, iconProps }: PropsWithIcon) {
     />
   );
 }
-
-export default IconWrapper;

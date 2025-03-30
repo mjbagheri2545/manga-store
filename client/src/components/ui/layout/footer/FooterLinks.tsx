@@ -1,5 +1,5 @@
+import RenderItems from "@/components/ui/RenderItems";
 import { List, ListItemLink } from "@/components/utility/list";
-import RenderItems from "@/components/utility/RenderItems";
 
 import FooterSection from "./FooterSection";
 

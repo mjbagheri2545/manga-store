@@ -20,10 +20,12 @@ type CreateEntityFormProps<
   entityKey: EntityKey;
   // example usage of getEntityFromData:
   // (data: UserResponse) => user
-  getIdFromData: (data: TEntityResponse) => string;
   navigatePath?: string;
   submitButton?: CrudFormProps<TFieldValues>["submitButton"];
-};
+} & (
+    | { getIdFromData: (data: TEntityResponse) => string }
+    | { onSuccessful: (data: TEntityResponse) => void }
+  );
 
 export function CreateEntityForm<
   TFieldValues extends FieldValues,
@@ -32,7 +34,6 @@ export function CreateEntityForm<
   createMethod,
   entityKey,
   navigatePath,
-  getIdFromData,
   ...restProps
 }: CreateEntityFormProps<TFieldValues, TEntityResponse>) {
   const navigate = useNavigate();
@@ -41,8 +42,12 @@ export function CreateEntityForm<
     const response = await createMethod({ data });
 
     parseApiResponse(response, (result) => {
+      if ("onSuccessful" in restProps) {
+        return restProps.onSuccessful(result.data);
+      }
+
       navigate(
-        navigatePath ?? PATH.admin.info(entityKey, getIdFromData(result.data))
+        PATH.admin.info(entityKey, restProps.getIdFromData(result.data))
       );
     });
   }

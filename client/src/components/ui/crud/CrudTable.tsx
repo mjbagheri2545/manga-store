@@ -8,18 +8,21 @@ import {
 import { DEFAULT_QUERY_TAKE } from "@/constants/global/general.global";
 import { useEntities } from "@/contexts/EntitiesContext";
 import { useInfiniteApi } from "@/lib/api";
-import { Entity, EntityKey, ICrudApi, TGetAllResponse } from "@/types";
+import { EntityKey, ICrudApi, TGetAllResponse } from "@/types";
 import { formatSingularEntityName, getEntityName } from "@/utils";
 
-import { Alert } from "../../utility/Alert";
-import ApiComponent from "../ApiComponent";
-import ApiErrorMessageList from "../ApiErrorMessageList";
+import { Alert } from "../../utility";
+import { ApiComponent, ApiErrorMessageList } from "../api";
 import LoadMoreButton from "../LoadMoreButton";
 
-export type CrudTableProps<TEntity extends Entity, TGetAllEntitiesResponse> = {
+export type CrudTableProps<
+  TEntity extends { id: string },
+  TGetAllEntitiesResponse,
+> = {
   entityKey: EntityKey;
   columns: TableColumn<TEntity>[];
   api: Pick<ICrudApi<TGetAllEntitiesResponse>, "getAll" | "delete">;
+  entityPath?: string;
   // example usage of getEntitiesFromData:
   // (data: GetAllUsersResponse) => users
   getEntitiesFromData: (
@@ -27,30 +30,35 @@ export type CrudTableProps<TEntity extends Entity, TGetAllEntitiesResponse> = {
   ) => TEntity[];
 };
 
-export function CrudTable<TEntity extends Entity, TGetAllEntitiesResponse>(
-  props: CrudTableProps<TEntity, TGetAllEntitiesResponse>
-) {
+export function CrudTable<
+  TEntity extends { id: string },
+  TGetAllEntitiesResponse,
+>(props: CrudTableProps<TEntity, TGetAllEntitiesResponse>) {
   return (
     <ApiComponent
       apiMethod={() => props.api.getAll({ skip: 0, take: DEFAULT_QUERY_TAKE })}
     >
-      {(result) => <CrudTableChildren data={result.data} {...props} />}
+      {(data) => <CrudTableChildren data={data} {...props} />}
     </ApiComponent>
   );
 }
 
 type CrudTableChildrenProps<
-  TEntity extends Entity,
+  TEntity extends { id: string },
   TGetAllEntitiesResponse,
 > = CrudTableProps<TEntity, TGetAllEntitiesResponse> & {
   data: TGetAllResponse<TGetAllEntitiesResponse>;
 };
 
-function CrudTableChildren<TEntity extends Entity, TGetAllEntitiesResponse>({
+function CrudTableChildren<
+  TEntity extends { id: string },
+  TGetAllEntitiesResponse,
+>({
   entityKey,
   api,
   columns,
   data,
+  entityPath,
   ...restProps
 }: CrudTableChildrenProps<TEntity, TGetAllEntitiesResponse>) {
   const {
@@ -89,6 +97,7 @@ function CrudTableChildren<TEntity extends Entity, TGetAllEntitiesResponse>({
               entityKey={entityKey}
               id={id}
               onSuccessfulDelete={handleOnSuccessfulDelete}
+              entityPath={entityPath}
             />
           );
         }}
@@ -110,7 +119,7 @@ function CrudTableChildren<TEntity extends Entity, TGetAllEntitiesResponse>({
 }
 
 type UseCrudTableChildrenOptions<
-  TEntity extends Entity,
+  TEntity extends { id: string },
   TGetAllEntitiesResponse,
 > = Pick<
   CrudTableProps<TEntity, TGetAllEntitiesResponse>,
@@ -120,7 +129,10 @@ type UseCrudTableChildrenOptions<
   data: CrudTableChildrenProps<TEntity, TGetAllEntitiesResponse>["data"];
 };
 
-function useCrudTableChildren<TEntity extends Entity, TGetAllEntitiesResponse>({
+function useCrudTableChildren<
+  TEntity extends { id: string },
+  TGetAllEntitiesResponse,
+>({
   data,
   api,
   getEntitiesFromData,
@@ -137,7 +149,7 @@ function useCrudTableChildren<TEntity extends Entity, TGetAllEntitiesResponse>({
     refetch,
   } = useInfiniteApi({
     entitiesLength: entities.length,
-    getAll: api.getAll,
+    getAllMethod: api.getAll,
     initialTotalCount: data.count,
     onSuccess: (data) =>
       setEntities((current) => [...current, ...getEntitiesFromData(data)]),

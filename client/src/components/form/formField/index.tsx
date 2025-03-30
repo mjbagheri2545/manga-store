@@ -33,13 +33,17 @@ export type FormFieldProps = Omit<
 } & ChildrenProps;
 
 export function FormField({ defaultValue = "", ...restProps }: FormFieldProps) {
-  const formContext = useFormContext();
+  const form = useFormContext();
 
   return "controllerName" in restProps ? (
     <Controller
-      control={formContext.control}
+      control={form.control}
       name={restProps.controllerName}
-      defaultValue={defaultValue}
+      defaultValue={
+        restProps.controllerName in form.control._defaultValues
+          ? form.control._defaultValues[restProps.controllerName]
+          : defaultValue
+      }
       render={({ field }) => {
         return (
           <FormField_Field {...restProps}>

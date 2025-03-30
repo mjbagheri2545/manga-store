@@ -1,7 +1,7 @@
 import { Section } from "@/components/ui/layout";
 import CreateCategoryForm from "@/features/category/components/CreateCategoryForm";
 
-import { CategoryPageHeader } from "./CategoryPageHeader";
+import CategoryPageHeader from "./CategoryPageHeader";
 
 function CreateCategoryPage() {
   return (

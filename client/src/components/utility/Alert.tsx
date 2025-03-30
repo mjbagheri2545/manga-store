@@ -6,7 +6,7 @@ import { twMerge } from "tailwind-merge";
 import { PropsWithContainer, PropsWithOptionalIcon } from "@/types";
 import { cn } from "@/utils";
 
-import IconWrapper from "./IconWrapper";
+import { IconWrapper } from "./IconWrapper";
 
 const alertStyles = cva("rounded", {
   variants: {

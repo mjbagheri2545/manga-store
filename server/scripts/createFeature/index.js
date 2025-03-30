@@ -49,10 +49,15 @@ async function createFeature() {
       promises.push(createLib(featureDirPath, capitalizedName, upperCasedName));
     }
 
-    promises.push(promisifiedExec(`npx prettier ${featureDirPath} --write`));
-    promises.push(
-      promisifiedExec(`npx eslint ${featureDirPath} --c .eslintrc.json --fix`)
-    );
+    // i use try catch because eslint throw error during fix
+    try {
+      await Promise.all([
+        promisifiedExec(
+          `npx eslint "${featureDirPath}" --fix --rule "simple-import-sort/imports: error"`
+        ),
+        promisifiedExec(`npx prettier "${featureDirPath}" --write`),
+      ]);
+    } catch (error) {}
 
     await Promise.all(promises);
     console.log(`Feature '${name}' created successfully!`);

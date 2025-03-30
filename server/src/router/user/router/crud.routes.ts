@@ -12,6 +12,7 @@ import SHARED_MESSAGES from "@/constants/messages";
 import {
   allResourcePermission,
   deleteEntity,
+  fileSizeChecker,
   idAuthorization,
   jwtAuthorization,
   specificResourcePermission,
@@ -19,6 +20,7 @@ import {
 import { getAllEntities } from "@/middlewares/crud.middleware";
 import { imageAuthorization } from "@/middlewares/features/user_product.middleware";
 import sharedUserService from "@/services/user.service";
+import { getFilePathFromDbFilePath, removeFile } from "@/utils";
 import { userLoggerData } from "@/utils/features/auth_user.util";
 import { slugValidation } from "@/validators";
 
@@ -38,8 +40,14 @@ function createUserCrudRoutes(router: Router) {
     storage: multer.memoryStorage(),
     limits: { files: 1, fileSize: AVATAR_IMAGE_SIZE_LIMIT },
   });
-  const { getUser, getAllManagers, createUser, updateUser, editProfile } =
-    new UserCrudController();
+  const {
+    getUser,
+    getAllManagers,
+    getAllTranslators,
+    createUser,
+    updateUser,
+    editProfile,
+  } = new UserCrudController();
 
   const { createUserValidation, updateUserValidation, editProfileValidation } =
     new UserCrudValidator();
@@ -49,13 +57,14 @@ function createUserCrudRoutes(router: Router) {
   );
 
   const getAllUsers = getAllEntities({
-    service: userService,
+    getAll: userService.getAll,
     entitiesKey: "users",
   });
 
   router.get("/", jwtAuthorization, viewPermission, getAllUsers);
 
   router.get(USER_PATH.getManagers, jwtAuthorization, getAllManagers);
+  router.get(USER_PATH.getTranslators, jwtAuthorization, getAllTranslators);
 
   router.get(USER_PATH.getByToken, jwtAuthorization, getUser);
   router.get(
@@ -74,10 +83,11 @@ function createUserCrudRoutes(router: Router) {
 
   router.post(
     "/",
+    avatarImageUploader.single("avatarImage"),
+    fileSizeChecker(AVATAR_IMAGE_SIZE_LIMIT, "MB"),
     createUserValidation(),
     jwtAuthorization,
     createPermission,
-    avatarImageUploader.single("avatarImage"),
     imageAuthorization(),
     createUser
   );
@@ -90,6 +100,8 @@ function createUserCrudRoutes(router: Router) {
 
   router.put(
     "/:id",
+    avatarImageUploader.single("avatarImage"),
+    fileSizeChecker(AVATAR_IMAGE_SIZE_LIMIT, "MB"),
     updateUserValidation(),
     jwtAuthorization,
     idAuthorization({
@@ -98,16 +110,16 @@ function createUserCrudRoutes(router: Router) {
       getByIdQuery: sharedUserService.getById,
     }),
     updatePermission,
-    avatarImageUploader.single("avatarImage"),
     imageAuthorization(),
     updateUser
   );
 
   router.put(
     USER_PATH.editProfile,
+    avatarImageUploader.single("avatarImage"),
+    fileSizeChecker(AVATAR_IMAGE_SIZE_LIMIT, "MB"),
     editProfileValidation(),
     jwtAuthorization,
-    avatarImageUploader.single("avatarImage"),
     imageAuthorization(),
     editProfile
   );
@@ -119,8 +131,18 @@ function createUserCrudRoutes(router: Router) {
     return deleteMessage(USER_MESSAGES.crud.action(user));
   }
 
-  const userToDelete = deleteEntity({
+  async function deleteUserOperation(user: User) {
+    if (user.avatarImage == null) return;
+
+    return removeFile(
+      getFilePathFromDbFilePath(user.avatarImage, { isPublic: false })
+    );
+  }
+
+  const deleteUser = deleteEntity({
     delete: userService.delete,
+    operation: deleteUserOperation,
+    failedOperationMessage: "حذف کاربر",
     entityKey: "userToDelete",
     hasPermission: (user, userToDelete) =>
       hasUserPermission(user, "delete", userToDelete),
@@ -136,7 +158,7 @@ function createUserCrudRoutes(router: Router) {
       entityName: "کاربری",
       getByIdQuery: sharedUserService.getById,
     }),
-    userToDelete
+    deleteUser
   );
 }
 

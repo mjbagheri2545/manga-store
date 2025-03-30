@@ -2,12 +2,10 @@ import { toast } from "react-toastify";
 
 import autoBind from "auto-bind";
 
-import PATH from "@/constants/path";
 import { HTTP } from "@/lib/http";
 import {
   ApiResponse,
   ApiResult,
-  EntityKey,
   IApiError,
   ICrudApi,
   PaginateQuery,
@@ -59,11 +57,11 @@ export class CrudApi<
 > implements
     ICrudApi<GetAllResponse, GetByIdResponse, CreateData, EntityResponse, Q>
 {
-  private entityPath: (typeof PATH)["base"][EntityKey];
+  private entityPath: string;
 
-  constructor(entityKey: EntityKey) {
+  constructor(entityPath: string) {
     autoBind(this);
-    this.entityPath = PATH.base[entityKey];
+    this.entityPath = entityPath;
   }
 
   private pathEntity(id: string) {

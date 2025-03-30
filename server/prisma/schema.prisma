@@ -14,23 +14,27 @@ datasource db {
 }
 
 model User {
-  id                 String    @id @default(uuid()) @db.Char(36)
-  fullName           String    @db.VarChar(65)
-  email              String    @unique @db.VarChar(65)
-  password           String    @db.Char(60)
-  oldPasswords       String[]  @default([]) @db.Char(60)
-  avatarImage        String?   @db.VarChar(255)
-  createdAt          DateTime  @default(now())
-  roles              Role[]    @default([user])
-  isVerified         Boolean   @default(false)
-  emailRemainingTime DateTime?
-  walletBalance      Int       @default(0) @db.Integer
-  bio                String?   @db.VarChar(600)
+  id                   String    @id @default(uuid()) @db.Char(36)
+  fullName             String    @db.VarChar(65)
+  email                String    @unique @db.VarChar(65)
+  password             String    @db.Char(60)
+  oldPasswords         String[]  @default([]) @db.Char(60)
+  avatarImage          String?   @db.VarChar(255)
+  createdAt            DateTime  @default(now())
+  roles                Role[]    @default([user])
+  isVerified           Boolean   @default(false)
+  emailRemainingTime   DateTime?
+  walletBalanceInToman Int       @default(0) @db.Integer
+  bio                  String?   @db.VarChar(600)
 
   Token              Token?
-  averageRatings     ProductAverageRating[]
+  productRatings     ProductRating[]
   translatedChapters Chapter[]
   managedProducts    Product[]
+  productViews       ProductView[]
+  productComments           ProductComment[]
+  productCommentsLikes              ProductCommentLike[]
+  productCommentsDislikes            ProductCommentDislike[]
 }
 
 enum Role {
@@ -49,19 +53,20 @@ model Token {
 }
 
 model Product {
-  id           String   @id @default(uuid()) @db.Char(36)
-  name         String   @db.VarChar(100)
-  persianName  String   @db.VarChar(100)
-  designer     String   @db.VarChar(65)
-  writer       String   @db.VarChar(65)
-  releaseYear  Int      @db.SmallInt
-  summary      String   @db.VarChar(1000)
-  priceInRials Int      @db.SmallInt
-  productImage String   @db.VarChar(255)
-  slug         String   @unique @db.VarChar(255)
-  createdAt    DateTime @default(now())
+  id                     String        @id @default(uuid()) @db.Char(36)
+  name                   String        @db.VarChar(100)
+  persianName            String        @db.VarChar(100)
+  designer               String        @db.VarChar(65)
+  writer                 String        @db.VarChar(65)
+  releaseYear            Int           @db.SmallInt
+  summary                String        @db.VarChar(1000)
+  oneChapterPriceInToman Int           @db.SmallInt
+  productImage           String        @db.VarChar(255)
+  slug                   String        @unique @db.VarChar(255)
+  createdAt              DateTime      @default(now())
+  views                  ProductView[]
 
-  averageRating ProductAverageRating?
+  ratings ProductRating[]
 
   manager   User?   @relation(fields: [managerId], references: [id], onDelete: SetDefault)
   managerId String? @default("مدیر حذف شده") @db.Char(36)
@@ -73,22 +78,30 @@ model Product {
   statusId String        @default("پایان یافته") @db.Char(36)
 
   chapters Chapter[]
+  comments ProductComment[]
   tags     Tag[]
-
-  @@index([categoryId])
-  @@index([managerId])
 }
 
-model ProductAverageRating {
+model ProductRating {
   rating Decimal @default(0) @db.Decimal(2, 1)
 
-  product   Product @relation(fields: [productId], references: [id])
-  productId String  @unique @db.Char(36)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String  @db.Char(36)
 
-  ratedBy   User   @relation(fields: [ratedById], references: [id])
-  ratedById String @unique @db.Char(36)
+  ratedBy   User   @relation(fields: [ratedById], references: [id], onDelete: Cascade)
+  ratedById String @db.Char(36)
 
   @@id([productId, ratedById])
+}
+
+model ProductView {
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String  @db.Char(36)
+
+  viewer   User   @relation(fields: [viewerId], references: [id], onDelete: Cascade)
+  viewerId String @db.Char(36)
+
+  @@id([productId, viewerId])
 }
 
 model Chapter {
@@ -123,4 +136,39 @@ model Tag {
   name     String    @unique @db.VarChar(50)
   slug     String    @unique @db.VarChar(50)
   products Product[]
+}
+
+model ProductComment {
+  id        String   @id @default(uuid()) @db.Char(36)
+  message   String   @db.VarChar(500)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String @db.Char(36)
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String    @db.Char(36)
+  likes     ProductCommentLike[]
+  dislikes   ProductCommentDislike[]
+}
+
+model ProductCommentLike {
+  likedBy   User   @relation(fields: [likedById], references: [id], onDelete: Cascade)
+  likedById String @db.Char(36)
+
+  comment   ProductComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String  @db.Char(36)
+
+  @@id([likedById, commentId])
+}
+
+model ProductCommentDislike {
+  dislikedBy   User   @relation(fields: [dislikedById], references: [id], onDelete: Cascade)
+  dislikedById String @db.Char(36)
+
+  comment   ProductComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String  @db.Char(36)
+
+  @@id([dislikedById, commentId])
 }

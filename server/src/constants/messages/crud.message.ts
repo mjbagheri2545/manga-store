@@ -1,5 +1,5 @@
 const crudMessages = {
-  create: (message: string) => `${message} با موفقیت ایجاد شد.`,
+  create: (message: string) => `${message} با موفقیت افزوده شد.`,
   delete: (message: string) => `${message} با موفقیت حذف شد.`,
   update: (message: string) => `${message} با موفقیت به‌روزرسانی شد.`,
   noFieldUpdated: "برای به‌روزرسانی باید حداقل یک فیلد را ویرایش کنید",

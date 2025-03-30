@@ -1,43 +1,48 @@
-import { AxiosProgressEvent } from "axios";
-
 import PATH from "@/constants/path";
+import {
+  GetAllTranslatorsResponse,
+  ProductBySlug,
+  RatingResponse,
+} from "@/contexts/ProductContext";
 import { HTTP } from "@/lib/http";
 import {
   EmptyObject,
+  PaginateQueryWithSort,
   Product,
   ProductGroup,
   TGetAllResponse,
-  User,
+  WithOnUploadProgress,
 } from "@/types";
 import { CrudApi } from "@/utils";
 
-import { CreateProductData, SearchData } from "../schema";
+import { CreateProductData } from "../schemas";
 import { ProductQuery } from "../types";
 
-type ProductResponse<T = EmptyObject> = { product: Product & T };
-
-type CreateProductOptions = {
+type CreateProductOptions = WithOnUploadProgress & {
   data: CreateProductData;
-  onUploadProgress: (event: AxiosProgressEvent) => void;
 };
 
-type UpdateProductOptions = {
+type UpdateProductOptions = WithOnUploadProgress & {
   id: string;
   data: Partial<CreateProductData>;
-  onUploadProgress?: (event: AxiosProgressEvent) => void;
 };
 
-export type GetAllProductBase = {
+export type GetAllProductBase = Pick<
+  Product,
+  | "name"
+  | "oneChapterPriceInToman"
+  | "productImage"
+  | "slug"
+  | "id"
+  | "summary"
+  | "views"
+  | "releaseYear"
+> & {
   status: ProductGroup;
-  name: string;
-  priceInRials: number;
-  productImage: string;
-  slug: string;
-  id: string;
-  _count: { chapters: number };
+  chaptersCount: number;
 };
 
-export type GetAllProductResponse<T = EmptyObject> = TGetAllResponse<{
+export type GetAllProductsResponse<T = EmptyObject> = TGetAllResponse<{
   products: (GetAllProductBase & T)[];
 }>;
 
@@ -45,54 +50,42 @@ type GetProductsOptions = {
   query?: ProductQuery;
 };
 
-type UpdateRatingOptions = {
-  rating: number;
+type RateOptions = {
+  ratingNumber: number;
   productId: string;
 };
 
-type ProductResponseChapter = {
-  id: string;
-  episode: number;
-  translator?: {
-    fullName: string;
+type GetProductBySlugResponse = {
+  product: ProductBySlug;
+};
+
+export type GetProductByIdResponse = {
+  product: Product & {
+    category: { id: string };
+    status: { id: string };
+    manager: { id: string };
+    tags: { id: string }[];
   };
 };
 
-type AverageRating = {
-  averageRating?: { rating: number };
-};
-
-type GetProductBySlugResponse = ProductResponse<
-  {
-    chapters: ProductResponseChapter[];
-    category: ProductGroup;
-    status: ProductGroup;
-    tags: ProductGroup[];
-  } & AverageRating
->;
-
-export type GetProductByIdResponse = ProductResponse<{
-  category: { id: string };
-  status: { id: string };
-  manager: { id: string };
-  tags: { id: string }[];
-}>;
-
-type GetAllProductResponseCrudDetails = {
+type GetAllProductsResponseCrudDetails = {
   manager: { fullName: string };
   category: ProductGroup;
-  _count: { chapters: number };
+  chaptersCount: number;
 };
 
-export type CrudProduct = GetAllProductBase & GetAllProductResponseCrudDetails;
+export type CrudProduct = GetAllProductBase & GetAllProductsResponseCrudDetails;
 
-type GetAllProductResponseCrud =
-  GetAllProductResponse<GetAllProductResponseCrudDetails>;
-
-type UpdateProductRatingResponse = ProductResponse<AverageRating>;
+type GetAllProductsResponseCrud =
+  GetAllProductsResponse<GetAllProductsResponseCrudDetails>;
 
 export type ManagersResponse = {
-  managers: User[];
+  managers: { id: string; fullName: string }[];
+};
+
+type GetRelatedProductsOptions = {
+  slug: string;
+  query?: PaginateQueryWithSort;
 };
 
 function pathWithSlug(slug: string) {
@@ -100,14 +93,14 @@ function pathWithSlug(slug: string) {
 }
 
 class ProductApi extends CrudApi<
-  GetAllProductResponseCrud,
+  GetAllProductsResponseCrud,
   GetProductByIdResponse,
   CreateProductData,
   { id: string },
   ProductQuery
 > {
   constructor() {
-    super("product");
+    super(PATH.base.product);
   }
   // Number.POSITIVE_INFINITY because maybe image file
   // is large and internet speed is low
@@ -133,10 +126,8 @@ class ProductApi extends CrudApi<
     return HTTP.get<GetProductByIdResponse>(pathWithSlug(id));
   }
 
-  getBySlug({ slug, query }: GetProductsOptions & { slug: string }) {
-    return HTTP.get<GetProductBySlugResponse>(pathWithSlug(slug), {
-      params: query,
-    });
+  getBySlug({ slug }: { slug: string }) {
+    return HTTP.get<GetProductBySlugResponse>(pathWithSlug(`by-slug/${slug}`));
   }
 
   getManagers() {
@@ -147,30 +138,34 @@ class ProductApi extends CrudApi<
     category,
     query,
   }: GetProductsOptions & { category: string }) {
-    return HTTP.get<GetAllProductResponse>(
+    return HTTP.get<GetAllProductsResponse>(
       pathWithSlug(`category/${category}`),
       { params: query }
     );
   }
 
   getByTag({ tag, query }: GetProductsOptions & { tag: string }) {
-    return HTTP.get<GetAllProductResponse>(pathWithSlug(`tag/${tag}`), {
+    return HTTP.get<GetAllProductsResponse>(pathWithSlug(`tag/${tag}`), {
       params: query,
     });
   }
 
-  updateRating({ productId, rating }: UpdateRatingOptions) {
-    return HTTP.put<UpdateProductRatingResponse>(
-      pathWithSlug(`${productId}/update-rating`),
-      {
-        data: { rating },
-      }
+  getRelatedProducts({ id }: { id: string }) {
+    return HTTP.get<GetAllProductsResponse>(
+      PATH.product.getRelatedProducts(id)
     );
   }
 
-  getByName({ name, query }: SearchData & GetProductsOptions) {
-    return HTTP.get<GetAllProductResponse>(PATH.base.product, {
-      params: { name, ...query },
+  getRelatedTranslators({ slug, query }: GetRelatedProductsOptions) {
+    return HTTP.get<GetAllTranslatorsResponse>(
+      PATH.product.getRelatedTranslators(slug),
+      { params: query }
+    );
+  }
+
+  rate({ productId, ratingNumber }: RateOptions) {
+    return HTTP.put<RatingResponse>(pathWithSlug(`${productId}/rate`), {
+      data: { ratingNumber },
     });
   }
 }

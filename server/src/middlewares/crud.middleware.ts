@@ -61,7 +61,7 @@ export function deleteEntity<
 }
 
 type GetAllEntitiesOptions<T, Q> = {
-  getAll: (query: Q) => Promise<[T[], number]>;
+  getAll: (query: Q) => Promise<[T[], number] | readonly [T[], number]>;
   entitiesKey: string;
 };
 

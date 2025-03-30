@@ -8,11 +8,13 @@ import {
   allResourcePermission,
   deleteEntity,
   fileAuthorization,
+  fileSizeChecker,
   idAuthorization,
   jwtAuthorization,
   specificResourcePermission,
 } from "@/middlewares";
 import { PermissionChapter } from "@/types";
+import { getFilePathFromDbFilePath, removeFile } from "@/utils";
 import { slugValidation } from "@/validators";
 
 import chapterLogger from "../constants/logger";
@@ -27,7 +29,7 @@ import ChapterValidator from "../validators";
 const CHAPTER_FILE_SIZE_LIMIT = 50 * 1024 * 1024;
 
 function createChapterRouter() {
-  const router = Router();
+  const router = Router({ mergeParams: true });
 
   const chapterFileUploader = multer({
     storage: multer.memoryStorage(),
@@ -36,12 +38,12 @@ function createChapterRouter() {
   const { getAllChapters, getChapter, createChapter, updateChapter } =
     new ChapterController();
 
-  const { createChapterValidation, updateChapterValidation } =
+  const { createChapterValidation, updateChapterValidation, idValidation } =
     new ChapterValidator();
 
   router.get(
-    "/product/:productId",
-    slugValidation("productId", "محصولی با آیدی مورد نظر"),
+    "/",
+    slugValidation("productId", "آیدی محصول"),
     jwtAuthorization,
     getAllChapters
   );
@@ -53,19 +55,25 @@ function createChapterRouter() {
 
   router.get(
     "/:id",
-    slugValidation(),
+    idValidation(),
     jwtAuthorization,
     getChapterById,
     getChapter
   );
 
+  const chapterFileAuthorization = fileAuthorization({
+    mimeChecker: (mime) => mime.startsWith("application/pdf"),
+    invalidMessage: SHARED_MESSAGES.general.invalidFileType("PDF"),
+  });
+
   router.post(
     "/",
+    chapterFileUploader.single("chapterFile"),
+    fileSizeChecker(CHAPTER_FILE_SIZE_LIMIT, "MB"),
     createChapterValidation(),
     jwtAuthorization,
     allResourcePermission((user) => hasChapterPermission(user, "create")),
-    chapterFileUploader.single("chapterFile"),
-    fileAuthorization([{ name: "PDF", mime: "application/pdf" }]),
+    chapterFileAuthorization,
     createChapter
   );
 
@@ -77,12 +85,13 @@ function createChapterRouter() {
 
   router.put(
     "/:id",
+    chapterFileUploader.single("chapterFile"),
+    fileSizeChecker(CHAPTER_FILE_SIZE_LIMIT, "MB"),
     updateChapterValidation(),
     jwtAuthorization,
     getChapterById,
     updatePermission,
-    chapterFileUploader.single("chapterFile"),
-    fileAuthorization([{ name: "PDF", mime: "application/pdf" }]),
+    chapterFileAuthorization,
     updateChapter
   );
 
@@ -95,8 +104,16 @@ function createChapterRouter() {
     return deleteMessage(CHAPTER_MESSAGES.crud(chapter));
   }
 
+  function deleteChapterOperation(chapter: Chapter) {
+    return removeFile(
+      getFilePathFromDbFilePath(chapter.chapterFile, { isPublic: false })
+    );
+  }
+
   const deleteChapter = deleteEntity<Chapter, PermissionChapter>({
     delete: chapterService.delete,
+    operation: deleteChapterOperation,
+    failedOperationMessage: "حذف فصل",
     entityKey: "chapter",
     hasPermission: (user, chapter) =>
       hasChapterPermission(user, "delete", chapter),
@@ -105,7 +122,7 @@ function createChapterRouter() {
 
   router.delete(
     "/:id",
-    slugValidation(),
+    idValidation(),
     jwtAuthorization,
     getChapterById,
     deleteChapter

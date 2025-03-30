@@ -1,20 +1,23 @@
 import { UpdateEntityForm } from "@/components/ui/form";
 import { ProductGroupFormFields } from "@/components/ui/productGroup";
 import createProductGroupSchema from "@/schemas/productGroup.schema";
+import { ProductGroup } from "@/types";
 
 import categoryApi from "../api";
 
-function UpdateCategoryForm() {
+type UpdateCategoryFormProps = {
+  category: ProductGroup;
+};
+
+function UpdateCategoryForm({ category }: UpdateCategoryFormProps) {
   return (
     <UpdateEntityForm
       entityKey="category"
-      api={categoryApi}
+      updateMethod={categoryApi.update}
       schema={createProductGroupSchema}
-      getFieldsDefaultValues={(data) => ({
-        name: data.category.name,
-        slug: data.category.slug,
-      })}
-      getEntityFromData={(data) => data.category}
+      useFormProps={{
+        defaultValues: { name: category.name, slug: category.slug },
+      }}
     >
       <ProductGroupFormFields />
     </UpdateEntityForm>

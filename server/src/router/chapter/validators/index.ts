@@ -4,15 +4,28 @@ import { createValidation, required, slugValidator } from "@/validators";
 class ChapterValidator extends AutoBind {
   private getCreateChapterValidation() {
     return [
-      required("productId", { label: "محصول" }),
       required("translatorId", { label: "مترجم" }),
+      required("episode", { label: "قسمت فصل" }),
     ];
   }
 
-  createChapterValidation() {
-    const episode = required("episode", { label: "قسمت فصل" }).toInt();
+  private getIdValidation() {
+    return [
+      slugValidator("productId", "آیدی محصول"),
+      // for chapter id
+      slugValidator("id", "آیدی فصل"),
+    ];
+  }
 
-    return createValidation([...this.getCreateChapterValidation(), episode]);
+  idValidation() {
+    return createValidation(this.getIdValidation());
+  }
+
+  createChapterValidation() {
+    return createValidation([
+      ...this.getCreateChapterValidation(),
+      slugValidator("productId", "آیدی محصول"),
+    ]);
   }
 
   updateChapterValidation() {
@@ -20,12 +33,7 @@ class ChapterValidator extends AutoBind {
       (validationChain) => validationChain.optional()
     );
 
-    const episode = required("episode", { label: "قسمت فصل" })
-      .optional()
-      .ifExists()
-      .toInt();
-
-    return createValidation([...optionalFields, episode, slugValidator()]);
+    return createValidation([...optionalFields, ...this.getIdValidation()]);
   }
 }
 

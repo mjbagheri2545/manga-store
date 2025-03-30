@@ -13,7 +13,7 @@ import {
   specificResourcePermission,
 } from "@/middlewares";
 import { imageAuthorization } from "@/middlewares/features/user_product.middleware";
-import { removeFile } from "@/utils";
+import { getFilePathFromDbFilePath, removeFile } from "@/utils";
 import { slugValidation } from "@/validators";
 
 import productLogger from "../constants/logger";
@@ -21,7 +21,7 @@ import PRODUCT_MESSAGES from "../constants/messages";
 import PRODUCT_PATH from "../constants/path";
 import ProductMutationController from "../controllers/productMutation.controller";
 import { hasProductPermission } from "../lib/permissions";
-import productService from "../services";
+import productService, { GetByIdOptions } from "../services";
 import { productLoggerData } from "../utils";
 import ProductMutationValidator from "../validators/productMutation.validator";
 import createGetProductsRoutes from "./getProducts.routes";
@@ -69,10 +69,11 @@ function createProductRouter() {
       hasProductPermission(user, "update", product),
   });
 
-  const getProductById = idAuthorization({
-    entityKey: "product",
-    getByIdQuery: productService.getById,
-  });
+  const createGetProductById = (options?: GetByIdOptions) =>
+    idAuthorization({
+      getByIdQuery: (id) => productService.getById(id, options),
+      entityKey: "product",
+    });
 
   router.put(
     "/:id",
@@ -80,17 +81,17 @@ function createProductRouter() {
     fileSizeChecker(PRODUCT_IMAGE_SIZE_LIMIT, "MB"),
     updateProductValidation(),
     jwtAuthorization,
-    getProductById,
+    createGetProductById({ include: { tags: { select: { id: true } } } }),
     updatePermission,
     imageAuthorization(),
     updateProduct
   );
 
   router.put(
-    PRODUCT_PATH.updateRating,
-    updateProductRatingValidation,
+    PRODUCT_PATH.rate,
+    updateProductRatingValidation(),
     jwtAuthorization,
-    getProductById,
+    createGetProductById(),
     updateProductRating
   );
 
@@ -105,7 +106,7 @@ function createProductRouter() {
   }
 
   async function deleteProductOperation(product: Product) {
-    return removeFile(`public/${product.productImage}`);
+    return removeFile(getFilePathFromDbFilePath(product.productImage));
   }
 
   const deleteProduct = deleteEntity({
@@ -122,7 +123,7 @@ function createProductRouter() {
     "/:id",
     slugValidation(),
     jwtAuthorization,
-    getProductById,
+    createGetProductById(),
     deleteProduct
   );
 

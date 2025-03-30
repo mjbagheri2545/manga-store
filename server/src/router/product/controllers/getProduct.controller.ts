@@ -11,8 +11,10 @@ import {
 import { notFound, successfulResponse } from "@/utils";
 
 import productService from "../services";
+import { calculateAverageProductRating } from "../utils";
 
-type GetProductReq = Req<{ product: Product }>;
+type ProductById = Product & { tags: { id: string }[] };
+type GetProductReq = Req<{ product: ProductById }>;
 
 type GetAllProductReq<P = EmptyObject> = UserAuthorizedReq<
   EmptyObject,
@@ -23,6 +25,12 @@ type GetAllProductReq<P = EmptyObject> = UserAuthorizedReq<
 type GetBySlugReq = UserAuthorizedReq<
   EmptyObject,
   EmptyObject,
+  { slug: string }
+>;
+
+type GetRelatedTranslatorsReq = Req<
+  EmptyObject,
+  PaginateQueryWithSort,
   { slug: string }
 >;
 
@@ -43,9 +51,13 @@ class GetProductController {
   async getProductBySlug(req: GetBySlugReq, res: Response) {
     const {
       params: { slug },
+      body: { user },
     } = req;
 
-    const product = await productService.getBySlug(slug);
+    const [product, translators] = await productService.getBySlug(
+      slug,
+      user.id
+    );
 
     if (product == null) {
       return notFound({
@@ -55,7 +67,35 @@ class GetProductController {
       });
     }
 
-    successfulResponse({ res, data: { product } });
+    const { _count, ratings, ...restData } = product;
+
+    const ratingsCount = _count.ratings;
+    const averageRating = calculateAverageProductRating(ratings, ratingsCount);
+
+    const viewerRating = ratings.find((rating) => rating.ratedById === user.id);
+    const finalTranslators = translators.map(
+      ({ _count, ...restTranslatorData }) => ({
+        ...restTranslatorData,
+        translatedChaptersCount: _count.translatedChapters,
+      })
+    );
+
+    const finalProduct = {
+      ...restData,
+      chaptersCount: _count.chapters,
+      views: _count.views,
+      translators: finalTranslators,
+      rating: {
+        averageRating,
+        ratingsCount,
+        myRating: viewerRating?.rating,
+      },
+    };
+
+    successfulResponse({
+      res,
+      data: { product: finalProduct },
+    });
   }
 
   async getProductsByCategory(
@@ -87,6 +127,32 @@ class GetProductController {
     const [products, count] = await productService.getByTag(tag, query);
 
     successfulResponse({ res, data: { products, count } });
+  }
+
+  async getRelatedProducts(req: GetProductReq, res: Response) {
+    const { product } = req.body;
+
+    const relatedProducts = await productService.getRelatedProducts(
+      product.categoryId,
+      product.tags.map((tag) => tag.id)
+    );
+
+    successfulResponse({ res, data: { products: relatedProducts } });
+  }
+
+  async getRelatedTranslators(req: GetRelatedTranslatorsReq, res: Response) {
+    const {
+      params: { slug },
+      query,
+    } = req;
+
+    const [relatedTranslators, count] =
+      await productService.getRelatedTranslators(slug, query);
+
+    successfulResponse({
+      res,
+      data: { translators: relatedTranslators, count },
+    });
   }
 }
 

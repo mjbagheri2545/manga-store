@@ -13,7 +13,7 @@ import PRODUCT_MESSAGES from "../constants/messages";
 import productService from "../services";
 
 const MAX_RELEASE_YEAR = 10000;
-
+const MAX_SUMMARY_LENGTH = 1000;
 class ProductMutationValidator extends AutoBind {
   private getLabel(label: string) {
     return `${label} محصول`;
@@ -25,11 +25,13 @@ class ProductMutationValidator extends AutoBind {
       isLength("persianName", { label: this.getLabel("نام فارسی") }),
       isLength("designer", { label: this.getLabel("طراح") }),
       isLength("writer", { label: this.getLabel("نویسنده") }),
-      required("summary", { label: this.getLabel("خلاصه داستان") }),
+      required("summary", { label: this.getLabel("خلاصه داستان") }).isLength({
+        max: MAX_SUMMARY_LENGTH,
+      }),
       required("managerId", { label: this.getLabel("مدیر") }),
       required("categoryId", { label: this.getLabel("دسته بندی") }),
       required("statusId", { label: this.getLabel("وضعیت") }),
-      required("priceInRials", { label: this.getLabel("قیمت") }),
+      required("oneChapterPriceInToman", { label: this.getLabel("قیمت") }),
       customExpressValidator
         .body("tagsId")
         .custom((tagsId) => Array.isArray(tagsId) && tagsId.length > 0)
@@ -48,7 +50,7 @@ class ProductMutationValidator extends AutoBind {
       label: this.getLabel("آدرس اینترنتی"),
     })
       .customSanitizer((slug) => slugify(slug))
-      .custom(uniquenessValidator(productService.getBySlug))
+      .custom(uniquenessValidator(productService.uniquenessValidationBySlug))
       .withMessage(PRODUCT_MESSAGES.alreadyExistsSlug);
 
     return createValidation([
@@ -77,7 +79,7 @@ class ProductMutationValidator extends AutoBind {
       .optional()
       .ifExists()
       .customSanitizer((slug) => slugify(slug))
-      .custom(uniquenessValidator(productService.getBySlug))
+      .custom(uniquenessValidator(productService.uniquenessValidationBySlug))
       .withMessage(PRODUCT_MESSAGES.alreadyExistsSlug);
 
     return createValidation([
@@ -89,11 +91,13 @@ class ProductMutationValidator extends AutoBind {
   }
 
   updateProductRatingValidation() {
-    const rating = required("rating", { label: "ریتینگ" }).customSanitizer(
-      (rating) => parseInt(rating)
-    );
-
-    return createValidation([slugValidator("productId", "آیدی محصول"), rating]);
+    return createValidation([
+      slugValidator(),
+      customExpressValidator
+        .body("ratingNumber")
+        .isInt({ min: 1, max: 5 })
+        .withMessage(PRODUCT_MESSAGES.invalidRating),
+    ]);
   }
 }
 export default ProductMutationValidator;

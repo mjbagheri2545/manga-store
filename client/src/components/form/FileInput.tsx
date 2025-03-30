@@ -7,8 +7,7 @@ import { twMerge } from "tailwind-merge";
 import { useProgress } from "@/contexts/ProgressContext";
 import { cn } from "@/utils";
 
-import { Button, Tooltip } from "../utility";
-import Image from "../utility/Image";
+import { Button, Image, Tooltip } from "../utility";
 import {
   FormField_Field,
   FormField_FieldChildrenProps,
@@ -58,7 +57,7 @@ function FileInputChildren({
   controllerName,
   imageProps,
 }: FileInputChildrenProps) {
-  const { setValue, watch } = useFormContext();
+  const { setValue, watch, clearErrors } = useFormContext();
 
   const className = cn(
     "file-input rounded bg-dark-body max-w-lg md:max-w-none max-[520px]:max-w-[300px] max-[460px]:max-w-[230px] max-[400px]:max-w-[185px] flex-1",
@@ -80,7 +79,11 @@ function FileInputChildren({
   function handleOnRemoveFile() {
     if (inputRef.current == null) return;
 
-    setValue(controllerName, undefined, { shouldDirty: false });
+    setValue(controllerName, undefined, {
+      shouldDirty: false,
+      shouldValidate: false,
+    });
+    clearErrors(controllerName);
     inputRef.current.value = "";
   }
 

@@ -2,7 +2,7 @@ import { ComponentProps } from "react";
 
 import { twMerge } from "tailwind-merge";
 
-function Divider({ className, ...restProps }: ComponentProps<"hr">) {
+export function Divider({ className, ...restProps }: ComponentProps<"hr">) {
   return (
     <hr
       {...restProps}
@@ -13,5 +13,3 @@ function Divider({ className, ...restProps }: ComponentProps<"hr">) {
     />
   );
 }
-
-export default Divider;

@@ -1,8 +1,10 @@
 import productApi from "@/features/product/api";
-import ProductListSection from "@/features/product/components/productListSection";
+import ProductsListSection from "@/features/product/components/productsListSection";
 
 function ProductsPage() {
-  return <ProductListSection getAllMethod={productApi.getAll} />;
+  return (
+    <ProductsListSection title="همه محصولات" getAllMethod={productApi.getAll} />
+  );
 }
 
 export default ProductsPage;
