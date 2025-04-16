@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 
 import UserAccountFormLayout from "@/features/user/components/account/UserAccountFormLayout";
 
-function UserAccountPage() {
+function UserAccountPageWrapper() {
   return (
     <UserAccountFormLayout>
       <Outlet />
@@ -10,4 +10,4 @@ function UserAccountPage() {
   );
 }
 
-export default UserAccountPage;
+export default UserAccountPageWrapper;

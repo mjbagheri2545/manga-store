@@ -8,7 +8,7 @@ export const chapterLogger = createLogger({
 
 export type ChapterBase = Pick<
   Chapter,
-  "id" | "episode" | "chapterFile" | "createdAt" | "productId"
+  "id" | "episode" | "chapterFile" | "createdAt" | "productId" | "status"
 >;
 
 export const CHAPTER_BASE_SELECT: Prisma.ChapterSelect = {
@@ -17,9 +17,12 @@ export const CHAPTER_BASE_SELECT: Prisma.ChapterSelect = {
   chapterFile: true,
   createdAt: true,
   productId: true,
+  status: true,
 };
 
 export const PERMISSION_CHAPTER_SELECT: Prisma.ChapterSelect = {
+  id: true,
   translatorId: true,
   product: { select: { managerId: true } },
+  chapterFile: true,
 };

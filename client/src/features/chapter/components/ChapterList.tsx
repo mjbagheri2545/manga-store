@@ -24,20 +24,6 @@ function ChapterList({ chapters, containerClassName }: ChapterListProps) {
         />
       ))}
     </div>
-    //     <ListItem
-    //       key={chapter.id}
-    //       isGutterLess
-    //       containerProps={{
-    //         className: "md:min-w-[130px] sm:min-w-[calc(50%-8px)] w-full",
-    //       }}
-    //     >
-    //       <ChapterCard
-    //         chapter={chapter}
-    //         cardProps={{ className: "size-full" }}
-    //       />
-    //     </ListItem>
-    //   ))}
-    // </List>
   );
 }
 

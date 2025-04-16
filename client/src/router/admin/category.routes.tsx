@@ -1,13 +1,23 @@
+import { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { EntitiesProvider } from "@/components/ui/crud";
-import CategoriesPage from "@/pages/admin/items/category/CategoriesPage";
-import CategoryInfoPage from "@/pages/admin/items/category/CategoryInfoPage";
-import CreateCategoryPage from "@/pages/admin/items/category/CreateCategoryPage";
-import UpdateCategoryPage from "@/pages/admin/items/category/UpdateCategoryPage";
 import { ProductGroup } from "@/types";
 
 import AdminCrudRoutes from "./crud.routes";
+
+const CategoriesPage = lazy(
+  () => import("@/pages/admin/items/category/CategoriesPage")
+);
+const CategoryInfoPage = lazy(
+  () => import("@/pages/admin/items/category/CategoryInfoPage")
+);
+const CreateCategoryPage = lazy(
+  () => import("@/pages/admin/items/category/CreateCategoryPage")
+);
+const UpdateCategoryPage = lazy(
+  () => import("@/pages/admin/items/category/UpdateCategoryPage")
+);
 
 function CategoryRoutes() {
   return (

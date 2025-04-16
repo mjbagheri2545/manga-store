@@ -87,6 +87,10 @@ function ChaptersListSectionChildren(props: GetAllChaptersResponse) {
         <SectionTitle title={`${totalEntitiesCount} فصل`}>
           <SingleProductLink />
         </SectionTitle>
+        <p className="w-full text-wrap mb-4 text-lg" dir="ltr">
+          I {"don't"} know why some the sort of chapters does not work
+          correctly, maybe this is happened because of how i generate fake data.
+        </p>
         <ChapterList chapters={chapters} />
         {status === "error" && (
           <ApiErrorMessageList

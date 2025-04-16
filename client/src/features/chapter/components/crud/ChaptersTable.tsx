@@ -8,10 +8,12 @@ import chapterApi from "../../api";
 
 const chapterTableColumns = [
   { key: "episode", title: "قسمت" },
+  { key: "status", title: "وضعیت" },
   {
     key: "createdAt",
     title: "تاریخ ایجاد",
-    render: (createdAt: string) => new Date(createdAt).toLocaleDateString("fa"),
+    renderItem: (createdAt: string) =>
+      new Date(createdAt).toLocaleDateString("fa"),
   },
 ] as TableColumn<Chapter>[];
 

@@ -65,7 +65,6 @@ class ProductService extends AutoBind {
         tags: { connect: tagsData },
         status: { connect: { id: statusId } },
       },
-      select: { id: true },
     });
   }
 
@@ -171,6 +170,7 @@ class ProductService extends AutoBind {
           include: {
             ratings: { select: { rating: true, ratedById: true } },
             chapters: {
+              where: { status: "public" },
               select: {
                 episode: true,
                 id: true,
@@ -284,12 +284,9 @@ class ProductService extends AutoBind {
     return setCountKey(products);
   }
 
-  async getRelatedTranslators(
-    productSlug: string,
-    query: PaginateQueryWithSort
-  ) {
+  async getRelatedTranslators(id: string, query: PaginateQueryWithSort) {
     const where = {
-      translatedChapters: { some: { product: { slug: productSlug } } },
+      translatedChapters: { some: { product: { id } } },
     };
 
     const countDbQuery = prisma.user.count({ where });
@@ -303,7 +300,7 @@ class ProductService extends AutoBind {
             COUNT(c.id) AS translated_chapters_count
           FROM "Chapter" c
           JOIN "Product" p ON c."productId" = p."id"
-          WHERE p."slug" = ${productSlug}
+          WHERE p."id" = ${id}
           GROUP BY c."translatorId"
         )
         SELECT
@@ -345,7 +342,7 @@ class ProductService extends AutoBind {
           fullName: true,
           _count: {
             select: {
-              translatedChapters: { where: { product: { slug: productSlug } } },
+              translatedChapters: { where: { product: { id } } },
             },
           },
         },

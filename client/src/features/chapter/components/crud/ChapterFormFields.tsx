@@ -1,7 +1,7 @@
 import { FileInput, InputField, SelectField } from "@/components/form";
 import { FormFieldsContainer } from "@/components/ui/form";
 import RenderItems from "@/components/ui/RenderItems";
-import { Chapter } from "@/types";
+import { Chapter, CHAPTER_STATUSES } from "@/types";
 
 import { GetTranslatorsResponse } from "../../api";
 
@@ -28,6 +28,16 @@ function ChapterFormFields({ chapter, translators }: ChapterFormFieldsProps) {
         </SelectField>
       </FormFieldsContainer>
       <FormFieldsContainer>
+        <SelectField
+          controllerName="chapterStatus"
+          label="وضعیت فصل"
+          containerProps={{ className: "w-full md:w-auto md:flex-1" }}
+        >
+          <RenderItems
+            items={CHAPTER_STATUSES}
+            renderItem={(status) => <option value={status}>{status}</option>}
+          />
+        </SelectField>
         <FileInput
           controllerName="chapterFile"
           label="فایل فصل"
@@ -35,7 +45,10 @@ function ChapterFormFields({ chapter, translators }: ChapterFormFieldsProps) {
             filePath: chapter?.chapterFile,
           }}
           containerProps={{
-            className: "flex-1",
+            className:
+              chapter?.chapterFile != null
+                ? "md:w-full md:flex-none"
+                : "w-full md:w-auto md:flex-1",
           }}
         />
       </FormFieldsContainer>

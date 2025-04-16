@@ -1,4 +1,3 @@
-import { PropsWithChildren } from "react";
 import { Outlet } from "react-router-dom";
 
 import { ArrowUpIcon } from "lucide-react";
@@ -9,7 +8,7 @@ import { ProductGroupsProvider } from "../productGroup";
 import Footer from "./footer";
 import Header from "./header";
 
-export function MainLayout({ children }: PropsWithChildren) {
+export function MainLayout() {
   // mt-[120px] -> 80px for header because header has position fixed plus
   // 40px same as mb-10 (mb-10 = mb-[40px])
 
@@ -21,7 +20,7 @@ export function MainLayout({ children }: PropsWithChildren) {
     <ProductGroupsProvider>
       <Header />
       <main className="flex flex-col flex-1 w-full min-h-fit items-center justify-center gap-5 mt-[120px] mb-10 px-5 mx-auto max-w-[1400px] min-[1440px]:px-0">
-        {children ?? <Outlet />}
+        <Outlet />
       </main>
       <Footer />
       <Button

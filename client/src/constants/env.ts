@@ -3,7 +3,7 @@ import { z } from "zod";
 import { required } from "@/validators";
 
 function createEnv() {
-  const stringEnvKeys = ["VITE_API_END_POINT", "VITE_APP_TITLE"] as const;
+  const stringEnvKeys = ["VITE_SERVER_END_POINT", "VITE_APP_TITLE"] as const;
 
   const stringsShape = stringEnvKeys.reduce(
     (shape, key) => {

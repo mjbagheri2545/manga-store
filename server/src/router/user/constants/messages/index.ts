@@ -1,3 +1,5 @@
+import { $Enums } from "@prisma/client";
+
 import { UserBase, VERIFICATION_CODE_LENGTH } from "../global";
 import userAccountMessages from "./account.message";
 
@@ -11,7 +13,7 @@ const USER_MESSAGES = {
   },
   validation: {
     verificationCode: `طول کد تأیید باید ${VERIFICATION_CODE_LENGTH} کاراکتر باشد.`,
-    role: "سطح دسترسی نامعتبر است، سطح دسترسی باید مقادیر ادمین، مدیر، مترجم و کاربر باشد.",
+    invalidRole: `سطح دسترسی نامعتبر است، سطح دسترسی باید یکی از مقادیر ${Object.values($Enums.Role).join(", ")} باشد.`,
   },
 } as const;
 

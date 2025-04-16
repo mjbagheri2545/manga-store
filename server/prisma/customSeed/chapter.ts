@@ -56,6 +56,7 @@ async function createChaptersSeedFunction(prisma: PrismaClient) {
       await prisma.chapter.create({
         data: {
           episode: i + 1,
+          status: i > 3 ? "private" : "public",
           productId,
           translatorId,
           chapterFile: `seed/chapterFile/${randomChapterFile}`,

@@ -15,27 +15,30 @@ const productCommentTableColumns = [
   {
     key: "author",
     title: "نویسنده",
-    render: (author: GetAllRootProductCommentBase["author"]) => author.fullName,
+    renderItem: (author: GetAllRootProductCommentBase["author"]) =>
+      author.fullName,
   },
   {
     key: "like",
     title: "تعداد لایک",
-    render: (like: GetAllProductCommentBaseLike) => like.count,
+    renderItem: (like: GetAllProductCommentBaseLike) => like.count,
   },
   {
     key: "dislike",
     title: "تعداد دیسلایک",
-    render: (dislike: GetAllProductCommentBaseDislike) => dislike.count,
+    renderItem: (dislike: GetAllProductCommentBaseDislike) => dislike.count,
   },
   {
     key: "createdAt",
     title: "تاریخ ایجاد",
-    render: (createdAt: string) => new Date(createdAt).toLocaleDateString("fa"),
+    renderItem: (createdAt: string) =>
+      new Date(createdAt).toLocaleDateString("fa"),
   },
   {
     key: "updatedAt",
     title: "تاریخ آخرین به‌روزرسانی",
-    render: (updatedAt: string) => new Date(updatedAt).toLocaleDateString("fa"),
+    renderItem: (updatedAt: string) =>
+      new Date(updatedAt).toLocaleDateString("fa"),
   },
 ] as TableColumn<GetAllRootProductCommentBase>[];
 

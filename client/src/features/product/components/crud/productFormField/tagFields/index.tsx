@@ -32,6 +32,9 @@ function TagFields({ defaultTags = [] }: TagFieldsProps) {
     }
   }
 
+  // this fields have a bug and i don't know why. when i update the product
+  // sometimes product tags will set to empty array.
+
   return (
     <FormFieldsContainer className="md:gap-6 flex-wrap">
       {tags.map((tag) => (

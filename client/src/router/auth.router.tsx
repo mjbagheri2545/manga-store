@@ -1,15 +1,32 @@
+import { lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
+import SuspenseWithSpinner from "@/components/ui/SuspenseWithSpinner";
 import PATH from "@/constants/path";
-import LoginPage from "@/pages/auth/LoginPage";
-import RegistrationPage from "@/pages/auth/RegistrationPage";
+
+const LoginPage = lazy(() => import("@/pages/auth/LoginPage"));
+const RegistrationPage = lazy(() => import("@/pages/auth/RegistrationPage"));
 
 function AuthRouter() {
   return (
     <Routes>
       <Route index element={<Navigate to={PATH.auth.login} replace />} />
-      <Route path="register" element={<RegistrationPage />} />
-      <Route path="login" element={<LoginPage />} />
+      <Route
+        path="register"
+        element={
+          <SuspenseWithSpinner key="registrationPage">
+            <RegistrationPage />
+          </SuspenseWithSpinner>
+        }
+      />
+      <Route
+        path="login"
+        element={
+          <SuspenseWithSpinner key="loginPage">
+            <LoginPage />
+          </SuspenseWithSpinner>
+        }
+      />
     </Routes>
   );
 }

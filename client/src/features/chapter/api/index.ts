@@ -10,7 +10,7 @@ import {
 import { CreateChapterData } from "../schemas";
 
 export type ChapterResponse = {
-  chapter: Chapter & { translator: { id: string } };
+  chapter: Chapter & { translatorId: string };
 };
 
 export type GetAllChapterBase = Chapter;

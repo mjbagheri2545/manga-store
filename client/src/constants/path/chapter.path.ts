@@ -4,7 +4,11 @@ function createChapterPath() {
   const basePath = createBasePath();
 
   function baseAdminChapterPath(productId: string) {
-    return `${basePath.admin}${basePath.product}/${productId}${basePath.chapter}`;
+    return `${basePath.admin}${baseChapterPath(productId)}`;
+  }
+
+  function baseChapterPath(productPath: string) {
+    return `${basePath.product}/${productPath}${basePath.chapter}`;
   }
 
   return {
@@ -17,8 +21,9 @@ function createChapterPath() {
       info: (productId: string, id: string) =>
         `${baseAdminChapterPath(productId)}/${id}`,
     },
-    api: (productId: string) =>
-      `${basePath.product}/${productId}${basePath.chapter}`,
+    api: baseChapterPath,
+    singleChapter: (productSlug: string, id: string) =>
+      `${baseChapterPath(productSlug)}/${id}`,
   } as const;
 }
 

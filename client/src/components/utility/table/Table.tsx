@@ -13,7 +13,7 @@ export type TableColumn<T> = {
   key: keyof T;
   title: string;
   cellProps?: CellProps;
-  render?: (value: T[keyof T]) => React.ReactNode;
+  renderItem?: (value: T[keyof T]) => React.ReactNode;
 };
 
 type RowProps = ComponentProps<"tr">;
@@ -134,7 +134,7 @@ function TableRow<T>({ row, columns, rowProps, index }: TableRowProps<T>) {
         items={columns}
         renderItem={(column) => (
           <TableCell
-            render={column.render}
+            renderItem={column.renderItem}
             value={row[column.key]}
             cellProps={column.cellProps}
           />
@@ -146,11 +146,11 @@ function TableRow<T>({ row, columns, rowProps, index }: TableRowProps<T>) {
 
 type TableCellProps<T> = {
   value: T;
-  render?: (value: T) => React.ReactNode;
+  renderItem?: (value: T) => React.ReactNode;
   cellProps?: CellProps;
 };
 
-function TableCell<T>({ cellProps, value, render }: TableCellProps<T>) {
+function TableCell<T>({ cellProps, value, renderItem }: TableCellProps<T>) {
   // w-[1%] whitespace-nowrap this is a trick i saw in somewhere
   return (
     <td
@@ -160,7 +160,7 @@ function TableCell<T>({ cellProps, value, render }: TableCellProps<T>) {
         cellProps?.className
       )}
     >
-      {(render ?? String)(value)}
+      {(renderItem ?? String)(value)}
     </td>
   );
 }

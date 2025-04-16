@@ -1,6 +1,6 @@
 import { Response } from "express";
 
-import { Chapter, Prisma } from "@prisma/client";
+import { $Enums, Chapter, Prisma } from "@prisma/client";
 
 import SHARED_MESSAGES from "@/constants/messages";
 import { EmptyObject, PaginateQueryWithSort, UserAuthorizedReq } from "@/types";
@@ -31,6 +31,7 @@ type GetChapterReq = UserAuthorizedReq<{ chapter: ChapterBase }>;
 type CreateChapterReqBody = {
   episode: string;
   translatorId: string;
+  chapterStatus: $Enums.ChapterStatus;
 };
 
 type CreateChapterReq = UserAuthorizedReq<
@@ -62,7 +63,7 @@ class ChapterController {
 
   async createChapter(req: CreateChapterReq, res: Response) {
     const {
-      body: { translatorId, episode },
+      body: { translatorId, episode, chapterStatus },
       params: { productId },
     } = req;
 
@@ -77,6 +78,7 @@ class ChapterController {
         data: {
           episode: parseInt(episode),
           chapterFile: getFilePathForDb(chapterFilePath),
+          status: chapterStatus,
         },
         translatorId,
         productId,
@@ -117,7 +119,7 @@ class ChapterController {
   }
 
   async updateChapter(req: UpdateChapterReq, res: Response) {
-    const { chapter, translatorId, episode } = req.body;
+    const { chapter, translatorId, episode, chapterStatus } = req.body;
 
     const translatorConnection = newModelConnectionWithId(
       translatorId,
@@ -130,6 +132,10 @@ class ChapterController {
 
     if (episode != null) {
       data.episode = parseInt(episode);
+    }
+
+    if (chapterStatus != null) {
+      data.status = chapterStatus;
     }
 
     if (req.file != null) {

@@ -37,6 +37,7 @@ export const PRODUCT_BASE_SELECT: Prisma.ProductSelect = {
 };
 
 export const PERMISSION_PRODUCT_SELECT: Prisma.ProductSelect = {
+  id: true,
   managerId: true,
   productImage: true,
 };

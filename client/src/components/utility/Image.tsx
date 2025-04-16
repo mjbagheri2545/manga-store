@@ -14,7 +14,7 @@ export function Image({
   // this should remove in production
   const finalSrc =
     src.includes("uploads") || src.includes("seed")
-      ? `${env.VITE_API_END_POINT}/${src}`
+      ? `${env.VITE_SERVER_END_POINT}/${src}`
       : src;
 
   return (

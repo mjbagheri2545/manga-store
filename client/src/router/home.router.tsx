@@ -1,16 +1,30 @@
+import { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 
+import SuspenseWithSpinner from "@/components/ui/SuspenseWithSpinner";
 import PATH from "@/constants/path";
-import LandingPage from "@/pages/home/LandingPage";
-import TagsPage from "@/pages/home/TagsPage";
+
+const LandingPage = lazy(() => import("@/pages/home/LandingPage"));
+const TagsPage = lazy(() => import("@/pages/home/TagsPage"));
 
 function HomeRouter() {
   return (
     <Routes>
-      <Route index element={<LandingPage />} />
+      <Route
+        index
+        element={
+          <SuspenseWithSpinner key="landingPage">
+            <LandingPage />
+          </SuspenseWithSpinner>
+        }
+      />
       <Route
         path={PATH.getPathForRoute(PATH.base.tag)}
-        element={<TagsPage />}
+        element={
+          <SuspenseWithSpinner key="tagsPage">
+            <TagsPage />
+          </SuspenseWithSpinner>
+        }
       />
     </Routes>
   );

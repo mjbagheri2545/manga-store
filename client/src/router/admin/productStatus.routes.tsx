@@ -1,11 +1,21 @@
+import { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { EntitiesProvider } from "@/components/ui/crud";
-import CreateProductStatusPage from "@/pages/admin/items/productStatus/CreateProductStatusPage";
-import ProductStatusesPage from "@/pages/admin/items/productStatus/ProductStatusesPage";
-import ProductStatusInfoPage from "@/pages/admin/items/productStatus/ProductStatusInfoPage";
-import UpdateProductStatusPage from "@/pages/admin/items/productStatus/UpdateProductStatusPage";
 import { ProductGroup } from "@/types";
+
+const ProductStatusesPage = lazy(
+  () => import("@/pages/admin/items/productStatus/ProductStatusesPage")
+);
+const ProductStatusInfoPage = lazy(
+  () => import("@/pages/admin/items/productStatus/ProductStatusInfoPage")
+);
+const CreateProductStatusPage = lazy(
+  () => import("@/pages/admin/items/productStatus/CreateProductStatusPage")
+);
+const UpdateProductStatusPage = lazy(
+  () => import("@/pages/admin/items/productStatus/UpdateProductStatusPage")
+);
 
 import AdminCrudRoutes from "./crud.routes";
 

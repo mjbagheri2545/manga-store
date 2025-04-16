@@ -24,7 +24,7 @@ export type ProductGroupModel = Tag | Category | ProductStatus;
 
 export type PermissionChapter = Pick<
   Chapter,
-  "chapterFile" | "translatorId"
+  "id" | "chapterFile" | "translatorId"
 > & {
   product: Pick<Product, "managerId">;
 };
@@ -37,7 +37,10 @@ export type PermissionProductComment = Pick<
 };
 
 export type PermissionUser = Pick<User, "id" | "avatarImage">;
-export type PermissionProduct = Pick<Product, "managerId" | "productImage">;
+export type PermissionProduct = Pick<
+  Product,
+  "id" | "managerId" | "productImage"
+>;
 
 export type PermissionModels =
   | ProductGroupModel

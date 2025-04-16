@@ -1,21 +1,37 @@
+import { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 
+import SuspenseWithSpinner from "@/components/ui/SuspenseWithSpinner";
 import PATH from "@/constants/path";
-import AccountVerificationVerifyForm from "@/features/user/components/account/AccountVerificationVerifyForm";
-import PasswordRecoveryPage from "@/pages/user/account/PasswordRecoveryPage";
-import UserAccountPage from "@/pages/user/account/UserAccountPage";
+import UserAccountPageWrapper from "@/pages/user/account/UserAccountPageWrapper";
+
+const AccountVerificationVerifyForm = lazy(
+  () =>
+    import("@/features/user/components/account/AccountVerificationVerifyForm")
+);
+const PasswordRecoveryPage = lazy(
+  () => import("@/pages/user/account/PasswordRecoveryPage")
+);
 
 function UserRouter() {
   return (
     <Routes>
-      <Route element={<UserAccountPage />}>
+      <Route element={<UserAccountPageWrapper />}>
         <Route
           path={PATH.user.account.password.recovery}
-          element={<PasswordRecoveryPage />}
+          element={
+            <SuspenseWithSpinner key="passwordRecoveryPage">
+              <PasswordRecoveryPage />
+            </SuspenseWithSpinner>
+          }
         />
         <Route
           path={PATH.user.account.verification}
-          element={<AccountVerificationVerifyForm />}
+          element={
+            <SuspenseWithSpinner key="accountVerificationPage">
+              <AccountVerificationVerifyForm />
+            </SuspenseWithSpinner>
+          }
         />
       </Route>
     </Routes>

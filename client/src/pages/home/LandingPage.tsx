@@ -9,7 +9,8 @@ function LandingPage() {
   return (
     <>
       <p className="text-center text-wrap text-lg font-semibold mb-4">
-        if you {"don't"} see any data, make sure run npm db:seed in server
+        if you {"don't"} see any data, make sure run npm db:seed in server.
+        seeding may take a few minutes, so please patient.
       </p>
       <ProductsSliderSection
         getAllProducts={() =>

@@ -7,7 +7,7 @@ import { CHAPTER_BASE_SELECT } from "../constants/global";
 import { parseChapterQuery } from "../utils";
 
 type CreateChapterOptions = {
-  data: Pick<Prisma.ChapterCreateInput, "episode" | "chapterFile">;
+  data: Pick<Prisma.ChapterCreateInput, "episode" | "chapterFile" | "status">;
   productId: string;
   translatorId: string;
 };
@@ -25,6 +25,7 @@ class ChapterService {
           chapterFile: true,
           createdAt: true,
           episode: true,
+          status: true,
         },
       }),
       prisma.chapter.count({ where: { productId } }),
@@ -50,7 +51,6 @@ class ChapterService {
         product: { connect: { id: productId } },
         translator: { connect: { id: translatorId } },
       },
-      select: { id: true },
     });
   }
 

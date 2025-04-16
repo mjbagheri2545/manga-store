@@ -1,7 +1,7 @@
 import { PageHeader, Section } from "@/components/ui/layout";
 import ProductCommentsTable from "@/features/productComment/components/crud/ProductCommentsTable";
 
-function ProductCommentsPage() {
+function AdminProductCommentsPage() {
   return (
     <>
       <PageHeader title="دیدگاه ها" />
@@ -12,4 +12,4 @@ function ProductCommentsPage() {
   );
 }
 
-export default ProductCommentsPage;
+export default AdminProductCommentsPage;

@@ -10,23 +10,23 @@ const productTableColumns = [
   {
     key: "oneChapterPriceInToman",
     title: "قیمت هر فصل",
-    render: (oneChapterPriceInToman: number) =>
+    renderItem: (oneChapterPriceInToman: number) =>
       `${NUMBER_FORMATTER.format(oneChapterPriceInToman)} تومان`,
   },
   {
     key: "manager",
     title: "مدیر",
-    render: (manager: { fullName: string }) => manager.fullName,
+    renderItem: (manager: { fullName: string }) => manager.fullName,
   },
   {
     key: "category",
     title: "دسته بندی",
-    render: (category: ProductGroup) => category.name,
+    renderItem: (category: ProductGroup) => category.name,
   },
   {
     key: "status",
     title: "وضعیت",
-    render: (status: ProductGroup) => status.name,
+    renderItem: (status: ProductGroup) => status.name,
   },
   {
     key: "chaptersCount",

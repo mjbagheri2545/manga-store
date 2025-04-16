@@ -106,16 +106,23 @@ model ProductView {
 }
 
 model Chapter {
-  id          String   @id @default(uuid()) @db.Char(36)
-  episode     Int      @db.SmallInt
-  chapterFile String   @db.VarChar(255)
-  createdAt   DateTime @default(now())
+  id          String        @id @default(uuid()) @db.Char(36)
+  episode     Int           @db.SmallInt
+  chapterFile String        @db.VarChar(255)
+  createdAt   DateTime      @default(now())
+  status      ChapterStatus @default(private)
 
   translator   User?   @relation(fields: [translatorId], references: [id], onDelete: SetDefault)
   translatorId String? @default("مترجم حذف شده") @db.Char(36)
 
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String  @db.Char(36)
+}
+
+enum ChapterStatus {
+  public
+  private
+  purchased
 }
 
 model ProductStatus {

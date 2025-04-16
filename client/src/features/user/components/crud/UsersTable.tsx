@@ -12,7 +12,7 @@ const userTableColumns = [
   {
     key: "isVerified",
     title: "وضعیت تأیید حساب",
-    render: (isVerified: boolean) =>
+    renderItem: (isVerified: boolean) =>
       isVerified ? (
         <CircleCheckIcon className="text-success" />
       ) : (
@@ -22,12 +22,13 @@ const userTableColumns = [
   {
     key: "createdAt",
     title: "تاریخ عضویت",
-    render: (createdAt: string) => new Date(createdAt).toLocaleDateString("fa"),
+    renderItem: (createdAt: string) =>
+      new Date(createdAt).toLocaleDateString("fa"),
   },
   {
     key: "walletBalanceInToman",
     title: "موجودی کیف پول",
-    render: (walletBalanceInToman: number) =>
+    renderItem: (walletBalanceInToman: number) =>
       `${NUMBER_FORMATTER.format(walletBalanceInToman)} تومان`,
   },
 ] as TableColumn<GetAllUserBase>[];

@@ -91,7 +91,8 @@ function UpdateChapterFormChildren({
       useFormProps={{
         defaultValues: {
           episode: chapter.episode,
-          translatorId: chapter.translator.id,
+          translatorId: chapter.translatorId,
+          chapterStatus: chapter.status,
         },
       }}
       schema={updateChapterSchema}

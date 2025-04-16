@@ -27,7 +27,7 @@ type GetBySlugReq = UserAuthorizedReq<
 type GetRelatedTranslatorsReq = UserAuthorizedReq<
   EmptyObject,
   PaginateQueryWithSort,
-  { slug: string }
+  { id: string }
 >;
 
 type GetRelatedProductsReq = UserAuthorizedReq<{
@@ -143,12 +143,12 @@ class GetProductController {
 
   async getRelatedTranslators(req: GetRelatedTranslatorsReq, res: Response) {
     const {
-      params: { slug },
+      params: { id },
       query,
     } = req;
 
     const [relatedTranslators, count] =
-      await productService.getRelatedTranslators(slug, query);
+      await productService.getRelatedTranslators(id, query);
 
     successfulResponse({
       res,

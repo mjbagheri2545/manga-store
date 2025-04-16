@@ -17,7 +17,7 @@ export function TableWithActions<TEntity extends { id: string }>({
     {
       key: "id",
       title: "عملیات",
-      render: children,
+      renderItem: children,
       cellProps: { className: "flex gap-2" },
     },
   ] as TableColumn<TEntity>[];

@@ -34,11 +34,16 @@ export type Product = {
   createdAt: string;
 };
 
+export const CHAPTER_STATUSES = ["public", "private", "purchased"] as const;
+
+export type ChapterStatus = (typeof CHAPTER_STATUSES)[number];
+
 export type Chapter = {
   id: string;
   episode: number;
   chapterFile: string;
   createdAt: string;
+  status: ChapterStatus;
 };
 
 export type ProductComment = {

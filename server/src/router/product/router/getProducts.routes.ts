@@ -3,7 +3,6 @@ import { Router } from "express";
 import { idAuthorization, jwtAuthorization } from "@/middlewares";
 import { getAllEntities } from "@/middlewares/crud.middleware";
 import { slugValidation } from "@/validators";
-import { productIdValidation } from "@/validators/chapter_productComment.validator";
 
 import { PRODUCT_BASE_SELECT } from "../constants/global";
 import PRODUCT_PATH from "../constants/path";
@@ -45,7 +44,12 @@ function createGetProductsRoutes(router: Router) {
     "/:id",
     jwtAuthorization,
     createGetProductById({
-      select: PRODUCT_BASE_SELECT,
+      select: {
+        ...PRODUCT_BASE_SELECT,
+        statusId: true,
+        categoryId: true,
+        tags: { select: { id: true } },
+      },
     }),
     getProduct
   );
@@ -83,7 +87,7 @@ function createGetProductsRoutes(router: Router) {
 
   router.get(
     PRODUCT_PATH.getRelatedTranslators,
-    productIdValidation(),
+    slugValidation(),
     createGetProductById(),
     jwtAuthorization,
     getRelatedTranslators

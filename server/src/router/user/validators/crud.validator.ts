@@ -29,7 +29,7 @@ class UserCrudValidator extends AutoBind {
         }
         return true;
       })
-      .withMessage(USER_MESSAGES.validation.role);
+      .withMessage(USER_MESSAGES.validation.invalidRole);
   }
 
   private walletBalanceInToman() {

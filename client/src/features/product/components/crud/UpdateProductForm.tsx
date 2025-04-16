@@ -35,9 +35,9 @@ function UpdateProductForm({ product }: GetProductByIdResponse) {
       useFormProps={{
         defaultValues: {
           tagsId: product.tags.map((tag) => tag.id),
-          statusId: product.status.id,
-          categoryId: product.category.id,
-          managerId: product.manager.id,
+          statusId: product.statusId,
+          categoryId: product.categoryId,
+          managerId: product.managerId,
           productImage: undefined,
           ...productDefaultData,
         },

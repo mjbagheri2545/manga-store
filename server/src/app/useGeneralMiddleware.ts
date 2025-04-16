@@ -12,7 +12,14 @@ import { morganMiddleware } from "@/middlewares";
 
 function useGeneralMiddlewares(app: express.Express) {
   [
-    helmet(),
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          frameAncestors: ["'self'", env.CLIENT_END_POINT],
+        },
+      },
+    }),
     cors({ origin: env.CLIENT_END_POINT, credentials: true }),
     cookieParser(),
     json(),

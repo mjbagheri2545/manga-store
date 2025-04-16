@@ -35,11 +35,11 @@ export type GetAllProductBase = Pick<
   | "slug"
   | "id"
   | "summary"
-  | "views"
   | "releaseYear"
 > & {
   status: ProductGroup;
   chaptersCount: number;
+  views: number;
 };
 
 export type GetAllProductsResponse<T = EmptyObject> = TGetAllResponse<{
@@ -61,9 +61,9 @@ type GetProductBySlugResponse = {
 
 export type GetProductByIdResponse = {
   product: Product & {
-    category: { id: string };
-    status: { id: string };
-    manager: { id: string };
+    categoryId: string;
+    statusId: string;
+    managerId: string;
     tags: { id: string }[];
   };
 };

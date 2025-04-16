@@ -60,7 +60,7 @@ function createChapterRouter() {
     idValidations("فصل"),
     jwtAuthorization,
     createGetChapterById({
-      select: CHAPTER_BASE_SELECT,
+      select: { ...CHAPTER_BASE_SELECT, translatorId: true },
     }),
     getChapter
   );

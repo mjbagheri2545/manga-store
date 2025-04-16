@@ -2,6 +2,7 @@ import {
   CalendarPlusIcon,
   FileDigitIcon,
   FileTextIcon,
+  HourglassIcon,
   IdCardIcon,
 } from "lucide-react";
 
@@ -17,6 +18,10 @@ const CHAPTER_INFO_ITEMS = {
   episode: {
     keyName: "قسمت",
     Icon: FileDigitIcon,
+  },
+  status: {
+    keyName: "وضعیت",
+    Icon: HourglassIcon,
   },
   createdAt: {
     renderItem: (createdAt: string) => (
