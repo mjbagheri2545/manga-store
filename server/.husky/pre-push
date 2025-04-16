@@ -1,9 +1,9 @@
 cd server || exit 1
 
-npm run lint:unusedExports || exit 1
-npm run format || exit 1
+npm run lint:unusedExports || echo "error in linting" && exit 1
+npm run format || echo "error in formatting" && exit 1
 
 cd ../client || exit 1
 
-npm run lint:unusedExports || exit 1
-npm run format || exit 1
+npm run lint:unusedExports || echo "error in linting" && exit 1
+npm run format || echo "error in formatting" && exit 1
