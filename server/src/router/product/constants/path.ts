@@ -4,7 +4,7 @@ const PRODUCT_PATH = {
   getByTag: "/tag/:tag",
   rate: "/:id/rate",
   getRelatedProducts: "/:id/related-products",
-  getRelatedTranslators: "/:slug/related-translators",
+  getRelatedTranslators: "/:id/related-translators",
 } as const;
 
 export default PRODUCT_PATH;

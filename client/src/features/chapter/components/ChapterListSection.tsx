@@ -2,13 +2,12 @@ import { useState } from "react";
 
 import { ApiComponent, ApiErrorMessageList } from "@/components/ui/api";
 import { Section, SectionTitle } from "@/components/ui/layout";
-import LinkWithArrow from "@/components/ui/LinkWithArrow";
 import LoadMoreButton from "@/components/ui/LoadMoreButton";
-import SortFilter from "@/components/ui/SortFilter";
+import SingleProductLink from "@/components/ui/product/SingleProductLink";
+import SortFilter, { SortFilterItem } from "@/components/ui/SortFilter";
 import { SpinnerContainer } from "@/components/ui/SpinnerContainer";
 import { Alert } from "@/components/utility";
 import { DEFAULT_SORT_ITEMS } from "@/constants/global/general.global";
-import PATH from "@/constants/path";
 import { useProduct } from "@/contexts/ProductContext";
 import chapterApi, {
   GetAllChapterBase,
@@ -20,9 +19,15 @@ import { useInfiniteApi } from "@/lib/api";
 
 import { CHAPTERS_QUERY_TAKE } from "../constants/global";
 
+const CHAPTERS_SORT_ITEMS: SortFilterItem[] = [
+  ...DEFAULT_SORT_ITEMS,
+  { title: "جدیدترین قسمت", value: "newest-episode" },
+  { title: "قدیمی ترین قسمت", value: "oldest-episode" },
+];
+
 function ChaptersListSection() {
   const sort = useQuerySort();
-  const { product } = useProduct();
+  const product = useProduct();
 
   return (
     <ApiComponent
@@ -48,23 +53,24 @@ export default ChaptersListSection;
 function ChaptersListSectionChildren(props: GetAllChaptersResponse) {
   const [chapters, setChapters] = useState<GetAllChapterBase[]>(props.chapters);
   const sort = useQuerySort();
-  const { product } = useProduct();
+  const product = useProduct();
 
-  const { error, status, hasMore, loadMoreEntities } = useInfiniteApi({
-    getAllMethod: (paginateQuery) =>
-      chapterApi.getAll({
-        productId: product.id,
-        query: {
-          skip: paginateQuery?.skip,
-          take: CHAPTERS_QUERY_TAKE,
-          sort,
-        },
-      }),
-    initialTotalCount: props.count,
-    entitiesLength: chapters.length,
-    onSuccess: (data) =>
-      setChapters((current) => [...current, ...data.chapters]),
-  });
+  const { error, status, hasMore, totalEntitiesCount, loadMoreEntities } =
+    useInfiniteApi({
+      getAllMethod: (paginateQuery) =>
+        chapterApi.getAll({
+          productId: product.id,
+          query: {
+            skip: paginateQuery?.skip,
+            take: CHAPTERS_QUERY_TAKE,
+            sort,
+          },
+        }),
+      initialTotalCount: props.count,
+      entitiesLength: chapters.length,
+      onSuccess: (data) =>
+        setChapters((current) => [...current, ...data.chapters]),
+    });
 
   if (props.count === 0) {
     return (
@@ -76,12 +82,10 @@ function ChaptersListSectionChildren(props: GetAllChaptersResponse) {
 
   return (
     <>
-      <SortFilter items={DEFAULT_SORT_ITEMS} />
+      <SortFilter items={CHAPTERS_SORT_ITEMS} />
       <Section containerProps={{ className: "bg-dark-body" }}>
-        <SectionTitle title="همه فصل ها">
-          <LinkWithArrow to={PATH.product.singleProduct(product.slug)}>
-            {product.name}
-          </LinkWithArrow>
+        <SectionTitle title={`${totalEntitiesCount} فصل`}>
+          <SingleProductLink />
         </SectionTitle>
         <ChapterList chapters={chapters} />
         {status === "error" && (

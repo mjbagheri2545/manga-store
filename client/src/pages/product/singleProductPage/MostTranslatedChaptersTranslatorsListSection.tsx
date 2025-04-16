@@ -5,7 +5,7 @@ import { useProduct } from "@/contexts/ProductContext";
 import TranslatorsList from "@/features/product/components/translators/TranslatorsList";
 
 function MostTranslatedChaptersTranslatorsListSection() {
-  const { product } = useProduct();
+  const product = useProduct();
   return (
     <Section>
       <SectionTitle title="مترجم ها">

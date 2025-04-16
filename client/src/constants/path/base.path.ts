@@ -9,6 +9,7 @@ function createBasePath() {
     productStatus: "/product-statuses",
     product: "/products",
     chapter: "/chapters",
+    productComment: "/product-comments",
     productGroup: (path: string) => `product-group/${path}`,
   } as const;
 }

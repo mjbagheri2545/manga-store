@@ -5,7 +5,7 @@ import { User } from "@prisma/client";
 import { EntityKey, PermissionModels, UserAuthorizedReq } from "@/types";
 import { forbidden } from "@/utils";
 
-export function allResourcePermission(hasPermission: (user: User) => boolean) {
+export function hasGeneralPermission(hasPermission: (user: User) => boolean) {
   return (req: UserAuthorizedReq, res: Response, next: NextFunction) => {
     const { user } = req.body;
 
@@ -17,15 +17,15 @@ export function allResourcePermission(hasPermission: (user: User) => boolean) {
   };
 }
 
-type SpecificResourcePermissionOptions<T> = {
+type hasSpecificPermissionOptions<T> = {
   hasPermission: (user: User, entity: T) => boolean;
   entityKey: EntityKey | (string & {});
 };
 
-export function specificResourcePermission<T extends PermissionModels>({
+export function hasSpecificPermission<T extends PermissionModels>({
   hasPermission,
   entityKey,
-}: SpecificResourcePermissionOptions<T>) {
+}: hasSpecificPermissionOptions<T>) {
   return (req: Request, res: Response, next: NextFunction) => {
     const { user, [entityKey]: entity } = req.body;
 

@@ -1,5 +1,9 @@
 import { AutoBind } from "@/utils";
-import { createValidation, required, slugValidator } from "@/validators";
+import { createValidation, required } from "@/validators";
+import {
+  idValidators,
+  productIdValidator,
+} from "@/validators/chapter_productComment.validator";
 
 class ChapterValidator extends AutoBind {
   private getCreateChapterValidation() {
@@ -9,22 +13,10 @@ class ChapterValidator extends AutoBind {
     ];
   }
 
-  private getIdValidation() {
-    return [
-      slugValidator("productId", "آیدی محصول"),
-      // for chapter id
-      slugValidator("id", "آیدی فصل"),
-    ];
-  }
-
-  idValidation() {
-    return createValidation(this.getIdValidation());
-  }
-
   createChapterValidation() {
     return createValidation([
       ...this.getCreateChapterValidation(),
-      slugValidator("productId", "آیدی محصول"),
+      productIdValidator(),
     ]);
   }
 
@@ -33,7 +25,7 @@ class ChapterValidator extends AutoBind {
       (validationChain) => validationChain.optional()
     );
 
-    return createValidation([...optionalFields, ...this.getIdValidation()]);
+    return createValidation([...optionalFields, ...idValidators("فصل")]);
   }
 }
 

@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 
-import { PASSWORD_CONFIG } from "@/constants/global/featuers/auth_user.global";
+import { PASSWORD_CONFIG } from "@/constants/global/features/auth_user.global";
 
 import { pick } from "../general.util";
 
@@ -24,6 +24,8 @@ export function pickUserData(user: User) {
   ]);
 }
 
-export function userLoggerData(user: User) {
+export function userLoggerData<
+  T extends Pick<User, "email" | "id" | "fullName">,
+>(user: T) {
   return pick(user, ["email", "fullName", "id"]);
 }

@@ -1,14 +1,9 @@
 import { Response } from "express";
 
-import { Prisma } from "@prisma/client";
+import { Chapter, Prisma } from "@prisma/client";
 
 import SHARED_MESSAGES from "@/constants/messages";
-import {
-  EmptyObject,
-  PaginateQuery,
-  PermissionChapter,
-  UserAuthorizedReq,
-} from "@/types";
+import { EmptyObject, PaginateQueryWithSort, UserAuthorizedReq } from "@/types";
 import {
   failedOperation,
   getFilePath,
@@ -16,22 +11,22 @@ import {
   newModelConnectionWithId,
   removeFile,
   successfulResponse,
-  updatedEntityFields,
   updateFile,
   withCatch,
   writeFile,
 } from "@/utils";
 
-import chapterLogger from "../constants/logger";
-import CHAPTER_MESSAGES from "../constants/messages";
+import { ChapterBase, chapterLogger } from "../constants/global";
 import chapterService from "../services";
 import { chapterLoggerData } from "../utils";
 
-type GetAllChapterReq = UserAuthorizedReq<
+type GetAllChaptersReq = UserAuthorizedReq<
   EmptyObject,
-  PaginateQuery,
+  PaginateQueryWithSort,
   { productId: string }
 >;
+
+type GetChapterReq = UserAuthorizedReq<{ chapter: ChapterBase }>;
 
 type CreateChapterReqBody = {
   episode: string;
@@ -45,10 +40,10 @@ type CreateChapterReq = UserAuthorizedReq<
 >;
 
 type UpdateChapterReq = UserAuthorizedReq<
-  Partial<CreateChapterReqBody> & { chapter: PermissionChapter }
+  Partial<CreateChapterReqBody> & { chapter: Chapter }
 >;
 class ChapterController {
-  async getAllChapters(req: GetAllChapterReq, res: Response) {
+  async getAllChapters(req: GetAllChaptersReq, res: Response) {
     const {
       query,
       params: { productId },
@@ -59,10 +54,7 @@ class ChapterController {
     successfulResponse({ res, data: { chapters, count } });
   }
 
-  getChapter(
-    req: UserAuthorizedReq<{ chapter: PermissionChapter }>,
-    res: Response
-  ) {
+  getChapter(req: GetChapterReq, res: Response) {
     const { chapter } = req.body;
 
     successfulResponse({ res, data: { chapter } });
@@ -112,14 +104,16 @@ class ChapterController {
     }
 
     chapterLogger.logMessage("Chapter created.", {
-      metaData: { chapter: chapterLoggerData(chapter) },
+      metaData: chapterLoggerData(chapter),
     });
 
     const { create: createMessage } = SHARED_MESSAGES.crud;
 
-    const message = createMessage(CHAPTER_MESSAGES.crud(chapter));
-
-    successfulResponse({ res, message, data: { id: chapter.id } });
+    successfulResponse({
+      res,
+      message: createMessage("فصل"),
+      data: { id: chapter.id },
+    });
   }
 
   async updateChapter(req: UpdateChapterReq, res: Response) {
@@ -170,14 +164,19 @@ class ChapterController {
     }
 
     chapterLogger.logMessage("Chapter updated.", {
-      metaData: updatedEntityFields(chapter, updatedChapter),
+      metaData: {
+        old: chapterLoggerData(chapter),
+        new: chapterLoggerData(updatedChapter),
+      },
     });
 
     const { update: updateMessage } = SHARED_MESSAGES.crud;
 
-    const message = updateMessage(CHAPTER_MESSAGES.crud(updatedChapter));
-
-    successfulResponse({ res, message, data: { id: updatedChapter.id } });
+    successfulResponse({
+      res,
+      message: updateMessage("فصل"),
+      data: { id: updatedChapter.id },
+    });
   }
 }
 

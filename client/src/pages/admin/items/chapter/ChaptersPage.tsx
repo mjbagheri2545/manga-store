@@ -2,13 +2,15 @@ import { PageHeader, Section } from "@/components/ui/layout";
 import { Button } from "@/components/utility";
 import PATH from "@/constants/path";
 import ChaptersTable from "@/features/chapter/components/crud/ChaptersTable";
+import useProductId from "@/hooks/features/useProductId";
 
-import useChapterPageParams from "../../../../features/chapter/hooks/useChapterPageParams";
+import ImportantText from "../../components/ImportantText";
 
 function ChaptersPage() {
-  const { productId } = useChapterPageParams();
+  const productId = useProductId();
   return (
     <>
+      <ImportantText />
       <PageHeader title="فصل ها">
         <Button
           isLinkComponent

@@ -6,25 +6,30 @@
 import { Router } from "express";
 
 import multer from "multer";
-import { User } from "@prisma/client";
 
 import SHARED_MESSAGES from "@/constants/messages";
 import {
-  allResourcePermission,
   deleteEntity,
   fileSizeChecker,
+  hasGeneralPermission,
+  hasSpecificPermission,
   idAuthorization,
   jwtAuthorization,
-  specificResourcePermission,
 } from "@/middlewares";
 import { getAllEntities } from "@/middlewares/crud.middleware";
 import { imageAuthorization } from "@/middlewares/features/user_product.middleware";
 import sharedUserService from "@/services/user.service";
+import { PermissionUser } from "@/types";
 import { getFilePathFromDbFilePath, removeFile } from "@/utils";
 import { userLoggerData } from "@/utils/features/auth_user.util";
 import { slugValidation } from "@/validators";
 
-import userLogger from "../constants/logger";
+import {
+  PERMISSION_USER_SELECT,
+  USER_BASE_SELECT,
+  UserBase,
+  userLogger,
+} from "../constants/global";
 import USER_MESSAGES from "../constants/messages";
 import USER_PATH from "../constants/path";
 import UserCrudController from "../controllers/crud.controller";
@@ -52,7 +57,7 @@ function createUserCrudRoutes(router: Router) {
   const { createUserValidation, updateUserValidation, editProfileValidation } =
     new UserCrudValidator();
 
-  const viewPermission = allResourcePermission((user) =>
+  const viewPermission = hasGeneralPermission((user) =>
     hasUserPermission(user, "view")
   );
 
@@ -72,12 +77,15 @@ function createUserCrudRoutes(router: Router) {
     slugValidation(),
     idAuthorization({
       entityKey: "user",
-      getByIdQuery: sharedUserService.getById,
+      getByIdQuery: (id: string) =>
+        sharedUserService.getById(id, {
+          select: USER_BASE_SELECT,
+        }),
     }),
     getUser
   );
 
-  const createPermission = allResourcePermission((user) =>
+  const createPermission = hasGeneralPermission((user) =>
     hasUserPermission(user, "create")
   );
 
@@ -92,7 +100,7 @@ function createUserCrudRoutes(router: Router) {
     createUser
   );
 
-  const updatePermission = specificResourcePermission<User>({
+  const updatePermission = hasSpecificPermission<PermissionUser>({
     entityKey: "userToUpdate",
     hasPermission: (user, userToUpdate) =>
       hasUserPermission(user, "update", userToUpdate),
@@ -124,14 +132,14 @@ function createUserCrudRoutes(router: Router) {
     editProfile
   );
 
-  function userDeleteMessage(user: User) {
+  function userDeleteMessage(user: UserBase) {
     const { delete: deleteMessage } = SHARED_MESSAGES.crud;
     userLogger.logMessage("User deleted.", { metaData: userLoggerData(user) });
 
     return deleteMessage(USER_MESSAGES.crud.action(user));
   }
 
-  async function deleteUserOperation(user: User) {
+  async function deleteUserOperation(user: PermissionUser) {
     if (user.avatarImage == null) return;
 
     return removeFile(
@@ -139,7 +147,7 @@ function createUserCrudRoutes(router: Router) {
     );
   }
 
-  const deleteUser = deleteEntity({
+  const deleteUser = deleteEntity<UserBase, PermissionUser>({
     delete: userService.delete,
     operation: deleteUserOperation,
     failedOperationMessage: "حذف کاربر",
@@ -156,7 +164,10 @@ function createUserCrudRoutes(router: Router) {
     idAuthorization({
       entityKey: "userToDelete",
       entityName: "کاربری",
-      getByIdQuery: sharedUserService.getById,
+      getByIdQuery: (id: string) =>
+        sharedUserService.getById(id, {
+          select: PERMISSION_USER_SELECT,
+        }),
     }),
     deleteUser
   );

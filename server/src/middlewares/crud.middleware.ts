@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import { Prisma, User } from "@prisma/client";
 
-import { EntityKey, Model, PaginateQuery, PermissionModels } from "@/types";
+import { EntityKey, PaginateQuery } from "@/types";
 import { failedOperation, forbidden, successfulResponse } from "@/utils";
 
 type DeleteEntityOptions<T, P> = {
@@ -10,14 +10,11 @@ type DeleteEntityOptions<T, P> = {
   hasPermission: (user: User, entity: P extends void ? T : P) => boolean;
   message: string | ((deletedEntity: T) => string);
   entityKey: EntityKey | (string & {});
-  operation?: (entity: T) => Promise<Error | void>;
+  operation?: (entity: P extends void ? T : P) => Promise<Error | void>;
   failedOperationMessage?: string;
 };
 
-export function deleteEntity<
-  T extends Model,
-  P extends PermissionModels | void = void,
->({
+export function deleteEntity<T extends { id: string }, P = void>({
   delete: deleteEntity,
   entityKey,
   hasPermission,
@@ -37,7 +34,6 @@ export function deleteEntity<
     }
 
     // operation is removing product Image for example
-
     const error = await operation?.(entity);
 
     if (error != null) {

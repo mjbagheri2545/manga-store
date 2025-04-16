@@ -1,10 +1,10 @@
 import PATH from "@/constants/path";
 
-import USER_CONFIG from "./config";
+import { VERIFICATION_CODE_LENGTH } from "./global";
 
 const USER_CONTENT = {
   account: {
-    identityVerificationNoticeText: `کد تایید ${USER_CONFIG.verificationCodeLength} کاراکتری که به ایمیل شما ارسال شد را وارد کنید.`,
+    identityVerificationNoticeText: `کد تایید ${VERIFICATION_CODE_LENGTH} کاراکتری که به ایمیل شما ارسال شد را وارد کنید.`,
     verification: {
       getEmail: {
         submitButtonText: "ارسال ایمیل تایید",

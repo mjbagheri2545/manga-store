@@ -23,6 +23,7 @@ export type CrudTableProps<
   columns: TableColumn<TEntity>[];
   api: Pick<ICrudApi<TGetAllEntitiesResponse>, "getAll" | "delete">;
   entityPath?: string;
+  isEditPageNeed?: boolean;
   // example usage of getEntitiesFromData:
   // (data: GetAllUsersResponse) => users
   getEntitiesFromData: (
@@ -59,6 +60,7 @@ function CrudTableChildren<
   columns,
   data,
   entityPath,
+  isEditPageNeed = true,
   ...restProps
 }: CrudTableChildrenProps<TEntity, TGetAllEntitiesResponse>) {
   const {
@@ -98,6 +100,7 @@ function CrudTableChildren<
               id={id}
               onSuccessfulDelete={handleOnSuccessfulDelete}
               entityPath={entityPath}
+              isEditPageNeed={isEditPageNeed}
             />
           );
         }}

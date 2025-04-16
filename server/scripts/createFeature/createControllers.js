@@ -4,7 +4,8 @@ async function createControllers(
   featureDirPath,
   name,
   capitalizedName,
-  upperCasedName
+  upperCasedName,
+  entityName
 ) {
   const controllersDirPath = `${featureDirPath}/controllers`;
   await fs.mkdir(controllersDirPath);
@@ -13,32 +14,36 @@ async function createControllers(
   const controllerData = `
     import { Response } from "express";
 
-    import { Prisma, ${capitalizedName} } from "@prisma/client";
+    import { Prisma } from "@prisma/client";
 
     import SHARED_MESSAGES from "@/constants/messages";
-    import { UserAuthorizedReq } from "@/types";
-
+    import { UserAuthorizedReq, PaginateQueryWithSort, EmptyObject } from "@/types";
     import {  successfulResponse } from "@/utils";
 
-    import ${name}Logger from "../constants/logger";
-    import ${upperCasedName}_MESSAGES from "../constants/messages";
+    import { ${name}Logger } from "../constants/global";
     import ${name}Service from "../services"
+    import { ${capitalizedName}Base } from "../types"
+    import { ${name}LoggerData } from "../utils"
 
-    type Get${capitalizedName}Req = UserAuthorizedReq<{${name}: ${capitalizedName}}>
+    type GetAll${capitalizedName}sReq = UserAuthorizedReq<
+    EmptyObject,
+    PaginateQueryWithSort
+    >;
+
+    type Get${capitalizedName}Req = UserAuthorizedReq<{${name}: ${capitalizedName}Base}>
 
     type Create${capitalizedName}ReqBody = {}
     type Create${capitalizedName}Req = UserAuthorizedReq<Create${capitalizedName}ReqBody>
 
     type Update${capitalizedName}ReqBody = Partial<Create${capitalizedName}ReqBody>
-     & {${name}: ${capitalizedName}};
+     & {${name}: ${capitalizedName}Base };
     type Update$${capitalizedName}Req = UserAuthorizedReq<Update${capitalizedName}ReqBody>
 
     class ${capitalizedName}Controller {
-        async getAll${capitalizedName}s(req: UserAuthorizedReq, res: Response) {
+        async getAll${capitalizedName}s(req: GetAll${capitalizedName}sReq, res: Response) {
+        const [${name}s, count] = await ${name}Service.getAll(req.query)
 
-        const ${name}s = await ${name}Service.getAll()
-
-        successfulResponse({res, data: {${name}s }})
+        successfulResponse({res, data: {${name}s, count }})
         }
 
         get${capitalizedName}(req: Get${capitalizedName}Req, res: Response) {
@@ -48,17 +53,15 @@ async function createControllers(
         }
 
         async create${capitalizedName}(req: Create${capitalizedName}Req, res: Response) {
-
-
           const ${name} = await ${name}Service.create();
 
-          ${name}Logger.info("${capitalizedName} created.", ${name});
+          ${name}Logger.logMessage("${capitalizedName} created.", {
+            metaData: ${name}LoggerData(${name})
+          });
 
-          const { create: createMessage } = SHARED_MESSAGES.features.crud;
+          const { create: createMessage } = SHARED_MESSAGES.crud;
 
-          const message = createMessage(${upperCasedName}_MESSAGES.crud(${name}));
-
-          successfulResponse({ res, message });
+          successfulResponse({ res, message: createMessage("${entityName}"), data: {id: ${name}.id } });
         }
 
         async update${capitalizedName}(req: Update$${capitalizedName}Req, res: Response) {
@@ -70,16 +73,16 @@ async function createControllers(
 
           const updated${capitalizedName} = await ${name}Service.update(${name}.id, data);
 
-          ${name}Logger.info("${capitalizedName} created.", {
-            old${capitalizedName}: ${name},
-            updated${capitalizedName}
+          ${name}Logger.info("${capitalizedName} updated.", {
+            metaData: {
+            old: ${name}LoggerData(${name}),
+            new: ${name}LoggerData(updated${capitalizedName})
+            }
           });
 
-          const { update: updateMessage } = SHARED_MESSAGES.features.crud;
+          const { update: updateMessage } = SHARED_MESSAGES.crud;
 
-          const message = updateMessage(${upperCasedName}_MESSAGES.crud(updated${capitalizedName}));
-
-          successfulResponse({ res, message });
+          successfulResponse({ res, message: updateMessage("${entityName}"), data: {id: updated${capitalizedName}.id} });
         }
     }
 

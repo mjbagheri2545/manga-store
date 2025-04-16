@@ -3,18 +3,19 @@ import createBasePath from "./base.path";
 function createChapterPath() {
   const basePath = createBasePath();
 
-  function baseChapterBase(productId: string) {
+  function baseAdminChapterPath(productId: string) {
     return `${basePath.admin}${basePath.product}/${productId}${basePath.chapter}`;
   }
 
   return {
     admin: {
-      index: baseChapterBase,
-      create: (productId: string) => `${baseChapterBase(productId)}/create`,
+      index: baseAdminChapterPath,
+      create: (productId: string) =>
+        `${baseAdminChapterPath(productId)}/create`,
       edit: (productId: string, id: string) =>
-        `${baseChapterBase(productId)}/edit/${id}`,
+        `${baseAdminChapterPath(productId)}/edit/${id}`,
       info: (productId: string, id: string) =>
-        `${baseChapterBase(productId)}/${id}`,
+        `${baseAdminChapterPath(productId)}/${id}`,
     },
     api: (productId: string) =>
       `${basePath.product}/${productId}${basePath.chapter}`,

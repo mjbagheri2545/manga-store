@@ -1,11 +1,10 @@
 import { PageHeader, PageHeaderProps } from "@/components/ui/layout";
 import LinkWithArrow from "@/components/ui/LinkWithArrow";
 import PATH from "@/constants/path";
-
-import useChapterPageParams from "../../../../features/chapter/hooks/useChapterPageParams";
+import useProductId from "@/hooks/features/useProductId";
 
 function ChapterPageHeader({ title }: PageHeaderProps) {
-  const { productId } = useChapterPageParams();
+  const productId = useProductId();
   return (
     <PageHeader title={title}>
       <LinkWithArrow to={PATH.chapter.admin.index(productId)}>

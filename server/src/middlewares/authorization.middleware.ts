@@ -7,7 +7,7 @@ import { ENTITY_NAMES } from "@/constants/global/general.global";
 import { errorLogger } from "@/constants/loggers";
 import SHARED_MESSAGES from "@/constants/messages";
 import sharedUserService from "@/services/user.service";
-import { EntityKey, Model } from "@/types";
+import { EntityKey } from "@/types";
 import {
   badRequest,
   getError,
@@ -30,7 +30,7 @@ export async function jwtAuthorization(
 
   try {
     const { data: userId } = await verifyJwtToken<{ data: string }>(token);
-    const user = await sharedUserService.getById(userId);
+    const user = await sharedUserService.getById(userId, {});
 
     if (user == null) {
       return unauthorized(res);
@@ -44,7 +44,7 @@ export async function jwtAuthorization(
   }
 }
 
-type GetByIdOptions<T> = {
+type IdAuthorizationOptions<T> = {
   getByIdQuery: (id: string) => PrismaPromise<T | null>;
 } & ({ entityKey: string; entityName: string } | { entityKey: EntityKey });
 
@@ -52,10 +52,10 @@ function getEntityName(name: string) {
   return name === "دسته بندی" ? name + " ای" : name + "ی";
 }
 
-export function idAuthorization<T extends Model>({
+export function idAuthorization<T>({
   getByIdQuery,
   ...restOptions
-}: GetByIdOptions<T>) {
+}: IdAuthorizationOptions<T>) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 

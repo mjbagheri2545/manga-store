@@ -22,6 +22,10 @@ const PRODUCT_LIST_SORT_ITEMS = [
     title: "بیشترین امتیاز",
     value: "high-rated",
   },
+  {
+    title: "بیشترین دیدگاه",
+    value: "most-comments-count",
+  },
 ];
 
 function ProductsFilter() {

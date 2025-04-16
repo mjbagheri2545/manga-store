@@ -4,8 +4,8 @@ import { PrismaClient } from "@prisma/client";
 import createSeed from "../createSeed";
 import { randomIndex, randomInt } from "../utils";
 
-const MIN_COMMENTS_COUNT = 0;
-const MAX_COMMENTS_COUNT = 25;
+const MIN_PRODUCT_COMMENTS_COUNT = 0;
+const MAX_PRODUCT_COMMENTS_COUNT = 15;
 
 async function createProductCommentsSeedFunction(prisma: PrismaClient) {
   const [products, users] = await Promise.all([
@@ -16,8 +16,8 @@ async function createProductCommentsSeedFunction(prisma: PrismaClient) {
   console.log("Creating Product Comments ...");
   for (const { id: productId } of products) {
     const commentsCount = randomInt({
-      min: MIN_COMMENTS_COUNT,
-      max: MAX_COMMENTS_COUNT,
+      min: MIN_PRODUCT_COMMENTS_COUNT,
+      max: MAX_PRODUCT_COMMENTS_COUNT,
     });
     let localUsers = [...users];
 

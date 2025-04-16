@@ -1,7 +1,6 @@
 import React from "react";
 
 import { InputField } from "@/components/form";
-import { User } from "@/types";
 
 export function isInputField(
   element: React.ReactNode
@@ -13,8 +12,8 @@ export function labelToPlaceholder(label?: string) {
   return label != null ? `${label} را وارد کنید` : "";
 }
 
-export function getAvatarChildren(user: User) {
-  const names = user.fullName.split(" ");
+export function getAvatarChildren(fullName: string) {
+  const names = fullName.split(" ");
 
   if (names.length === 1) {
     return names[0][0].toUpperCase();

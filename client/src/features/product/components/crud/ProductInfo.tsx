@@ -31,20 +31,27 @@ function ProductInfoChildren({ product }: GetProductByIdResponse) {
   return (
     <>
       <EntityInfoList info={PRODUCT_INFO_ITEMS} entity={product} />
-      <div className="flex gap-6 mt-6">
+      <div className="flex gap-x-6 gap-y-4 mt-6 flex-wrap w-full">
         <Button
           isLinkComponent
           to={PATH.admin.update("product", product.id)}
-          className="flex-1"
+          className="lg:flex-1 max-lg:w-full"
         >
           به‌روزرسانی
         </Button>
         <Button
           isLinkComponent
           to={PATH.chapter.admin.index(product.id)}
-          className="flex-1"
+          className="md:flex-1 max-md:w-full"
         >
           فصل های این محصول
+        </Button>
+        <Button
+          isLinkComponent
+          to={PATH.productComment.admin.index(product.id)}
+          className="md:flex-1 max-md:w-full"
+        >
+          دیدگاه های این محصول
         </Button>
       </div>
     </>

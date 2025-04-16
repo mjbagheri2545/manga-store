@@ -32,7 +32,6 @@ export type Product = {
   oneChapterPriceInToman: number;
   productImage: string;
   createdAt: string;
-  views: number;
 };
 
 export type Chapter = {
@@ -40,4 +39,11 @@ export type Chapter = {
   episode: number;
   chapterFile: string;
   createdAt: string;
+};
+
+export type ProductComment = {
+  id: string;
+  message: string;
+  createdAt: string;
+  updatedAt: string;
 };

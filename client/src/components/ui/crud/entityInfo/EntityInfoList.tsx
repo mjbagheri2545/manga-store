@@ -28,7 +28,7 @@ export function EntityInfoList<TEntity extends Entity>({
 }: EntityInfoListProps<TEntity>) {
   return (
     <>
-      <div className="grid gap-5 grid-cols-[repeat(auto-fill,minmax(250px,1fr))]">
+      <div className="grid gap-5 grid-cols-1]">
         <RenderItems
           items={Object.entries<KeyInfo<TEntity>>(info)}
           renderItem={([key, keyInfo]) => {

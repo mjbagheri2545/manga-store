@@ -1,27 +1,31 @@
 import { Router } from "express";
 
 import multer from "multer";
-import { Product } from "@prisma/client";
 
 import SHARED_MESSAGES from "@/constants/messages";
 import {
-  allResourcePermission,
   deleteEntity,
   fileSizeChecker,
+  hasGeneralPermission,
+  hasSpecificPermission,
   idAuthorization,
   jwtAuthorization,
-  specificResourcePermission,
 } from "@/middlewares";
 import { imageAuthorization } from "@/middlewares/features/user_product.middleware";
+import { PermissionProduct } from "@/types";
 import { getFilePathFromDbFilePath, removeFile } from "@/utils";
 import { slugValidation } from "@/validators";
 
-import productLogger from "../constants/logger";
-import PRODUCT_MESSAGES from "../constants/messages";
+import {
+  PERMISSION_PRODUCT_SELECT,
+  PRODUCT_BASE_SELECT,
+  ProductBase,
+  productLogger,
+} from "../constants/global";
 import PRODUCT_PATH from "../constants/path";
 import ProductMutationController from "../controllers/productMutation.controller";
 import { hasProductPermission } from "../lib/permissions";
-import productService, { GetByIdOptions } from "../services";
+import productService, { GetProductByIdOptions } from "../services";
 import { productLoggerData } from "../utils";
 import ProductMutationValidator from "../validators/productMutation.validator";
 import createGetProductsRoutes from "./getProducts.routes";
@@ -48,7 +52,7 @@ function createProductRouter() {
     updateProductRatingValidation,
   } = new ProductMutationValidator();
 
-  const createPermission = allResourcePermission((user) =>
+  const createPermission = hasGeneralPermission((user) =>
     hasProductPermission(user, "create")
   );
 
@@ -63,13 +67,13 @@ function createProductRouter() {
     createProduct
   );
 
-  const updatePermission = specificResourcePermission<Product>({
+  const updatePermission = hasSpecificPermission<PermissionProduct>({
     entityKey: "product",
     hasPermission: (user, product) =>
       hasProductPermission(user, "update", product),
   });
 
-  const createGetProductById = (options?: GetByIdOptions) =>
+  const createGetProductById = (options?: GetProductByIdOptions) =>
     idAuthorization({
       getByIdQuery: (id) => productService.getById(id, options),
       entityKey: "product",
@@ -81,7 +85,12 @@ function createProductRouter() {
     fileSizeChecker(PRODUCT_IMAGE_SIZE_LIMIT, "MB"),
     updateProductValidation(),
     jwtAuthorization,
-    createGetProductById({ include: { tags: { select: { id: true } } } }),
+    createGetProductById({
+      select: {
+        ...PRODUCT_BASE_SELECT,
+        tags: { select: { id: true } },
+      },
+    }),
     updatePermission,
     imageAuthorization(),
     updateProduct
@@ -95,21 +104,21 @@ function createProductRouter() {
     updateProductRating
   );
 
-  function deleteProductMessage(product: Product) {
+  function deleteProductMessage(product: ProductBase) {
     const { delete: deleteMessage } = SHARED_MESSAGES.crud;
 
     productLogger.logMessage("Product deleted.", {
-      metaData: { product: productLoggerData(product) },
+      metaData: productLoggerData(product),
     });
 
-    return deleteMessage(PRODUCT_MESSAGES.crud(product));
+    return deleteMessage("محصول");
   }
 
-  async function deleteProductOperation(product: Product) {
+  async function deleteProductOperation(product: PermissionProduct) {
     return removeFile(getFilePathFromDbFilePath(product.productImage));
   }
 
-  const deleteProduct = deleteEntity({
+  const deleteProduct = deleteEntity<ProductBase, PermissionProduct>({
     delete: productService.delete,
     operation: deleteProductOperation,
     failedOperationMessage: "حذف محصول",
@@ -123,7 +132,7 @@ function createProductRouter() {
     "/:id",
     slugValidation(),
     jwtAuthorization,
-    createGetProductById(),
+    createGetProductById({ select: PERMISSION_PRODUCT_SELECT }),
     deleteProduct
   );
 

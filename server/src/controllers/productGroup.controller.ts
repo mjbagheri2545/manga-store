@@ -15,7 +15,6 @@ import {
   badRequest,
   CustomLogger,
   successfulResponse,
-  updatedEntityFields,
   upperFirst,
 } from "@/utils";
 
@@ -107,7 +106,10 @@ class ProductGroupModelController<T extends ProductGroupModel> {
     const updatedEntity = await this.service.update(entity.id, { name, slug });
 
     this.logger.logMessage(`${upperFirst(this.entityKey)} updated.`, {
-      metaData: updatedEntityFields(entity, updatedEntity),
+      metaData: {
+        old: entity,
+        new: updatedEntity,
+      },
     });
 
     const { update: updateMessage } = SHARED_MESSAGES.crud;

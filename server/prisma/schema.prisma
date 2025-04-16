@@ -27,14 +27,15 @@ model User {
   walletBalanceInToman Int       @default(0) @db.Integer
   bio                  String?   @db.VarChar(600)
 
-  Token              Token?
-  productRatings     ProductRating[]
-  translatedChapters Chapter[]
-  managedProducts    Product[]
-  productViews       ProductView[]
-  productComments           ProductComment[]
-  productCommentsLikes              ProductCommentLike[]
-  productCommentsDislikes            ProductCommentDislike[]
+  Token                   Token?
+  productRatings          ProductRating[]
+  translatedChapters      Chapter[]
+  managedProducts         Product[]
+  productViews            ProductView[]
+  writtenProductComments  ProductComment[]        @relation("ProductCommentAuthor")
+  receivedReplies         ProductComment[]        @relation("ProductCommentReplyTo")
+  productCommentsLikes    ProductCommentLike[]
+  productCommentsDislikes ProductCommentDislike[]
 }
 
 enum Role {
@@ -142,15 +143,23 @@ model ProductComment {
   id        String   @id @default(uuid()) @db.Char(36)
   message   String   @db.VarChar(500)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 
-  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author   User   @relation("ProductCommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
   authorId String @db.Char(36)
 
-  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String    @db.Char(36)
-  likes     ProductCommentLike[]
-  dislikes   ProductCommentDislike[]
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String  @db.Char(36)
+
+  parent   ProductComment?  @relation("ParentChildRelation", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId String?
+  replies  ProductComment[] @relation("ParentChildRelation")
+
+  replyTo   User?   @relation("ProductCommentReplyTo", fields: [replyToId], references: [id], onDelete: Cascade)
+  replyToId String? @db.Char(36)
+
+  likes    ProductCommentLike[]
+  dislikes ProductCommentDislike[]
 }
 
 model ProductCommentLike {
@@ -158,7 +167,7 @@ model ProductCommentLike {
   likedById String @db.Char(36)
 
   comment   ProductComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  commentId String  @db.Char(36)
+  commentId String         @db.Char(36)
 
   @@id([likedById, commentId])
 }
@@ -168,7 +177,7 @@ model ProductCommentDislike {
   dislikedById String @db.Char(36)
 
   comment   ProductComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  commentId String  @db.Char(36)
+  commentId String         @db.Char(36)
 
   @@id([dislikedById, commentId])
 }

@@ -2,13 +2,12 @@ import { useState } from "react";
 
 import { ApiComponent, ApiErrorMessageList } from "@/components/ui/api";
 import { Section, SectionTitle } from "@/components/ui/layout";
-import LinkWithArrow from "@/components/ui/LinkWithArrow";
 import LoadMoreButton from "@/components/ui/LoadMoreButton";
+import SingleProductLink from "@/components/ui/product/SingleProductLink";
 import SortFilter, { SortFilterItem } from "@/components/ui/SortFilter";
 import { SpinnerContainer } from "@/components/ui/SpinnerContainer";
 import { Alert } from "@/components/utility";
 import { DEFAULT_SORT_ITEMS } from "@/constants/global/general.global";
-import PATH from "@/constants/path";
 import {
   GetAllTranslatorBase,
   GetAllTranslatorsResponse,
@@ -27,14 +26,14 @@ const TRANSLATORS_LIST_SORT_ITEMS: SortFilterItem[] = [
 ];
 
 function TranslatorsListSection() {
-  const { product } = useProduct();
+  const product = useProduct();
   const sort = useQuerySort();
 
   return (
     <ApiComponent
       apiMethod={() =>
         productApi.getRelatedTranslators({
-          slug: product.slug,
+          productId: product.id,
           query: {
             skip: 0,
             take: TRANSLATORS_QUERY_TAKE,
@@ -56,22 +55,23 @@ function TranslatorsListSectionChildren(props: GetAllTranslatorsResponse) {
     props.translators
   );
   const sort = useQuerySort();
-  const { product } = useProduct();
+  const product = useProduct();
 
-  const { error, status, hasMore, loadMoreEntities } = useInfiniteApi({
-    getAllMethod: (paginateQuery) =>
-      productApi.getRelatedTranslators({
-        slug: product.slug,
-        query: {
-          ...paginateQuery,
-          sort,
-        },
-      }),
-    initialTotalCount: props.count,
-    entitiesLength: translators.length,
-    onSuccess: (data) =>
-      setTranslators((current) => [...current, ...data.translators]),
-  });
+  const { error, status, hasMore, totalEntitiesCount, loadMoreEntities } =
+    useInfiniteApi({
+      getAllMethod: (paginateQuery) =>
+        productApi.getRelatedTranslators({
+          productId: product.id,
+          query: {
+            ...paginateQuery,
+            sort,
+          },
+        }),
+      initialTotalCount: props.count,
+      entitiesLength: translators.length,
+      onSuccess: (data) =>
+        setTranslators((current) => [...current, ...data.translators]),
+    });
 
   if (props.count === 0) {
     return (
@@ -85,10 +85,8 @@ function TranslatorsListSectionChildren(props: GetAllTranslatorsResponse) {
     <>
       <SortFilter items={TRANSLATORS_LIST_SORT_ITEMS} />
       <Section>
-        <SectionTitle title="همه مترجم ها">
-          <LinkWithArrow to={PATH.product.singleProduct(product.slug)}>
-            {product.name}
-          </LinkWithArrow>
+        <SectionTitle title={`${totalEntitiesCount} مترجم`}>
+          <SingleProductLink />
         </SectionTitle>
         <TranslatorsList translators={translators} />
         {status === "error" && (

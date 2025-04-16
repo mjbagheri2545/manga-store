@@ -1,10 +1,11 @@
 import { Request } from "express";
 
-import { Prisma, Product } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 
 import { paginate, parseQuerySort, pick } from "@/utils";
 
+import { ProductBase } from "../constants/global";
 import { ProductQuery } from "../types";
 
 export function pickProductCreateData(req: Request) {
@@ -29,7 +30,7 @@ export function getTagsData(tagsId: string[], productTags: { id: string }[]) {
   return isSameTags ? {} : { tags: { set: tags } };
 }
 
-export function productLoggerData(product: Product) {
+export function productLoggerData(product: ProductBase) {
   return pick(product, ["name", "id", "managerId"]);
 }
 
@@ -41,6 +42,8 @@ function parseProductQuerySort(
       return { views: { _count: "desc" } };
     case "high-chapters-count":
       return { chapters: { _count: "desc" } };
+    case "most-comments-count":
+      return { comments: { _count: "desc" } };
     default:
       return parseQuerySort(sort);
   }

@@ -63,7 +63,7 @@ class AuthController {
     await withCatch(sendEmailPromise);
 
     authLogger.logMessage("Registration", {
-      metaData: { userData: pickUserData(user) },
+      metaData: pickUserData(user),
     });
 
     successfulResponse({

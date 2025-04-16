@@ -3,6 +3,7 @@ import {
   Chapter,
   Prisma,
   Product,
+  ProductComment,
   ProductStatus,
   Tag,
   User,
@@ -16,17 +17,34 @@ export type EntityKey =
   | ProductGroupModelEntityKey
   | "user"
   | "product"
-  | "chapter";
+  | "chapter"
+  | "productComment";
 
 export type ProductGroupModel = Tag | Category | ProductStatus;
 
-export type PermissionChapter = Chapter & {
-  product: { managerId: string | null };
+export type PermissionChapter = Pick<
+  Chapter,
+  "chapterFile" | "translatorId"
+> & {
+  product: Pick<Product, "managerId">;
 };
 
-export type Model = ProductGroupModel | Product | User | Chapter;
+export type PermissionProductComment = Pick<
+  ProductComment,
+  "id" | "authorId"
+> & {
+  product: Pick<Product, "managerId">;
+};
 
-export type PermissionModels = Exclude<Model, Chapter> | PermissionChapter;
+export type PermissionUser = Pick<User, "id" | "avatarImage">;
+export type PermissionProduct = Pick<Product, "managerId" | "productImage">;
+
+export type PermissionModels =
+  | ProductGroupModel
+  | PermissionProduct
+  | PermissionChapter
+  | PermissionProductComment
+  | PermissionUser;
 
 type ProductGroupModelCreateInput = {
   name: string;

@@ -11,7 +11,7 @@ import ProductFormFields from "./productFormField";
 function CreateProductForm() {
   return (
     <ApiComponent apiMethod={productApi.getManagers}>
-      {(result) => <CreateProductFormChildren data={result.data} />}
+      {(result) => <CreateProductFormChildren data={result} />}
     </ApiComponent>
   );
 }

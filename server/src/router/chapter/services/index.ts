@@ -2,7 +2,9 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { PaginateQueryWithSort } from "@/types";
-import { parsePaginateQueryWithSort } from "@/utils";
+
+import { CHAPTER_BASE_SELECT } from "../constants/global";
+import { parseChapterQuery } from "../utils";
 
 type CreateChapterOptions = {
   data: Pick<Prisma.ChapterCreateInput, "episode" | "chapterFile">;
@@ -10,24 +12,34 @@ type CreateChapterOptions = {
   translatorId: string;
 };
 
+export type GetChapterByIdOptions = Omit<Prisma.ChapterFindUniqueArgs, "where">;
+
 class ChapterService {
   getAll(productId: string, query: PaginateQueryWithSort) {
     return Promise.all([
       prisma.chapter.findMany({
         where: { productId },
-        ...parsePaginateQueryWithSort(query),
+        ...parseChapterQuery(query),
+        select: {
+          id: true,
+          chapterFile: true,
+          createdAt: true,
+          episode: true,
+        },
       }),
       prisma.chapter.count({ where: { productId } }),
     ]);
   }
 
-  getById(id: string) {
+  getById(
+    id: string,
+    options: GetChapterByIdOptions = {
+      select: { id: true },
+    }
+  ) {
     return prisma.chapter.findUnique({
       where: { id },
-      include: {
-        product: { select: { managerId: true } },
-        translator: { select: { id: true } },
-      },
+      ...options,
     });
   }
 
@@ -38,15 +50,23 @@ class ChapterService {
         product: { connect: { id: productId } },
         translator: { connect: { id: translatorId } },
       },
+      select: { id: true },
     });
   }
 
   update(id: string, data: Prisma.ChapterUpdateInput = {}) {
-    return prisma.chapter.update({ where: { id }, data });
+    return prisma.chapter.update({
+      where: { id },
+      data,
+      select: CHAPTER_BASE_SELECT,
+    });
   }
 
   delete(id: string) {
-    return prisma.chapter.delete({ where: { id } });
+    return prisma.chapter.delete({
+      where: { id },
+      select: CHAPTER_BASE_SELECT,
+    });
   }
 }
 

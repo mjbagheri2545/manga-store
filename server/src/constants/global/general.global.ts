@@ -7,6 +7,7 @@ export const ENTITY_NAMES = {
   productStatus: "وضعیت محصول",
   tag: "ژانر",
   user: "کاربر",
+  productComment: "دیدگاه",
 } as const satisfies Record<EntityKey, string>;
 
 export const TIME = {

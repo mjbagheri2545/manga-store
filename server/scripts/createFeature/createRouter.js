@@ -4,7 +4,8 @@ async function createRouter(
   featureDirPath,
   name,
   capitalizedName,
-  upperCasedName
+  upperCasedName,
+  entityName
 ) {
   const routerDirPath = `${featureDirPath}/router`;
   await fs.mkdir(routerDirPath);
@@ -13,24 +14,26 @@ async function createRouter(
   const routerData = `
     import { Router } from "express";
 
-    import { ${capitalizedName} } from "@prisma/client";
-
+    import { Permission${capitalizedName} } from "@/types"
     import SHARED_MESSAGES from "@/constants/messages";
     import {
-      allResourcePermission,
+      deleteEntity,
+      hasGeneralPermission,
+      hasSpecificPermission,
       idAuthorization,
       jwtAuthorization,
-      specificResourcePermission,
     } from "@/middlewares";
-    import { deleteEntity } from "@/middlewares/features/crud.middleware";
     import { slugValidation } from "@/validators";
 
-    import ${name}Logger from "../constants/logger";
-    import ${upperCasedName}_MESSAGES from "../constants/messages";
+    import { ${name}Logger, ${upperCasedName}_BASE_SELECT, PERMISSION_${upperCasedName}_SELECT } from "../constants/global";
     import ${capitalizedName}Controller from "../controllers";
     import { has${capitalizedName}Permission } from "../lib/permissions";
-    import ${name}Service from "../services";
+    import ${name}Service, {
+      Get${capitalizedName}ByIdOptions,
+    } from "../services";
     import ${capitalizedName}Validator from "../validators";
+    import { ${name}LoggerData } from "../utils";
+    import { ${capitalizedName}Base } from "../types";
 
     function create${capitalizedName}Router() {
       const router = Router();
@@ -46,20 +49,20 @@ async function createRouter(
         getAll${capitalizedName}s
       );
 
-      const get${capitalizedName}ById = idAuthorization({
+      const createGet${capitalizedName}ById =(options?: Get${capitalizedName}ByIdOptions) => idAuthorization({
         entityKey: "${name}",
-        getByIdQuery: ${name}Service.getById,
+        getByIdQuery: (id) => ${name}Service.getById(id, options),
       });
 
       router.get(
         "/:id",
         slugValidation(),
         jwtAuthorization,
-        get${capitalizedName}ById,
+        createGet${capitalizedName}ById({ select: ${upperCasedName}_BASE_SELECT }),
         get${capitalizedName}
       );
 
-        const createPermission = allResourcePermission((user) =>
+        const createPermission = hasGeneralPermission((user) =>
           has${capitalizedName}Permission(user, "create")
         );
 
@@ -71,7 +74,7 @@ async function createRouter(
         create${capitalizedName}
       );
 
-      const updatePermission = specificResourcePermission<${capitalizedName}>({
+      const updatePermission = hasSpecificPermission<Permission${capitalizedName}>({
         entityKey: "${name}",
         hasPermission: (user, ${name}) =>
           has${capitalizedName}Permission(user, "update", ${name}),
@@ -81,19 +84,19 @@ async function createRouter(
         "/:id",
         update${capitalizedName}Validation(),
         jwtAuthorization,
-        get${capitalizedName}ById,
+        createGet${capitalizedName}ById({select: ${upperCasedName}_BASE_SELECT }),
         updatePermission,
         update${capitalizedName}
       );
 
-      function delete${capitalizedName}Message(${name}: ${capitalizedName}) {
-        const { delete: deleteMessage } = SHARED_MESSAGES.features.crud;
-        ${name}Logger.info("${capitalizedName} deleted.", ${name});
+      function delete${capitalizedName}Message(${name}: ${capitalizedName}Base) {
+        const { delete: deleteMessage } = SHARED_MESSAGES.crud;
+        ${name}Logger.logMessage("${capitalizedName} deleted.", {metaData: ${name}LoggerData(${name}) });
 
-        return deleteMessage(${upperCasedName}_MESSAGES.crud(${name}));
+        return deleteMessage("${entityName}");
       }
 
-      const delete${capitalizedName} = deleteEntity({
+      const delete${capitalizedName} = deleteEntity<${capitalizedName}Base, Permission${capitalizedName}>({
         delete: ${name}Service.delete,
         entityKey: "${name}",
         hasPermission: (user, ${name}) =>
@@ -105,7 +108,7 @@ async function createRouter(
         "/:id",
         slugValidation(),
         jwtAuthorization,
-        get${capitalizedName}ById,
+        createGet${capitalizedName}ById({ select: PERMISSION_${upperCasedName}_SELECT }),
         delete${capitalizedName}
       );
 

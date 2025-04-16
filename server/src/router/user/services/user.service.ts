@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { PaginateQuery } from "@/types";
 import { paginate } from "@/utils";
 
+import { USER_BASE_SELECT } from "../constants/global";
+
 class UserService {
   getAll(query: PaginateQuery) {
     return Promise.all([
@@ -50,6 +52,7 @@ class UserService {
   delete(id: string) {
     return prisma.user.delete({
       where: { id },
+      select: USER_BASE_SELECT,
     });
   }
 
@@ -57,6 +60,7 @@ class UserService {
     return prisma.user.update({
       where: { id },
       data: { emailRemainingTime: null },
+      select: { id: true },
     });
   }
 }

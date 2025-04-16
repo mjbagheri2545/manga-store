@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
 import RenderItems from "@/components/ui/RenderItems";
 import { List, ListItem, ListItemLink } from "@/components/utility/list";
@@ -21,9 +21,9 @@ function ProductLinks() {
       >
         محصولات
         {isOpened ? (
-          <ChevronUp className="size-5 mt-1" />
+          <ChevronUpIcon className="size-5 mt-1" />
         ) : (
-          <ChevronDown className="size-5 mt-1" />
+          <ChevronDownIcon className="size-5 mt-1" />
         )}
       </button>
       {isOpened && (

@@ -1,6 +1,6 @@
 import { Response } from "express";
 
-import { Prisma, Product } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 import SHARED_MESSAGES from "@/constants/messages";
 import { UserAuthorizedReq } from "@/types";
@@ -11,13 +11,12 @@ import {
   newModelConnectionWithId,
   removeFile,
   successfulResponse,
-  updatedEntityFields,
   updateFile,
   withCatch,
   writeFile,
 } from "@/utils";
 
-import productLogger from "../constants/logger";
+import { ProductBase, productLogger } from "../constants/global";
 import PRODUCT_MESSAGES from "../constants/messages";
 import productService from "../services";
 import {
@@ -41,14 +40,12 @@ type CreateProductReqBody = Pick<
 
 type CreateProductReq = UserAuthorizedReq<CreateProductReqBody>;
 
-type ProductResponse = Product & {
-  tags: {
-    id: string;
-  }[];
-};
-
 type UpdateProductReqBody = Partial<CreateProductReqBody> & {
-  product: ProductResponse;
+  product: ProductBase & {
+    tags: {
+      id: string;
+    }[];
+  };
 };
 
 type UpdateProductReq = UserAuthorizedReq<UpdateProductReqBody>;
@@ -112,14 +109,16 @@ class ProductMutationController {
     }
 
     productLogger.logMessage("Product created.", {
-      metaData: { product: productLoggerData(product) },
+      metaData: productLoggerData(product),
     });
 
     const { create: createMessage } = SHARED_MESSAGES.crud;
 
-    const message = createMessage(PRODUCT_MESSAGES.crud(product));
-
-    successfulResponse({ res, message, data: { id: product.id } });
+    successfulResponse({
+      res,
+      message: createMessage("محصول"),
+      data: { id: product.id },
+    });
   }
 
   async updateProduct(req: UpdateProductReq, res: Response) {
@@ -178,14 +177,19 @@ class ProductMutationController {
     }
 
     productLogger.logMessage("Product updated.", {
-      metaData: updatedEntityFields(product, updatedProduct),
+      metaData: {
+        old: productLoggerData(product),
+        new: productLoggerData(updatedProduct),
+      },
     });
 
     const { update: updateMessage } = SHARED_MESSAGES.crud;
 
-    const message = updateMessage(PRODUCT_MESSAGES.crud(updatedProduct));
-
-    successfulResponse({ res, message, data: { id: updatedProduct.id } });
+    successfulResponse({
+      res,
+      message: updateMessage("محصول"),
+      data: { id: updatedProduct.id },
+    });
   }
 
   async updateProductRating(req: UpdateRatingReq, res: Response) {
@@ -212,10 +216,11 @@ class ProductMutationController {
       myRating: viewerRating?.rating,
     };
 
-    productLogger.logMessage("Product rating updated.", {
+    productLogger.logMessage("Product rating added.", {
       metaData: {
         ratingNumber,
         newProductRating: newRating,
+        productId: product.id,
       },
     });
 

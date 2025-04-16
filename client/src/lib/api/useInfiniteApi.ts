@@ -49,6 +49,7 @@ export function useInfiniteApi<GetAllResponse>({
     setTotalEntitiesCount,
     loadMoreEntities,
     refetch,
+    execute,
     ...restState,
   };
 }

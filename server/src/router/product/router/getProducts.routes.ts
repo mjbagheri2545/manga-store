@@ -3,10 +3,12 @@ import { Router } from "express";
 import { idAuthorization, jwtAuthorization } from "@/middlewares";
 import { getAllEntities } from "@/middlewares/crud.middleware";
 import { slugValidation } from "@/validators";
+import { productIdValidation } from "@/validators/chapter_productComment.validator";
 
+import { PRODUCT_BASE_SELECT } from "../constants/global";
 import PRODUCT_PATH from "../constants/path";
 import GetProductController from "../controllers/getProduct.controller";
-import productService from "../services";
+import productService, { GetProductByIdOptions } from "../services";
 
 // we can't use router.use for this routes because these routes
 // does not have a same parent path to group these routes like below path
@@ -33,20 +35,20 @@ function createGetProductsRoutes(router: Router) {
 
   router.get("/", jwtAuthorization, getAllProducts);
 
-  const getProductById = idAuthorization({
-    getByIdQuery: (id) =>
-      productService.getById(id, {
-        include: {
-          tags: { select: { id: true } },
-          category: { select: { id: true } },
-          manager: { select: { id: true } },
-          status: { select: { id: true } },
-        },
-      }),
-    entityKey: "product",
-  });
+  const createGetProductById = (options?: GetProductByIdOptions) =>
+    idAuthorization({
+      getByIdQuery: (id) => productService.getById(id, options),
+      entityKey: "product",
+    });
 
-  router.get("/:id", jwtAuthorization, getProductById, getProduct);
+  router.get(
+    "/:id",
+    jwtAuthorization,
+    createGetProductById({
+      select: PRODUCT_BASE_SELECT,
+    }),
+    getProduct
+  );
 
   router.get(
     PRODUCT_PATH.getBySlug,
@@ -72,14 +74,17 @@ function createGetProductsRoutes(router: Router) {
   router.get(
     PRODUCT_PATH.getRelatedProducts,
     slugValidation(),
-    getProductById,
+    createGetProductById({
+      select: { categoryId: true, tags: { select: { id: true } } },
+    }),
     jwtAuthorization,
     getRelatedProducts
   );
 
   router.get(
     PRODUCT_PATH.getRelatedTranslators,
-    slugValidation("slug", "آدرس اینترنتی محصول"),
+    productIdValidation(),
+    createGetProductById(),
     jwtAuthorization,
     getRelatedTranslators
   );

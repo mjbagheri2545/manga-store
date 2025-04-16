@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 
 import { $Enums, Prisma, User } from "@prisma/client";
 
@@ -22,10 +22,12 @@ import {
   userLoggerData,
 } from "@/utils/features/auth_user.util";
 
-import userLogger from "../constants/logger";
+import { UserBase, userLogger } from "../constants/global";
 import USER_MESSAGES from "../constants/messages";
 import userService from "../services/user.service";
 import { pickUserCreateData, updateAvatarImage } from "../utils";
+
+type GetUserReq = Req<{ user: UserBase }>;
 
 type CreateUserReqBody = Pick<
   Prisma.UserCreateInput,
@@ -48,19 +50,19 @@ type EditProfileReq = UserAuthorizedReq<
   }>
 >;
 class UserCrudController {
-  getUser(req: UserAuthorizedReq, res: Response) {
+  getUser(req: GetUserReq, res: Response) {
     const { user } = req.body;
 
-    successfulResponse({ res, data: { user: pickUserData(user) } });
+    successfulResponse({ res, data: { user } });
   }
 
-  async getAllManagers(_req: Request, res: Response) {
+  async getAllManagers(_req: UserAuthorizedReq, res: Response) {
     const managers = await userService.getManagers();
 
     successfulResponse({ res, data: { managers } });
   }
 
-  async getAllTranslators(_req: Request, res: Response) {
+  async getAllTranslators(_req: UserAuthorizedReq, res: Response) {
     const translators = await userService.getTranslators();
 
     successfulResponse({ res, data: { translators } });
@@ -122,7 +124,7 @@ class UserCrudController {
     }
 
     userLogger.logMessage("User created.", {
-      metaData: { user: userLoggerData(user) },
+      metaData: userLoggerData(user),
     });
 
     const { create: createMessage } = SHARED_MESSAGES.crud;
@@ -198,8 +200,8 @@ class UserCrudController {
 
     userLogger.logMessage("User updated.", {
       metaData: {
-        oldUser: pickUserData(userToUpdate),
-        updatedUser: pickUserData(updatedUser),
+        old: pickUserData(userToUpdate),
+        new: pickUserData(updatedUser),
       },
     });
 
@@ -255,8 +257,8 @@ class UserCrudController {
 
     userLogger.logMessage("User profile edited.", {
       metaData: {
-        oldUser: pickUserData(user),
-        updatedUser: pickUserData(updatedUser),
+        old: pickUserData(user),
+        new: pickUserData(updatedUser),
       },
     });
 

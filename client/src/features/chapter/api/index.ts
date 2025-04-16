@@ -2,7 +2,7 @@ import PATH from "@/constants/path";
 import { HTTP } from "@/lib/http";
 import {
   Chapter,
-  PaginateQuery,
+  PaginateQueryWithSort,
   TGetAllResponse,
   WithOnUploadProgress,
 } from "@/types";
@@ -18,43 +18,41 @@ export type GetAllChaptersResponse = TGetAllResponse<{
   chapters: GetAllChapterBase[];
 }>;
 
-type CreateChapterOptions = WithOnUploadProgress & {
-  data: CreateChapterData;
-};
-
-type UpdateChapterOptions = WithOnUploadProgress & {
-  id: string;
-  data: Partial<CreateChapterData>;
-};
-
-type ChapterQuery = PaginateQuery & {
-  sort?: string;
-};
-
 type ChapterBaseOptions = {
   productId: string;
 };
+
+type GetAllChaptersOptions = ChapterBaseOptions & {
+  query?: PaginateQueryWithSort;
+};
+
+type CreateChapterOptions = ChapterBaseOptions &
+  WithOnUploadProgress & {
+    data: CreateChapterData;
+  };
+
+type UpdateChapterOptions = ChapterBaseOptions &
+  WithOnUploadProgress & {
+    id: string;
+    data: Partial<CreateChapterData>;
+  };
 
 export type GetTranslatorsResponse = {
   translators: { fullName: string; id: string }[];
 };
 
 class ChapterApi {
-  getAll({ query, productId }: { query?: ChapterQuery } & ChapterBaseOptions) {
+  getAll({ query, productId }: GetAllChaptersOptions) {
     return HTTP.get<GetAllChaptersResponse>(PATH.chapter.api(productId), {
       params: query,
     });
   }
 
-  getById({ id, productId }: { id: string } & ChapterBaseOptions) {
+  getById({ id, productId }: ChapterBaseOptions & { id: string }) {
     return HTTP.get<ChapterResponse>(`${PATH.chapter.api(productId)}/${id}`);
   }
 
-  create({
-    data,
-    productId,
-    onUploadProgress,
-  }: CreateChapterOptions & ChapterBaseOptions) {
+  create({ data, productId, onUploadProgress }: CreateChapterOptions) {
     return HTTP.post<{ id: string }>(PATH.chapter.api(productId), {
       data,
       onUploadProgress,
@@ -63,12 +61,7 @@ class ChapterApi {
     });
   }
 
-  update({
-    id,
-    data,
-    onUploadProgress,
-    productId,
-  }: UpdateChapterOptions & ChapterBaseOptions) {
+  update({ id, data, onUploadProgress, productId }: UpdateChapterOptions) {
     return HTTP.put<{ id: string }>(`${PATH.chapter.api(productId)}/${id}`, {
       data,
       onUploadProgress,
@@ -77,7 +70,7 @@ class ChapterApi {
     });
   }
 
-  delete({ id, productId }: { id: string } & ChapterBaseOptions) {
+  delete({ id, productId }: ChapterBaseOptions & { id: string }) {
     return HTTP.delete<{ id: string }>(`${PATH.chapter.api(productId)}/${id}`);
   }
 

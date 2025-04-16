@@ -21,8 +21,8 @@ function ProductRatingStars({
             <StarIcon
               onClick={() => handleOnRatingChange(index)}
               className={cn(
-                "stroke-slate-500/25 fill-slate-500/25 cursor-pointer transition duration-150 size-7",
-                ratingNumber >= index && "fill-warning stroke-warning"
+                "text-slate-500/25 fill-slate-500/25 cursor-pointer transition duration-150 size-7",
+                ratingNumber >= index && "fill-warning text-warning"
               )}
             />
           );

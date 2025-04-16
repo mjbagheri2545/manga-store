@@ -18,12 +18,14 @@ export type TableActionsProps = {
   onSuccessfulDelete: (id: string) => void;
   entityKey: EntityKey;
   entityPath?: string;
+  isEditPageNeed?: boolean;
 };
 
 export function TableActions({
   id,
   entityKey,
   entityPath,
+  isEditPageNeed = true,
   ...restProps
 }: TableActionsProps) {
   const [isOpened, setIsOpened] = useState(false);
@@ -43,19 +45,21 @@ export function TableActions({
           <IconWrapper Icon={ClipboardListIcon} />
         </Button>
       </Tooltip>
-      <Tooltip title="به‌روزرسانی">
-        <Button
-          variant="icon"
-          isLinkComponent
-          to={
-            entityPath != null
-              ? `${entityPath}/edit/${id}`
-              : PATH.admin.update(entityKey, id)
-          }
-        >
-          <IconWrapper Icon={PencilIcon} />
-        </Button>
-      </Tooltip>
+      {isEditPageNeed && (
+        <Tooltip title="به‌روزرسانی">
+          <Button
+            variant="icon"
+            isLinkComponent
+            to={
+              entityPath != null
+                ? `${entityPath}/edit/${id}`
+                : PATH.admin.update(entityKey, id)
+            }
+          >
+            <IconWrapper Icon={PencilIcon} />
+          </Button>
+        </Tooltip>
+      )}
       <Tooltip title="حذف">
         <Button
           variant="icon"

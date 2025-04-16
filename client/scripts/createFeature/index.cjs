@@ -31,7 +31,6 @@ async function createFeature() {
 
   const capitalizedName = name[0].toUpperCase() + name.slice(1);
   const upperCasedName = name.toUpperCase();
-  // path.resolve because project names may have space
   const featureDirPath = path.join(__dirname, `../../src/features/${name}`);
 
   // for easily overwrite existing feature
@@ -74,6 +73,8 @@ async function createFeature() {
       promisifiedExec(`npx prettier "${featureDirPath}" --write`),
     ]);
   } catch (error) {}
+
+  console.log(`Feature '${name}' created successfully!`);
 }
 
 createFeature();

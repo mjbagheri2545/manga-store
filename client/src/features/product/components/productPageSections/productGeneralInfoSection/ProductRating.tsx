@@ -14,7 +14,7 @@ import { cn } from "@/utils";
 import ProductRatingStars from "./ProductRatingStars";
 
 function ProductRating() {
-  const { product } = useProduct();
+  const product = useProduct();
   const [isOpened, setIsOpened] = useState(false);
   const [localRating, setLocalRating] = useState(product.rating);
 
@@ -23,7 +23,7 @@ function ProductRating() {
       <div className="flex items-center gap-2 px-1 w-full">
         <StarIcon
           className={cn(
-            "stroke-warning",
+            "text-warning",
             localRating.ratingsCount > 0 && "fill-warning"
           )}
         />
@@ -61,7 +61,7 @@ function ProductRatingModal({
   setIsOpened,
   initialRatingNumber,
 }: ProductRatingModalProps) {
-  const { product } = useProduct();
+  const product = useProduct();
   const [ratingNumber, setRatingNumber] = useState(
     initialRatingNumber != null ? initialRatingNumber - 1 : 0
   );

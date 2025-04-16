@@ -12,7 +12,7 @@ async function createUpdateForm(
     import { ${capitalizedName} } from "@/types";
 
     import ${name}Api from "../../api";
-    import { update${capitalizedName}Schema } from "../../schemas/crud.schema";
+    import { update${capitalizedName}Schema } from "../../schemas";
     import ${capitalizedName}FormFields from "./${capitalizedName}FormFields";
 
     type Update${capitalizedName}FormProps = {

@@ -4,10 +4,10 @@ import { ApiComponent } from "@/components/ui/api";
 import { CreateEntityForm } from "@/components/ui/form";
 import PATH from "@/constants/path";
 import { useProgress } from "@/contexts/ProgressContext";
+import useProductId from "@/hooks/features/useProductId";
 import { createOnUploadProgress } from "@/utils";
 
 import chapterApi, { GetTranslatorsResponse } from "../../api";
-import useChapterPageParams from "../../hooks/useChapterPageParams";
 import { createChapterSchema } from "../../schemas";
 import ChapterFormFields from "./ChapterFormFields";
 
@@ -23,7 +23,7 @@ export default CreateChapterForm;
 
 function CreateChapterFormChildren({ translators }: GetTranslatorsResponse) {
   const { setProgress } = useProgress();
-  const { productId } = useChapterPageParams();
+  const productId = useProductId();
   const navigate = useNavigate();
 
   return (

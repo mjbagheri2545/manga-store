@@ -84,7 +84,7 @@ export type ManagersResponse = {
 };
 
 type GetRelatedProductsOptions = {
-  slug: string;
+  productId: string;
   query?: PaginateQueryWithSort;
 };
 
@@ -156,9 +156,9 @@ class ProductApi extends CrudApi<
     );
   }
 
-  getRelatedTranslators({ slug, query }: GetRelatedProductsOptions) {
+  getRelatedTranslators({ productId, query }: GetRelatedProductsOptions) {
     return HTTP.get<GetAllTranslatorsResponse>(
-      PATH.product.getRelatedTranslators(slug),
+      PATH.product.getRelatedTranslators(productId),
       { params: query }
     );
   }

@@ -11,11 +11,12 @@ import { TEntityInfo } from "@/components/ui/crud";
 import TextWithIcon from "@/components/ui/TextWithIcon";
 import { Image } from "@/components/utility";
 import { User } from "@/types";
+import { NUMBER_FORMATTER } from "@/utils";
 
 const USER_INFO_ITEMS = {
   avatarImage: {
     renderItem: (avatarImage: string) => (
-      <div className="col-span-full flex mb-4">
+      <div className="flex mb-4">
         <Image
           className="mx-auto w-full max-w-sm max-md:max-w-xs"
           src={avatarImage}
@@ -37,8 +38,11 @@ const USER_INFO_ITEMS = {
     Icon: MailIcon,
   },
   walletBalanceInToman: {
-    keyName: "موجودی کیف پول",
-    Icon: WalletIcon,
+    renderItem: (walletBalanceInToman: number) => (
+      <TextWithIcon Icon={WalletIcon}>
+        موجودی کیف پول : {NUMBER_FORMATTER.format(walletBalanceInToman)} تومان
+      </TextWithIcon>
+    ),
   },
   createdAt: {
     renderItem: (createdAt: string) => (

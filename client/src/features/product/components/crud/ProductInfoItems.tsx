@@ -19,7 +19,7 @@ import { NUMBER_FORMATTER } from "@/utils";
 const PRODUCT_INFO_ITEMS = {
   productImage: {
     renderItem: (productImage: string) => (
-      <div className="col-span-full flex mb-4">
+      <div className="flex mb-4">
         <Image
           className="mx-auto w-full max-w-sm max-md:max-w-xs"
           src={productImage}
@@ -72,7 +72,7 @@ const PRODUCT_INFO_ITEMS = {
   },
   summary: {
     renderItem: (summary: string) => (
-      <TextWithIcon Icon={NotebookTextIcon} className="col-span-full">
+      <TextWithIcon Icon={NotebookTextIcon}>
         <p className="flex-1">خلاصه: {summary}</p>
       </TextWithIcon>
     ),

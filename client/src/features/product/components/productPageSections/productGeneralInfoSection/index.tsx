@@ -6,7 +6,7 @@ import ProductListData from "./ProductListData";
 import ProductSummaryAndRating from "./ProductSummaryAndRating";
 
 function ProductGeneralInfoSection() {
-  const { product } = useProduct();
+  const product = useProduct();
 
   return (
     <>

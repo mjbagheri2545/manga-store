@@ -4,13 +4,13 @@ async function createFormFields(crudComponentsDirPath, name, capitalizedName) {
   const formFieldsComponentPath = `${crudComponentsDirPath}/${capitalizedName}FormFields.tsx`;
   const formFieldsComponentData = `
     import {
-      FileInput,
       InputField,
       SelectField,
       TextareaField,
     } from "@/components/form";
     import { FormFieldsContainer } from "@/components/ui/form";
-    import RenderItems from "@/components/utility/RenderItems";
+    import RenderItems from "@/components/ui/RenderItems";
+    import { ${capitalizedName} } from "@/types";
 
     type ${capitalizedName}FormFieldsProps = {
       ${name}?: ${capitalizedName};

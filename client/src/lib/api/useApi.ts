@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from "react";
+import { toast } from "react-toastify";
 
 import { ApiMethod } from "@/types";
 import { toastApiResponseError } from "@/utils";
@@ -57,7 +58,11 @@ export function useExecuteApi<T, P = void>(
 
 export function useMutation<T, P = void>(
   apiMethod: ApiMethod<T, P>,
-  options?: UseBaseApiOptions<T>
+  {
+    isToastSuccessfulMessageNeed = true,
+    onSuccess,
+    ...restOptions
+  }: UseBaseApiOptions<T> & { isToastSuccessfulMessageNeed?: boolean } = {}
 ) {
   const {
     refetch: _,
@@ -65,7 +70,13 @@ export function useMutation<T, P = void>(
     ...state
   } = useBaseApi<T, P>(apiMethod, {
     onError: toastApiResponseError,
-    ...options,
+    ...restOptions,
+    onSuccess: (result) => {
+      onSuccess?.(result);
+      if (isToastSuccessfulMessageNeed) {
+        toast.success(result.message);
+      }
+    },
   });
 
   const mutate: UseApiCallback<T, P, SignalOptions & EventsOptions<T>> =

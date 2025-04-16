@@ -57,7 +57,7 @@ const PRODUCT_LIST_DATA = [
 ] as ListItemData[];
 
 function ProductListData() {
-  const { product } = useProduct();
+  const product = useProduct();
 
   return (
     <div className="w-full md:w-auto flex-none md:flex-1 flex flex-col mt-3 md:mt-0">

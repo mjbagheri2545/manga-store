@@ -1,6 +1,6 @@
 import React, { ComponentProps, useRef } from "react";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
 import { useClickOutside, useToggleState } from "@/hooks";
 import { cn } from "@/utils";
@@ -59,9 +59,9 @@ export function Dropdown({
       >
         {title}
         {isOpened ? (
-          <ChevronUp className="size-5 mt-1" />
+          <ChevronUpIcon className="size-5 mt-1" />
         ) : (
-          <ChevronDown className="size-5 mt-1" />
+          <ChevronDownIcon className="size-5 mt-1" />
         )}
       </div>
       <List

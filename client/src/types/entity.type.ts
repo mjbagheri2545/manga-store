@@ -1,4 +1,10 @@
-import { Chapter, Product, ProductGroup, User } from "./model.type";
+import {
+  Chapter,
+  Product,
+  ProductComment,
+  ProductGroup,
+  User,
+} from "./model.type";
 
 export type ProductGroupEntityKey = "tag" | "category" | "productStatus";
 
@@ -6,6 +12,11 @@ export type ProductGroupEntityKey = "tag" | "category" | "productStatus";
 // specify a key in an object in generic,
 // GetUserResponse: {user: User}
 // if we want to make Response generic we need EntityKey
-export type EntityKey = ProductGroupEntityKey | "user" | "product" | "chapter";
+export type EntityKey =
+  | ProductGroupEntityKey
+  | "user"
+  | "product"
+  | "chapter"
+  | "productComment";
 
-export type Entity = ProductGroup | User | Product | Chapter;
+export type Entity = ProductGroup | User | Product | Chapter | ProductComment;

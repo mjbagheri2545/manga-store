@@ -1,9 +1,11 @@
 import { Prisma, Product } from "@prisma/client";
 
+import { GET_ALL_PRODUCT_COMMENTS_SELECT } from "@/constants/global/features/product_productComment.global";
 import { prisma } from "@/lib/prisma";
 import { PaginateQueryWithSort, ProductGroupModel, StrictOmit } from "@/types";
 import { AutoBind, paginate, parseQuerySort } from "@/utils";
 
+import { PRODUCT_BASE_SELECT } from "../constants/global";
 import { ProductQuery } from "../types";
 import {
   MappedProduct,
@@ -26,9 +28,9 @@ type RateOptions = {
   ratingNumber: number;
 };
 
-export type GetByIdOptions = Omit<Prisma.ProductFindUniqueArgs, "where">;
+export type GetProductByIdOptions = Omit<Prisma.ProductFindUniqueArgs, "where">;
 
-type ProductSelectBase = Pick<
+type ProductSelect = Pick<
   Product,
   | "id"
   | "name"
@@ -44,6 +46,7 @@ type ProductSelectBase = Pick<
 };
 
 const TRANSLATOR_LIMIT = 10;
+const SINGLE_PRODUCT_ENTITY_TAKE = 4;
 class ProductService extends AutoBind {
   create({
     data,
@@ -62,6 +65,7 @@ class ProductService extends AutoBind {
         tags: { connect: tagsData },
         status: { connect: { id: statusId } },
       },
+      select: { id: true },
     });
   }
 
@@ -90,7 +94,7 @@ class ProductService extends AutoBind {
 
   private async getByRating(
     query: ProductQuery
-  ): Promise<[MappedProduct<ProductSelectBase>[], number]> {
+  ): Promise<[MappedProduct<ProductSelect>[], number]> {
     const parsedQuery = parseProductQuery(query);
 
     const items = await prisma.productRating.groupBy({
@@ -145,7 +149,10 @@ class ProductService extends AutoBind {
     );
   }
 
-  getById(id: string, options: GetByIdOptions = { select: { id: true } }) {
+  getById(
+    id: string,
+    options: GetProductByIdOptions = { select: { id: true } }
+  ) {
     return prisma.product.findUnique({
       where: { id },
       ...options,
@@ -168,8 +175,14 @@ class ProductService extends AutoBind {
                 episode: true,
                 id: true,
               },
-              take: 4,
+              take: SINGLE_PRODUCT_ENTITY_TAKE,
               orderBy: { createdAt: "desc" },
+            },
+            comments: {
+              where: { parentId: null },
+              select: GET_ALL_PRODUCT_COMMENTS_SELECT,
+              orderBy: { createdAt: "desc" },
+              take: SINGLE_PRODUCT_ENTITY_TAKE,
             },
             category: true,
             tags: true,
@@ -216,7 +229,7 @@ class ProductService extends AutoBind {
           },
         },
         skip: 0,
-        take: 4,
+        take: SINGLE_PRODUCT_ENTITY_TAKE,
       }),
     ]);
   }
@@ -356,6 +369,7 @@ class ProductService extends AutoBind {
     return prisma.product.update({
       where: { id },
       data,
+      select: PRODUCT_BASE_SELECT,
     });
   }
 
@@ -376,7 +390,10 @@ class ProductService extends AutoBind {
   }
 
   delete(id: string) {
-    return prisma.product.delete({ where: { id } });
+    return prisma.product.delete({
+      where: { id },
+      select: PRODUCT_BASE_SELECT,
+    });
   }
 }
 

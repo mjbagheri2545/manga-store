@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 
-import { Permissions, PermissionsAction } from "@/types";
+import { Permissions, PermissionsAction, PermissionUser } from "@/types";
 import { hasPermission } from "@/utils";
 
 // view false is mean for all users list in admin page not
@@ -11,26 +11,26 @@ const USER_PERMISSIONS = {
     view: false,
     create: false,
     update: (user, userToUpdate) => user.id === userToUpdate.id,
-    delete: false,
+    delete: (user, userToDelete) => user.id === userToDelete.id,
   },
   translator: {
     view: false,
     create: false,
     update: (user, userToUpdate) => user.id === userToUpdate.id,
-    delete: false,
+    delete: (user, userToDelete) => user.id === userToDelete.id,
   },
   user: {
     view: false,
     create: false,
     update: (user, userToUpdate) => user.id === userToUpdate.id,
-    delete: false,
+    delete: (user, userToDelete) => user.id === userToDelete.id,
   },
-} as const satisfies Permissions<User>;
+} as const satisfies Permissions<PermissionUser>;
 
 export function hasUserPermission(
   user: User,
   action: PermissionsAction,
-  data?: User
+  data?: PermissionUser
 ) {
   return hasPermission(user, USER_PERMISSIONS, action, data);
 }

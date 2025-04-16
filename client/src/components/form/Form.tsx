@@ -19,6 +19,7 @@ export type FormProps<T extends FieldValues> = PropsWithChildren &
     handleOnSubmit: (data: T) => Promise<void> | void;
     handleOnFailure?: (error: FieldErrors) => void;
     submitButton: React.JSX.Element | string;
+    onAfterSubmit?: (formMethods: UseFormReturn<T>) => void;
   };
 
 export function Form<T extends FieldValues>({
@@ -28,10 +29,12 @@ export function Form<T extends FieldValues>({
   children,
   containerProps,
   submitButton,
+  onAfterSubmit,
 }: FormProps<T>) {
   function handleOnSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     formMethods.handleSubmit(onSubmit, onFailure)(e);
+    onAfterSubmit?.(formMethods);
   }
 
   return (

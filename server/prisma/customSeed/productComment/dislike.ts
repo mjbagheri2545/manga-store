@@ -7,13 +7,13 @@ const MIN_DISLIKES_COUNT = 0;
 const MAX_DISLIKES_COUNT = 25;
 
 async function createProductCommentDislikesSeedFunction(prisma: PrismaClient) {
-  const [comments, users] = await Promise.all([
+  const [productComments, users] = await Promise.all([
     prisma.productComment.findMany({ select: { id: true } }),
     prisma.user.findMany({ select: { id: true } }),
   ]);
 
   console.log("Creating Product Comment Dislikes ...");
-  for (const { id: commentId } of comments) {
+  for (const { id: commentId } of productComments) {
     const likesCount = randomInt({
       min: MIN_DISLIKES_COUNT,
       max: MAX_DISLIKES_COUNT,
@@ -22,7 +22,7 @@ async function createProductCommentDislikesSeedFunction(prisma: PrismaClient) {
     let localUsers = await prisma.user.findMany({
       where: {
         NOT: {
-          productComments: {
+          writtenProductComments: {
             some: {
               id: commentId,
               likes: {

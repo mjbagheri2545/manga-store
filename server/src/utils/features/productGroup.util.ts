@@ -10,8 +10,8 @@ import { hasProductGroupModelPermission } from "@/lib/productGroupPermissions";
 import { deleteEntity, idAuthorization, jwtAuthorization } from "@/middlewares";
 import { getAllEntities } from "@/middlewares/crud.middleware";
 import {
-  allResourcePermission,
-  specificResourcePermission,
+  hasGeneralPermission,
+  hasSpecificPermission,
 } from "@/middlewares/permission.middleware";
 import { ProductGroupModel, ProductGroupModelEntityKey } from "@/types";
 import { slugValidation } from "@/validators";
@@ -60,7 +60,7 @@ export function createProductGroupModelRouter<T extends ProductGroupModel>(
 
   router.get("/:id", jwtAuthorization, getEntityById, getEntity);
 
-  const createPermission = allResourcePermission((user) =>
+  const createPermission = hasGeneralPermission((user) =>
     hasProductGroupModelPermission(user, "create")
   );
 
@@ -72,7 +72,7 @@ export function createProductGroupModelRouter<T extends ProductGroupModel>(
     createEntity
   );
 
-  const updatePermission = specificResourcePermission<T>({
+  const updatePermission = hasSpecificPermission<T>({
     entityKey,
     hasPermission: (user, entity) =>
       hasProductGroupModelPermission(user, "update", entity),
@@ -93,7 +93,7 @@ export function createProductGroupModelRouter<T extends ProductGroupModel>(
     const entityName = ENTITY_NAMES[entityKey];
 
     logger.logMessage(`${upperFirst(entityKey)} delete.`, {
-      metaData: { [entityKey]: entity },
+      metaData: entity,
     });
 
     return deleteMessage(PRODUCT_GROUP_MESSAGES.crud(entity, entityName));

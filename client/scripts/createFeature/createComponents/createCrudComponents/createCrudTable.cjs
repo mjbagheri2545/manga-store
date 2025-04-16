@@ -16,12 +16,12 @@ async function createCrudTable(crudComponentsDirPath, name, capitalizedName) {
      { key: "", title: "" },
      {
        key: "createdAt",
-       title: "تاریخ عضویت",
+       title: "تاریخ ایجاد",
        render: (createdAt: string) => new Date(createdAt).toLocaleDateString("fa"),
      },
     ] as TableColumn<GetAll${capitalizedName}Base>[];
 
-    function ${capitalizedName}sTable;() {
+    function ${capitalizedName}sTable() {
       return (
         <CrudTable
           api={${name}Api}

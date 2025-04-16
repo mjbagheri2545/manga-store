@@ -1,20 +1,16 @@
 import { Request, Response } from "express";
 
-import { Product } from "@prisma/client";
-
-import {
-  EmptyObject,
-  PaginateQueryWithSort,
-  Req,
-  UserAuthorizedReq,
-} from "@/types";
+import { EmptyObject, PaginateQueryWithSort, UserAuthorizedReq } from "@/types";
 import { notFound, successfulResponse } from "@/utils";
+import { mapProductComments } from "@/utils/features/product_productComment.util";
 
+import { ProductBase } from "../constants/global";
 import productService from "../services";
 import { calculateAverageProductRating } from "../utils";
 
-type ProductById = Product & { tags: { id: string }[] };
-type GetProductReq = Req<{ product: ProductById }>;
+type GetProductReq = UserAuthorizedReq<{
+  product: ProductBase;
+}>;
 
 type GetAllProductReq<P = EmptyObject> = UserAuthorizedReq<
   EmptyObject,
@@ -28,11 +24,15 @@ type GetBySlugReq = UserAuthorizedReq<
   { slug: string }
 >;
 
-type GetRelatedTranslatorsReq = Req<
+type GetRelatedTranslatorsReq = UserAuthorizedReq<
   EmptyObject,
   PaginateQueryWithSort,
   { slug: string }
 >;
+
+type GetRelatedProductsReq = UserAuthorizedReq<{
+  product: { categoryId: string; tags: { id: string }[] };
+}>;
 
 class GetProductController {
   async getAllProductGroups(_req: Request, res: Response) {
@@ -67,7 +67,7 @@ class GetProductController {
       });
     }
 
-    const { _count, ratings, ...restData } = product;
+    const { _count, ratings, comments, ...restData } = product;
 
     const ratingsCount = _count.ratings;
     const averageRating = calculateAverageProductRating(ratings, ratingsCount);
@@ -85,6 +85,7 @@ class GetProductController {
       chaptersCount: _count.chapters,
       views: _count.views,
       translators: finalTranslators,
+      comments: mapProductComments(comments, user),
       rating: {
         averageRating,
         ratingsCount,
@@ -129,7 +130,7 @@ class GetProductController {
     successfulResponse({ res, data: { products, count } });
   }
 
-  async getRelatedProducts(req: GetProductReq, res: Response) {
+  async getRelatedProducts(req: GetRelatedProductsReq, res: Response) {
     const { product } = req.body;
 
     const relatedProducts = await productService.getRelatedProducts(

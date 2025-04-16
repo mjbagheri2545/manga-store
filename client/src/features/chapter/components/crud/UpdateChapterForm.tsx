@@ -8,6 +8,7 @@ import { Alert } from "@/components/utility";
 import SHARED_MESSAGES from "@/constants/messages";
 import PATH from "@/constants/path";
 import { useProgress } from "@/contexts/ProgressContext";
+import useProductId from "@/hooks/features/useProductId";
 import {
   createOnUploadProgress,
   getUpdatedFields,
@@ -15,13 +16,12 @@ import {
 } from "@/utils";
 
 import chapterApi, { ChapterResponse, GetTranslatorsResponse } from "../../api";
-import useChapterPageParams from "../../hooks/useChapterPageParams";
 import { UpdateChapterData, updateChapterSchema } from "../../schemas";
 import ChapterFormFields from "./ChapterFormFields";
 
 function UpdateChapterForm() {
   const { chapterId } = useParams();
-  const { productId } = useChapterPageParams();
+  const productId = useProductId();
 
   if (chapterId == null) {
     return <Alert type="error">آیدی فصل یافت نشد</Alert>;
@@ -58,7 +58,7 @@ function UpdateChapterFormChildren({
   chapter,
 }: UpdateChapterFormChildrenProps) {
   const navigate = useNavigate();
-  const { productId } = useChapterPageParams();
+  const productId = useProductId();
   const { setProgress } = useProgress();
 
   async function handleOnSubmit(

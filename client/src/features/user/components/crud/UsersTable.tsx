@@ -2,6 +2,7 @@ import { CircleCheckIcon, XCircleIcon } from "lucide-react";
 
 import { CrudTable } from "@/components/ui/crud";
 import { TableColumn } from "@/components/utility/table";
+import { NUMBER_FORMATTER } from "@/utils";
 
 import userCrudApi, { GetAllUserBase } from "../../api/crud.api";
 
@@ -23,7 +24,12 @@ const userTableColumns = [
     title: "تاریخ عضویت",
     render: (createdAt: string) => new Date(createdAt).toLocaleDateString("fa"),
   },
-  { key: "walletBalanceInToman", title: "موجودی کیف پول" },
+  {
+    key: "walletBalanceInToman",
+    title: "موجودی کیف پول",
+    render: (walletBalanceInToman: number) =>
+      `${NUMBER_FORMATTER.format(walletBalanceInToman)} تومان`,
+  },
 ] as TableColumn<GetAllUserBase>[];
 
 function UsersTable() {

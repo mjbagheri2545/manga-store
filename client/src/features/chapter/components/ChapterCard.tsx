@@ -11,7 +11,7 @@ type ChapterCardProps = {
 };
 
 export function ChapterCard({ chapter, cardProps }: ChapterCardProps) {
-  const { product } = useProduct();
+  const product = useProduct();
 
   return (
     <Card {...cardProps}>

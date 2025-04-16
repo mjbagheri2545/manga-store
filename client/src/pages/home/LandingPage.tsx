@@ -8,6 +8,9 @@ import { PRODUCTS_QUERY_TAKE } from "@/features/product/constants/global";
 function LandingPage() {
   return (
     <>
+      <p className="text-center text-wrap text-lg font-semibold mb-4">
+        if you {"don't"} see any data, make sure run npm db:seed in server
+      </p>
       <ProductsSliderSection
         getAllProducts={() =>
           productApi.getAll({

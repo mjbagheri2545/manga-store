@@ -4,7 +4,7 @@ import { IdentityVerificationReq, UserAuthorizedReq } from "@/types";
 import { badRequest, successfulResponse } from "@/utils";
 import { userLoggerData } from "@/utils/features/auth_user.util";
 
-import userLogger from "../constants/logger";
+import { userLogger } from "../constants/global";
 import USER_MESSAGES from "../constants/messages";
 import userAccountService from "../services/account.service";
 import { identityVerification } from "../utils";
@@ -38,7 +38,7 @@ class UserAccountVerificationController {
     await userAccountService.verify(user.id);
 
     userLogger.logMessage("User account verification.", {
-      metaData: { user: userLoggerData(user) },
+      metaData: userLoggerData(user),
     });
 
     const { successful: successfulMessage } =

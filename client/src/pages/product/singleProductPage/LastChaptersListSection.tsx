@@ -5,7 +5,7 @@ import { useProduct } from "@/contexts/ProductContext";
 import ChapterList from "@/features/chapter/components/ChapterList";
 
 function LastChaptersListSection() {
-  const { product } = useProduct();
+  const product = useProduct();
 
   return (
     <Section>

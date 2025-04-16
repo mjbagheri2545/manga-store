@@ -10,9 +10,9 @@ async function createLib(
 
   const permissionsPath = `${libDirPath}/permissions.ts`;
   const permissionsData = `
-    import { ${capitalizedName}, User } from "@prisma/client"; 
+    import { User } from "@prisma/client"; 
 
-    import { Permissions, PermissionsAction } from "@/types";
+    import { Permissions, PermissionsAction, Permission${capitalizedName} } from "@/types";
     import { hasPermission } from "@/utils";    
 
     const ${upperCasedName}_PERMISSIONS = {
@@ -35,12 +35,12 @@ async function createLib(
         update: false,
         delete: false,
       },
-    } as const satisfies Permissions<${capitalizedName}>;  
+    } as const satisfies Permissions<Permission${capitalizedName}>;  
 
     export function has${capitalizedName}Permission(
       user: User,
       action: PermissionsAction,
-      data?: ${capitalizedName}
+      data?: Permission${capitalizedName}
     ) {
       return hasPermission(user, ${upperCasedName}_PERMISSIONS, action, data);
     }

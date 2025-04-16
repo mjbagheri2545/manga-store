@@ -7,6 +7,7 @@ export const ENTITY_NAMES = {
   user: "کاربر",
   product: "محصول",
   chapter: "فصل",
+  productComment: "دیدگاه",
 } as const satisfies Record<EntityKey, string>;
 
 export const DEFAULT_QUERY_TAKE = 8;

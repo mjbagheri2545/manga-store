@@ -20,7 +20,7 @@ function ProductProvider({ children }: PropsWithChildren) {
       apiMethodOptions={{ dependencies: [slug] }}
     >
       {(data) => (
-        <ProductContext.Provider value={data}>
+        <ProductContext.Provider value={data.product}>
           {children}
         </ProductContext.Provider>
       )}

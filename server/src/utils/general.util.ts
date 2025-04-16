@@ -2,12 +2,7 @@ import autoBind from "auto-bind";
 import { User } from "@prisma/client";
 
 import { TIME } from "@/constants/global/general.global";
-import {
-  Model,
-  Permissions,
-  PermissionsAction,
-  TypeOrTypeArray,
-} from "@/types";
+import { Permissions, PermissionsAction, TypeOrTypeArray } from "@/types";
 
 export function upperFirst(str: string) {
   return str[0].toUpperCase() + str.slice(1);
@@ -73,16 +68,6 @@ export abstract class AutoBind {
   constructor() {
     autoBind(this);
   }
-}
-
-export function updatedEntityFields<E extends Model>(oldObj: E, updatedObj: E) {
-  const changedFieldsKeys = Object.keys(updatedObj).filter((key) => {
-    const finalKey = key as keyof E;
-
-    return updatedObj[finalKey] !== oldObj[finalKey];
-  }) as (keyof E)[];
-
-  return pick(updatedObj, changedFieldsKeys);
 }
 
 export function wait(waitTime: number = 1000) {

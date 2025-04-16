@@ -6,7 +6,7 @@ import { useProduct } from "@/contexts/ProductContext";
 import ProductRating from "./ProductRating";
 
 function ProductSummaryAndRating() {
-  const { product } = useProduct();
+  const product = useProduct();
   return (
     <div className="w-full max-w-none lg:max-w-[19rem] flex flex-col mt-3 lg:mt-0">
       <ProductRating />

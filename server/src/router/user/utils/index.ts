@@ -14,7 +14,7 @@ import {
   writeFile,
 } from "@/utils";
 
-import USER_CONFIG from "../constants/config";
+import { VERIFICATION_CODE_LENGTH } from "../constants/global";
 import USER_MESSAGES from "../constants/messages";
 import tokenService from "../services/token.service";
 import userService from "../services/user.service";
@@ -37,7 +37,7 @@ function generateVerificationCodeFromUuid(uuid: string): string {
   const uuidWithoutDash = uuid.replace(/-/g, "");
   const uuidLength = uuidWithoutDash.length;
 
-  const code = Array(USER_CONFIG.verificationCodeLength)
+  const code = Array(VERIFICATION_CODE_LENGTH)
     .fill(undefined)
     .reduce((previousCode) => {
       previousCode += uuidWithoutDash[Math.floor(uuidLength * Math.random())];

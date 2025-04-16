@@ -1,4 +1,4 @@
-import { PASSWORD_CONFIG } from "@/constants/global/featuers/auth_user.global";
+import { PASSWORD_CONFIG } from "@/constants/global/features/auth_user.global";
 import AUTH_USER_MESSAGES from "@/constants/messages/features/auth_user.message";
 import sharedUserService from "@/services/user.service";
 

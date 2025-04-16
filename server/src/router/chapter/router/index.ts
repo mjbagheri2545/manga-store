@@ -1,27 +1,33 @@
 import { Router } from "express";
 
 import multer from "multer";
-import { Chapter } from "@prisma/client";
 
 import SHARED_MESSAGES from "@/constants/messages";
 import {
-  allResourcePermission,
   deleteEntity,
   fileAuthorization,
   fileSizeChecker,
+  hasGeneralPermission,
+  hasSpecificPermission,
   idAuthorization,
   jwtAuthorization,
-  specificResourcePermission,
 } from "@/middlewares";
 import { PermissionChapter } from "@/types";
 import { getFilePathFromDbFilePath, removeFile } from "@/utils";
-import { slugValidation } from "@/validators";
+import {
+  idValidations,
+  productIdValidation,
+} from "@/validators/chapter_productComment.validator";
 
-import chapterLogger from "../constants/logger";
-import CHAPTER_MESSAGES from "../constants/messages";
+import {
+  CHAPTER_BASE_SELECT,
+  ChapterBase,
+  chapterLogger,
+  PERMISSION_CHAPTER_SELECT,
+} from "../constants/global";
 import ChapterController from "../controllers";
 import { hasChapterPermission } from "../lib/permissions";
-import chapterService from "../services";
+import chapterService, { GetChapterByIdOptions } from "../services";
 import { chapterLoggerData } from "../utils";
 import ChapterValidator from "../validators";
 
@@ -38,26 +44,24 @@ function createChapterRouter() {
   const { getAllChapters, getChapter, createChapter, updateChapter } =
     new ChapterController();
 
-  const { createChapterValidation, updateChapterValidation, idValidation } =
+  const { createChapterValidation, updateChapterValidation } =
     new ChapterValidator();
 
-  router.get(
-    "/",
-    slugValidation("productId", "آیدی محصول"),
-    jwtAuthorization,
-    getAllChapters
-  );
+  router.get("/", productIdValidation(), jwtAuthorization, getAllChapters);
 
-  const getChapterById = idAuthorization({
-    entityKey: "chapter",
-    getByIdQuery: chapterService.getById,
-  });
+  const createGetChapterById = (options?: GetChapterByIdOptions) =>
+    idAuthorization({
+      entityKey: "chapter",
+      getByIdQuery: (id) => chapterService.getById(id, options),
+    });
 
   router.get(
     "/:id",
-    idValidation(),
+    idValidations("فصل"),
     jwtAuthorization,
-    getChapterById,
+    createGetChapterById({
+      select: CHAPTER_BASE_SELECT,
+    }),
     getChapter
   );
 
@@ -72,12 +76,12 @@ function createChapterRouter() {
     fileSizeChecker(CHAPTER_FILE_SIZE_LIMIT, "MB"),
     createChapterValidation(),
     jwtAuthorization,
-    allResourcePermission((user) => hasChapterPermission(user, "create")),
+    hasGeneralPermission((user) => hasChapterPermission(user, "create")),
     chapterFileAuthorization,
     createChapter
   );
 
-  const updatePermission = specificResourcePermission<PermissionChapter>({
+  const updatePermission = hasSpecificPermission<PermissionChapter>({
     entityKey: "chapter",
     hasPermission: (user, chapter) =>
       hasChapterPermission(user, "update", chapter),
@@ -89,28 +93,30 @@ function createChapterRouter() {
     fileSizeChecker(CHAPTER_FILE_SIZE_LIMIT, "MB"),
     updateChapterValidation(),
     jwtAuthorization,
-    getChapterById,
+    createGetChapterById({
+      select: CHAPTER_BASE_SELECT,
+    }),
     updatePermission,
     chapterFileAuthorization,
     updateChapter
   );
 
-  function deleteChapterMessage(chapter: Chapter) {
+  function deleteChapterMessage(chapter: ChapterBase) {
     const { delete: deleteMessage } = SHARED_MESSAGES.crud;
     chapterLogger.logMessage("Chapter deleted.", {
-      metaData: { chapter: chapterLoggerData(chapter) },
+      metaData: chapterLoggerData(chapter),
     });
 
-    return deleteMessage(CHAPTER_MESSAGES.crud(chapter));
+    return deleteMessage("فصل");
   }
 
-  function deleteChapterOperation(chapter: Chapter) {
+  function deleteChapterOperation(chapter: PermissionChapter) {
     return removeFile(
       getFilePathFromDbFilePath(chapter.chapterFile, { isPublic: false })
     );
   }
 
-  const deleteChapter = deleteEntity<Chapter, PermissionChapter>({
+  const deleteChapter = deleteEntity<ChapterBase, PermissionChapter>({
     delete: chapterService.delete,
     operation: deleteChapterOperation,
     failedOperationMessage: "حذف فصل",
@@ -122,9 +128,11 @@ function createChapterRouter() {
 
   router.delete(
     "/:id",
-    idValidation(),
+    idValidations("فصل"),
     jwtAuthorization,
-    getChapterById,
+    createGetChapterById({
+      select: PERMISSION_CHAPTER_SELECT,
+    }),
     deleteChapter
   );
 
