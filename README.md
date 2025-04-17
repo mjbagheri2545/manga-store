@@ -114,7 +114,7 @@ Instead of generic error messages like `Invalid value`, this system provides:
 | **Database** | PostgreSQL + Prisma ORM |
 | **Authentication** | JWT |
 | **Styles** | Tailwind CSS + DaisyUI *(minimal use)* |
-| **Validation** | `express-validator` (server) + custom (client) |
+| **Validation** | `express-validator` (server) + `zod` (client) |
 | **Logging** | Winston-based custom logger |
 | **Tooling** | Husky, lint-staged, Madge, ESLint, Prettier |
 | **Testing** | *(Optional in future)* |
