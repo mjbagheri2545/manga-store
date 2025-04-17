@@ -74,7 +74,7 @@ Here’s what this project actually **does** have — and most of it was built f
    All error and success messages are clear, contextual, and human-friendly.
    Instead of vague messages like invalid value, each response gives users precise, helpful feedback — both on the client and the server.
 
-***And many more ...***
+**And many more ...**
 
 ---
 
