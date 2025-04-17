@@ -2,14 +2,14 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
-export type GetUserByIdOptions = Omit<Prisma.UserFindUniqueArgs, "where">;
+type GetUserByIdOptions = Omit<Prisma.UserFindUniqueArgs, "where">;
 
 class SharedUserService {
   create(data: Prisma.UserCreateInput) {
     return prisma.user.create({ data });
   }
 
-  getById(id: string, options: GetUserByIdOptions = { select: { id: true } }) {
+  getById(id: string, options: GetUserByIdOptions = {}) {
     return prisma.user.findUnique({
       where: { id },
       ...options,
