@@ -20,8 +20,7 @@
       "plugins": ["unused-imports", "import"],
 
       "rules": {
-        "unused-imports/no-unused-imports": "error",
-        "import/no-unused-modules": ["error", { "unusedExports": true }]
+        "unused-imports/no-unused-imports": "error"
       }
     }
   ]

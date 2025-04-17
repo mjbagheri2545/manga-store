@@ -22,10 +22,10 @@ async function huskyInit() {
 
     const prePushCommands = [
       "cd server",
-      "npm run lint:unusedExports",
+      "npm run lint:unusedImports",
       "npm run format",
       "cd ../client",
-      "npm run lint:unusedExports",
+      "npm run lint:unusedImports",
       "npm run format",
     ];
 

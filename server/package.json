@@ -7,7 +7,7 @@
     "build": "tsc --watch",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "lint:unusedExports": "eslint . --fix --c .eslintrc.pre-push.json",
+    "lint:unusedImports": "eslint . --fix --c .eslintrc.pre-push.json",
     "format": "prettier . --write",
     "pre:commit": "lint-staged -c lint-staged.pre-commit.json",
     "deps:check": "madge src --circular",
