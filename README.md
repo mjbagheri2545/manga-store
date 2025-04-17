@@ -1,102 +1,137 @@
 # Manga Store 🛒📚 (Training Project)
 
-This is a **training project** built from scratch without relying on tools like React Query or any advanced UI libraries — **intentionally**.
+This is a **training project** built from scratch without relying on tools like React Query or advanced UI libraries — intentionally.
 
-> ⚠️ **Why I Didn't Use React Query, UI Libraries, etc?**  
-> Because this was a practice project, I deliberately avoided advanced libraries and did many things manually to deeply understand how they work.  
-> Also, due to some early decisions and constraints, I had to build things myself — and that turned out to be a very good thing.
+---
 
-> ⚠️ **What’s Up With Some Design Choices, Things I’m Aware of (But Didn’t Change)?**  
-> I'm fully aware that certain parts of the architecture could be better — but it’s too late to refactor them now. The project has served its learning purpose, and the mistakes are part of that learning process.
+## ⚠️ Why I Didn't Use React Query, UI Libraries, etc.
+
+Because this is a **practice project**, I deliberately avoided advanced libraries and built many features manually to deeply understand their internal mechanics.  
+Also, due to some early constraints, I was *forced* to write my own solutions — and that turned out to be a great learning opportunity.
+
+---
+
+## ⚠️ Design Choices I'm Aware of (But Didn't Change)
+
+I know that some design choices could’ve been better or more scalable.  
+However, it's **too late for major refactors**, and I chose to let the imperfections stay — because this project already fulfilled its purpose: **learning**.  
+Mistakes included.
 
 ---
 
 ## 🚀 Key Features and Architecture
 
-Here’s what this project actually **does** have — and most of it was built from scratch:
+> All of the following were either built from scratch or heavily customized:
 
-1. **Custom Mini React Query**  
-   A lightweight state management system for handling async queries, caching, and automatic refetching — similar in concept to React Query, but much simpler and custom-built.
+### ✅ Custom Mini React Query
+A lightweight async state manager that handles:
+- Caching
+- Query invalidation
+- Auto-refetching  
+Built manually to understand how libraries like React Query actually work.
 
-2. **ABAC Permission System (Server-Side Only)**  
-   Implements an Attribute-Based Access Control system on the server, allowing fine-grained control over what users can do based on attributes.
+### ✅ ABAC Permission System (Server-Side Only)
+Implements **Attribute-Based Access Control** to define dynamic user permissions based on their attributes and context.
 
-3. **Custom Scripts for Repetitive Tasks**  
-   Includes `npm run` scripts to automate repetitive development tasks like seeding, generating features, and more.
+### ✅ Custom Scripts
+Reusable CLI scripts for repetitive tasks like:
+- Seeding
+- Feature generation
+- Cleanup operations
 
-4. **Advanced Team-Ready Configuration**  
-   Configured to support teamwork and collaboration:
-   - **Git hooks** via [Husky](https://typicode.github.io/husky) and `lint-staged`
-   - **Madge** for visualizing and enforcing dependency graph rules.
-     > Madge analyzes module dependencies to detect circular imports and enforce clean architecture.
-   - Strict **ESLint** and **Prettier** setup for consistent code formatting
-   - Separated `eslint` configs for different scripts
+### ✅ Advanced Team-Ready Dev Config
+Fully configured for smooth team development:
+- **Git hooks** using `Husky` and `lint-staged`
+- **Madge** for automated module dependency graph analysis  
+  > Detects circular dependencies and visualizes the structure
+- **Strict linting and formatting** with ESLint and Prettier
+- Separate ESLint configs for various scripts
 
-5. **JWT Authentication System**  
-   Full registration, login, logout system using JSON Web Tokens.
+### ✅ JWT Authentication System
+Full implementation of:
+- Registration
+- Login
+- Token-based access with refresh/expiration
 
-6. **Advanced Logging System**  
-   Custom logging setup with:
-   - Separate log files by category (errors, operations, etc.)
-   - Daily rotating file logs
-   - Works well for production environments too
+### ✅ Advanced Logging System
+Custom logger using **Winston**:
+- Daily rotating log files
+- Logs categorized by purpose (error, operation, etc.)
+- Suitable for production-ready monitoring
 
-7. **Custom Seeding System**  
-   Generates realistic fake data for every important part of the database. Automatically creates users, products, categories, tags, etc.
+### ✅ Custom Seeding System
+Generates **realistic fake data**:
+- Users
+- Products
+- Categories
+- Tags, and more
 
-8. **Feature-Based Structure (Both Client and Server)**  
-   Every module (feature) is self-contained. Client and server both follow feature-first architecture for better scalability.
+### ✅ Feature-Based Architecture
+Both **client and server** follow feature-first structure:  
+Modular, scalable, and easy to maintain.
 
-9. **Code Splitting and Lazy Loading**  
-   Dynamic import of components, pages, and routes to improve performance and reduce initial load time.
+### ✅ Code Splitting & Lazy Loading
+Optimized performance via dynamic imports of:
+- Pages
 
-10. **Git + Husky Auto-Init on Install**  
-   After `npm install`, the server will automatically:
-   - Re-initialize Git (if needed)
-   - Set up Husky hooks
-   - Prepare all required hooks/scripts for a clean workflow
+### ✅ Git + Husky Auto-Init on Install
+After running `npm install` in the server:
+- Git will auto-initialize (if missing)
+- Husky hooks will be auto-installed
+- Lint + commit logic is instantly ready
 
-11. **Advanced Comment System**  
-   Built-in support for nested comments, replies, likes and dislikes, and comment moderation.
+### ✅ Advanced Comment System
+Includes:
+- Nested comments
+- Likes/dislikes
+- Replies
+- Moderation capabilities
 
-12. **Data Validation (Client + Server)**  
-   Full validation for all inputs — including:
-   - Strong server-side validation with detailed error messages
-   - Client-side form validations
-   - **File validation**: file size, MIME type, filename cleaning, etc.
+### ✅ Data Validation (Client + Server)
+All user input is validated:
+- **Server**: Using `express-validator`
+- **Client**: Using `zod`
+- **Files**: MIME type, file size, and more
 
-13. **File Upload System**  
-   - Files are **organized by date** to avoid clutter
-   - **Private files** (like avatars) are securely served and not publicly accessible
-   - Public and private file separation handled by custom middleware
-     
-14. **Advanced Messaging System**  
-   All error and success messages are clear, contextual, and human-friendly.
-   Instead of vague messages like invalid value, each response gives users precise, helpful feedback — both on the client and the server.
+### ✅ File Upload System
+- Files are organized into **date-based folders**
+- **Private files** like avatar images are securely served and not publicly accessible
+- Middleware ensures correct access handling
 
-**And many more ...**
+### ✅ Advanced Messaging System
+Instead of generic error messages like `Invalid value`, this system provides:
+- **Readable**, **human-friendly**, and **contextual** messages
+- Consistent on both client and server
 
 ---
 
 ## 🛠️ Tech Stack (Overview)
 
-- **Frontend**: React + Vite + TypeScript
-- **Backend**: Node.js + Express + TypeScript
-- **Database**: PostgreSQL + Prisma ORM
-- **Auth**: JWT
-- **Styles**: Tailwind CSS (basic setup) + Daisyui (I prefer not to use this library in all of my projects. just use and see why!)
-- **Testing**: [optional in future]
-- **Logging**: Winston-based advanced logger
-- **Validation**: express-validator (server), custom client validation
-- **Dev Tools**: Husky, lint-staged, Madge, ESLint, Prettier
+| Layer      | Tools / Libraries |
+|------------|------------------|
+| **Frontend** | React + Vite + TypeScript |
+| **Backend**  | Node.js + Express + TypeScript |
+| **Database** | PostgreSQL + Prisma ORM |
+| **Authentication** | JWT |
+| **Styles** | Tailwind CSS + DaisyUI *(minimal use)* |
+| **Validation** | `express-validator` (server) + custom (client) |
+| **Logging** | Winston-based custom logger |
+| **Tooling** | Husky, lint-staged, Madge, ESLint, Prettier |
+| **Testing** | *(Optional in future)* |
 
 ---
 
 ## ⚡ Final Note
 
-I built this project not just to learn how things work, but to **build the things that usually get abstracted away**.
+I didn’t just build this project to check off features —  
+I built it to **understand what goes on behind the scenes**.
 
-Now that I’ve seen the internals of permissions, file upload systems, caching, and logging — I’m more confident moving forward into real-world applications.
+Now that I’ve dealt with permission systems, file uploads, seeding, validation, caching, logging, and more —  
+I feel much more confident to dive into **real-world, production-grade applications**.
 
 ---
+
+### 🤝 Thanks for reading!
+
+Feel free to explore the code, leave feedback, or use this as inspiration for your own projects.
 
