@@ -25,9 +25,10 @@ Mistakes included.
 
 ### ✅ Custom Mini React Query
 A lightweight async state manager that handles:
-- Caching
-- Query invalidation
-- Auto-refetching  
+- Caching (manually and simple)
+- Mutation handling
+- Pagination
+- Infinite scroll
 Built manually to understand how libraries like React Query actually work.
 
 ### ✅ ABAC Permission System (Server-Side Only)
@@ -37,21 +38,21 @@ Implements **Attribute-Based Access Control** to define dynamic user permissions
 Reusable CLI scripts for repetitive tasks like:
 - Seeding
 - Feature generation
-- Cleanup operations
 
-### ✅ Advanced Team-Ready Dev Config
-Fully configured for smooth team development:
-- **Git hooks** using `Husky` and `lint-staged`
-- **Madge** for automated module dependency graph analysis  
-  > Detects circular dependencies and visualizes the structure
-- **Strict linting and formatting** with ESLint and Prettier
-- Separate ESLint configs for various scripts
+### ✅ Advanced Team-Ready Dev Config  
+Strictly configured for scalable teamwork — enforced on both **client** and **server**:
+- **Git Hooks via Husky** for pre-commit checks  
+- **Lint-Staged** for running checks only on staged files  
+- **Madge** for visualizing and enforcing module boundaries  
+- **ESLint Plugin Boundary** ensures each feature is isolated and can't import from other features  
+- **ESLint Plugin Sort Imports** enforces consistent import order across the project  
+- **ESLint & Prettier** for strict formatting and linting  
+- All checks are automatically run in `pre-commit` hooks to prevent bad code from being pushed
 
 ### ✅ JWT Authentication System
 Full implementation of:
 - Registration
 - Login
-- Token-based access with refresh/expiration
 
 ### ✅ Advanced Logging System
 Custom logger using **Winston**:
@@ -103,6 +104,14 @@ Instead of generic error messages like `Invalid value`, this system provides:
 - **Readable**, **human-friendly**, and **contextual** messages
 - Consistent on both client and server
 
+### ✅ Type-Safe & Runtime-Safe Environment Variables  
+Environment variables are validated with **Zod** — both on the **client** and **server**:
+- Runtime validation using schema parsing  
+- Prevents the app from running with missing or invalid values  
+- Separate configurations for development and production environments *(though this project only uses development)*
+
+  ### ➕ And Many More...
+  
 ---
 
 ## 🛠️ Tech Stack (Overview)
