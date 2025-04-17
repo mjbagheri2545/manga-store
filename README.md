@@ -44,7 +44,8 @@ Strictly configured for scalable teamwork — enforced on both **client** and **
 - **Git Hooks via Husky** for pre-commit checks  
 - **Lint-Staged** for running checks only on staged files  
 - **Madge** for visualizing and enforcing module boundaries  
-- **ESLint Plugin Boundary** ensures each feature is isolated and can't import from other features  
+- **ESLint Plugin Boundary** ensures each feature is isolated and can't import from other features
+  and ensures all files are known and defined.
 - **ESLint Plugin Sort Imports** enforces consistent import order across the project  
 - **ESLint & Prettier** for strict formatting and linting  
 - All checks are automatically run in `pre-commit` hooks to prevent bad code from being pushed
