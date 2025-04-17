@@ -21,15 +21,6 @@ export function pickProductCreateData(req: Request) {
   ]);
 }
 
-export function getTagsData(tagsId: string[], productTags: { id: string }[]) {
-  const tags = tagsId.sort().map((id) => ({ id }));
-  const currentTags = productTags.sort();
-
-  const isSameTags = JSON.stringify(tags) === JSON.stringify(currentTags);
-
-  return isSameTags ? {} : { tags: { set: tags } };
-}
-
 export function productLoggerData(product: ProductBase) {
   return pick(product, ["name", "id", "managerId"]);
 }

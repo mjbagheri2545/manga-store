@@ -7,13 +7,15 @@ import {
 import { FormFieldsContainer } from "@/components/ui/form";
 import RenderItems from "@/components/ui/RenderItems";
 import { useProductGroups } from "@/contexts/ProductGroupsContext";
-import { GetProductByIdResponse } from "@/features/product/api";
+import {
+  GetProductByIdResponse,
+  ManagersResponse,
+} from "@/features/product/api";
 import { MAX_SUMMARY_LENGTH } from "@/features/product/schemas";
 
 import TagFields from "./tagFields";
 
-type ProductFormFieldsProps = {
-  managers: { id: string; fullName: string }[];
+type ProductFormFieldsProps = ManagersResponse & {
   product?: GetProductByIdResponse["product"];
 };
 

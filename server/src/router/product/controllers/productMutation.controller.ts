@@ -21,7 +21,6 @@ import PRODUCT_MESSAGES from "../constants/messages";
 import productService from "../services";
 import {
   calculateAverageProductRating,
-  getTagsData,
   pickProductCreateData,
   productLoggerData,
 } from "../utils";
@@ -122,9 +121,7 @@ class ProductMutationController {
   }
 
   async updateProduct(req: UpdateProductReq, res: Response) {
-    const { categoryId, tagsId = [], statusId, managerId, product } = req.body;
-
-    const tagsConnection = getTagsData(tagsId, product.tags);
+    const { categoryId, tagsId, statusId, managerId, product } = req.body;
 
     const managerConnection = newModelConnectionWithId(managerId, "manager");
     const categoryConnection = newModelConnectionWithId(categoryId, "category");
@@ -144,7 +141,6 @@ class ProductMutationController {
       ...managerConnection,
       ...categoryConnection,
       ...statusConnection,
-      ...tagsConnection,
     };
 
     if (req.file != null) {
@@ -154,6 +150,14 @@ class ProductMutationController {
       });
 
       finalData.productImage = getFilePathForDb(productImagePath);
+    }
+
+    if (tagsId != null) {
+      finalData.tags = {
+        set: tagsId.map((id) => ({
+          id,
+        })),
+      };
     }
 
     const [error, updatedProduct] = await withCatch(
