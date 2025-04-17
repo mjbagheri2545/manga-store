@@ -69,6 +69,10 @@ Here’s what this project actually **does** have — and most of it was built f
    - Files are **organized by date** to avoid clutter
    - **Private files** (like avatars) are securely served and not publicly accessible
    - Public and private file separation handled by custom middleware
+     
+14. **Advanced Messaging System**  
+   All error and success messages are clear, contextual, and human-friendly.
+   Instead of vague messages like invalid value, each response gives users precise, helpful feedback — both on the client and the server.
 
 ---
 
