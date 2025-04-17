@@ -30,5 +30,3 @@ function CloseButton({ closeToast }: CloseButtonProps) {
     </Button>
   );
 }
-
-export default CloseButton;

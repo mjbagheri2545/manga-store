@@ -5,7 +5,7 @@ import { Entity } from "@/types";
 
 import TextWithIcon from "../../TextWithIcon";
 
-export type KeyInfo<TEntity> =
+type KeyInfo<TEntity> =
   | {
       keyName: string;
       Icon: LucideIcon;

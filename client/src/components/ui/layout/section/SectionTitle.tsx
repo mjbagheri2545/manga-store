@@ -29,5 +29,3 @@ export function SectionTitle({
     </div>
   );
 }
-
-export default SectionTitle;

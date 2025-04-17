@@ -12,7 +12,7 @@ import UpdateProductCommentForm from "../crud/UpdateProductCommentForm";
 import { LikeDislike } from "./LikeDislike";
 import MoreActionsMenu from "./MoreActionsMenu";
 
-export type ProductCommentCardProps<T extends GetAllRootProductCommentBase> = {
+type ProductCommentCardProps<T extends GetAllRootProductCommentBase> = {
   productComment: T;
   onSuccessfulDelete: (id: string) => void;
   replyTo?: (reply: T) => React.ReactNode;
