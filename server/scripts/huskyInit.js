@@ -18,24 +18,11 @@ async function huskyInit() {
       "npm run pre:commit",
     ];
 
-    const prePushPath = path.join(__dirname, "../.husky/pre-push");
-
-    const prePushCommands = [
-      "cd server",
-      "npm run lint:unusedImports",
-      "npm run format",
-      "cd ../client",
-      "npm run lint:unusedImports",
-      "npm run format",
-    ];
 
     const promises = [];
 
     promises.push(
       fs.writeFile(preCommitPath, preCommitCommands.join("|| exit 1\n"))
-    );
-    promises.push(
-      fs.writeFile(prePushPath, prePushCommands.join("|| exit 1\n"))
     );
 
     const packageJsonPath = path.join(__dirname, "../package.json");
