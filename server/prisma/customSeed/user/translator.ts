@@ -4,7 +4,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import createSeed from "../createSeed";
 import { hashPassword, randomDate, randomInt } from "../utils";
 
-const TRANSLATORS_COUNT = 30;
+const TRANSLATORS_COUNT = 15;
 
 async function createTranslatorsSeedFunction(prisma: PrismaClient) {
   console.log("Creating Translators ...");

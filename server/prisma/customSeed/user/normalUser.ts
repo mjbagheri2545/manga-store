@@ -4,7 +4,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import createSeed from "../createSeed";
 import { hashPassword, randomDate, randomInt } from "../utils";
 
-const NORMAL_USERS_COUNT = 300;
+const NORMAL_USERS_COUNT = 150;
 
 async function createNormalUsersSeedFunction(prisma: PrismaClient) {
   console.log("Creating Normal Users ...");

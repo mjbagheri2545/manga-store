@@ -5,7 +5,7 @@ import createSeed from "../createSeed";
 import { randomIndex, randomInt } from "../utils";
 
 const MIN_PRODUCT_COMMENTS_COUNT = 0;
-const MAX_PRODUCT_COMMENTS_COUNT = 15;
+const MAX_PRODUCT_COMMENTS_COUNT = 10;
 
 async function createProductCommentsSeedFunction(prisma: PrismaClient) {
   const [products, users] = await Promise.all([
@@ -25,7 +25,7 @@ async function createProductCommentsSeedFunction(prisma: PrismaClient) {
       const authorId = localUsers[randomIndex({ max: localUsers.length })].id;
       localUsers = localUsers.filter((user) => user.id != authorId);
 
-      const messageWordsCount = randomInt({ min: 5, max: 25 });
+      const messageWordsCount = randomInt({ min: 5, max: 20 });
       const message = faker.word.words(messageWordsCount);
 
       await prisma.productComment.create({

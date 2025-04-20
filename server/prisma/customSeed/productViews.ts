@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import createSeed from "./createSeed";
 import { randomIndex, randomInt } from "./utils";
 
-const MIN_PRODUCTS_VIEWS_COUNT = 100;
+const MIN_PRODUCTS_VIEWS_COUNT = 0;
 
 export async function createProductViewsSeedFunction(prisma: PrismaClient) {
   const [products, users] = await Promise.all([

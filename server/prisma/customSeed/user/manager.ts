@@ -4,7 +4,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import createSeed from "../createSeed";
 import { hashPassword, randomDate, randomInt } from "../utils";
 
-const MANAGERS_COUNT = 10;
+const MANAGERS_COUNT = 5;
 
 async function createManagersSeedFunction(prisma: PrismaClient) {
   console.log("Creating Managers ...");

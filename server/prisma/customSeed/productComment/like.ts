@@ -4,7 +4,7 @@ import createSeed from "../createSeed";
 import { randomIndex, randomInt } from "../utils";
 
 const MIN_LIKES_COUNT = 0;
-const MAX_LIKES_COUNT = 25;
+const MAX_LIKES_COUNT = 10;
 
 async function createProductCommentLikesSeedFunction(prisma: PrismaClient) {
   const [comments, users] = await Promise.all([

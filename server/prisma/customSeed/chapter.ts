@@ -5,8 +5,8 @@ import { PrismaClient } from "@prisma/client";
 import createSeed from "./createSeed";
 import { randomIndex, randomInt } from "./utils";
 
-const MIN_CHAPTERS_COUNT = 70;
-const MAX_CHAPTERS_COUNT = 200;
+const MIN_CHAPTERS_COUNT = 15;
+const MAX_CHAPTERS_COUNT = 40;
 
 async function createChaptersSeedFunction(prisma: PrismaClient) {
   const [products, translators] = await Promise.all([
@@ -17,7 +17,7 @@ async function createChaptersSeedFunction(prisma: PrismaClient) {
     }),
   ]);
 
-  const translatorsCount = randomInt({ min: 5, max: 15 });
+  const translatorsCount = randomInt({ min: 3, max: 10 });
   const randomTranslators: { id: string }[] = [];
   let localTranslators = [...translators];
 

@@ -57,7 +57,7 @@ const suffixes = [
   { en: "Gekitou", fa: "نبرد شدید" },
 ];
 
-const PRODUCTS_COUNT = 200;
+const PRODUCTS_COUNT = 80;
 
 function getRandomUniqueWords() {
   const nameWordsNumber = randomInt({ max: 5 });
