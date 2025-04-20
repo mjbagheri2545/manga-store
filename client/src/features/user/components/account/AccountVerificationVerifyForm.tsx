@@ -27,9 +27,7 @@ function AccountVerificationVerifyForm() {
     <IdentityVerificationForm
       formMethods={formMethods}
       handleOnSubmit={handleOnSubmit}
-      submitButtonText={
-        USER_CONTENT.account.verification.verify.submitButtonText
-      }
+      submitButton={USER_CONTENT.account.verification.verify.submitButtonText}
       content={USER_CONTENT.account.verification.mainContent}
       onResend={getEmail}
     >

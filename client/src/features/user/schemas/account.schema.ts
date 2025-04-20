@@ -39,10 +39,12 @@ export const passwordRecoveryRecoverSchema = z
     verificationCode: verificationCodeValidator(),
   })
   .extend(changePasswordBaseSchema.shape)
+  .extend(getEmailSchema.shape)
   .refine(checkPasswordConfirmation, passwordConfirmationValidationOptions);
 
-export type PasswordRecoveryRecoverData = z.infer<
-  typeof passwordRecoveryRecoverSchema
+export type PasswordRecoveryRecoverData = Omit<
+  z.infer<typeof passwordRecoveryRecoverSchema>,
+  "email"
 >;
 
 export const passwordResetSchema = z

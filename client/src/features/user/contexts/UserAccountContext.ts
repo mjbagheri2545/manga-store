@@ -18,7 +18,7 @@ export type TUserAccountContext = {
   password: {
     recovery: {
       getEmail: ApiMethodWrapper<GetEmailData>;
-      recover: ApiMethodWrapper<PasswordRecoveryRecoverData>;
+      recover: ApiMethodWrapper<PasswordRecoveryRecoverData & GetEmailData>;
       getEmailData?: GetEmailData;
     };
     reset: ApiMethodWrapper<PasswordResetData>;

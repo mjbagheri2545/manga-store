@@ -1,10 +1,11 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./src/server.ts",
   "scripts": {
     "dev": "tsx watch --env-file=.env.development.local ./src/server.ts",
     "build": "tsc --watch",
+    "prod": "tsx --env-file=.env.development.local ./src/server.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:unusedImports": "eslint . --fix --c .eslintrc.unused.json",
@@ -14,16 +15,16 @@
     "deps:graph": "node ./scripts/depsGraph.js",
     "husky:prepare": "cd .. && husky server/.husky",
     "init": "node ./scripts/init.js",
-    "postinstall": "npm run init",
     "create-feature": "node ./scripts/createFeature",
     "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
-    "db:seed": "dotenv -e .env.development.local -- npx prisma db seed"
+    "db:seed": "dotenv -e .env.development.local -- npx prisma db seed",
+    "db:migrate:prod": "dotenv -e .env.development.local -- npx prisma migrate deploy"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
-  "author": "",
+  "author": "Mohammad Javad Bagheri",
   "license": "ISC",
   "description": "",
   "devDependencies": {

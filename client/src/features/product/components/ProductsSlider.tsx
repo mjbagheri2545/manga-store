@@ -8,7 +8,9 @@ type ProductsSliderProps = {
   products: GetAllProductBase[];
 };
 
+// @ts-expect-error this is swiper mistake
 import "swiper/css";
+// @ts-expect-error this is swiper mistake
 import "swiper/css/pagination";
 
 function ProductsSlider({ products }: ProductsSliderProps) {

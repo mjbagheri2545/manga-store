@@ -7,20 +7,20 @@ import { InputField } from "@/components/form";
 import USER_CONTENT from "../../constants/content";
 import { useUserAccount } from "../../contexts/UserAccountContext";
 import {
+  PasswordRecoveryRecoverData,
   passwordRecoveryRecoverSchema,
-  PasswordResetData,
 } from "../../schemas/account.schema";
 import IdentityVerificationForm from "./IdentityVerificationForm";
 
 function PasswordRecoveryRecoverForm() {
-  const formMethods = useForm<PasswordResetData>({
+  const formMethods = useForm<PasswordRecoveryRecoverData>({
     resolver: zodResolver(passwordRecoveryRecoverSchema),
   });
 
   const { recover, getEmail, getEmailData } =
     useUserAccount().password.recovery;
 
-  function handleOnSubmit(data: PasswordResetData) {
+  function handleOnSubmit(data: PasswordRecoveryRecoverData) {
     if (getEmailData == null) return Promise.reject();
 
     return recover({ ...data, email: getEmailData.email });
@@ -36,7 +36,7 @@ function PasswordRecoveryRecoverForm() {
     <IdentityVerificationForm
       formMethods={formMethods}
       handleOnSubmit={handleOnSubmit}
-      submitButtonText={
+      submitButton={
         USER_CONTENT.account.password.recovery.recover.submitButtonText
       }
       content={USER_CONTENT.account.password.recovery.mainContent}
