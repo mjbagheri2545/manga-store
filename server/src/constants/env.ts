@@ -4,7 +4,6 @@ function createEnv() {
   const STRING_ENV_KEYS = [
     "APP_NAME",
     "CLIENT_END_POINT",
-    "HOST",
     "JWT_PRIVATE_TOKEN_KEY",
     "EMAIL_SERVICE_NAME",
     "EMAIL_SERVICE_USER",

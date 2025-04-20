@@ -9,8 +9,8 @@ import createApp from "./createApp";
 function startServer() {
   const app = createApp();
   const server = http.createServer(app);
-  server.listen({ host: env.HOST, port: env.PORT }, () => {
-    console.log(`server started at http://${env.HOST}:${env.PORT}`);
+  server.listen({ port: env.PORT }, () => {
+    console.log(`server started with port ${env.PORT}`);
   });
 
   const signals: NodeJS.Signals[] = ["SIGTERM", "SIGINT", "SIGUSR2"];

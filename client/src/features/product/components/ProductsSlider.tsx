@@ -8,9 +8,7 @@ type ProductsSliderProps = {
   products: GetAllProductBase[];
 };
 
-// @ts-expect-error this is swiper mistake
 import "swiper/css";
-// @ts-expect-error this is swiper mistake
 import "swiper/css/pagination";
 
 function ProductsSlider({ products }: ProductsSliderProps) {
@@ -20,15 +18,15 @@ function ProductsSlider({ products }: ProductsSliderProps) {
       grabCursor
       loop
       spaceBetween={17}
-      className="w-full p-4 pb-0"
+      className="w-full !p-4 !pb-0"
       wrapperTag="ul"
-      wrapperClass="swiper-wrapper mb-12 grid grid-flow-col"
+      wrapperClass="swiper-wrapper mb-12 !grid grid-flow-col"
       pagination={{
         clickable: true,
         bulletClass:
-          "swiper-pagination-bullet size-3 bg-slate-950 inline-block transition-all opacity-65",
+          "swiper-pagination-bullet !size-3 bg-slate-950 !inline-block !transition-all !opacity-65",
         bulletActiveClass:
-          "swiper-pagination-bullet-active !bg-primary-600 !opacity-100 w-8 rounded-full",
+          "swiper-pagination-bullet-active !bg-primary-600 !opacity-100 !w-8 !rounded-full",
       }}
       // i try many break points then i realize
       // these are one of the best break points
