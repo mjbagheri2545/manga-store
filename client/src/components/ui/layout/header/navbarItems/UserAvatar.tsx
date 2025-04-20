@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { BadgeCheckIcon, LogOutIcon, UserIcon } from "lucide-react";
 
 import Avatar from "@/components/ui/Avatar";
-import { Button } from "@/components/utility";
+import { Button, Link } from "@/components/utility";
 import { List, ListItem } from "@/components/utility/list";
 import PATH from "@/constants/path";
 import { useAuth } from "@/contexts/AuthContext";
@@ -54,11 +54,19 @@ function LoggedInUserAvatar({ user }: { user: User }) {
         <List className="absolute top-full gap-2 left-0 bg-base-300 shadow-lg shadow-slate-950 rounded min-w-48">
           <ListItem containerProps={{ className: "flex flex-col" }}>
             <span>{user.email}</span>
-            <div className="flex gap-2 items-center -mt-1">
+            <div className="flex gap-2 items-center -mt-1 flex-wrap">
               {user.isVerified && (
                 <BadgeCheckIcon className="size-5 text-info stroke-info" />
               )}
-              <span className="text-nowrap">{user.fullName}</span>
+              <span className="flex-1">{user.fullName}</span>
+              {!user.isVerified && (
+                <Link
+                  to={PATH.user.getFullPath(PATH.user.account.verification)}
+                  className="w-full"
+                >
+                  تایید حساب
+                </Link>
+              )}
             </div>
           </ListItem>
           <ListItem>

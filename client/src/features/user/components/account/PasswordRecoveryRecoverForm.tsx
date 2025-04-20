@@ -20,16 +20,16 @@ function PasswordRecoveryRecoverForm() {
   const { recover, getEmail, getEmailData } =
     useUserAccount().password.recovery;
 
-  function handleOnSubmit(data: PasswordRecoveryRecoverData) {
+  async function handleOnSubmit(data: PasswordRecoveryRecoverData) {
     if (getEmailData == null) return Promise.reject();
 
-    return recover({ ...data, email: getEmailData.email });
+    await recover({ ...data, email: getEmailData.email });
   }
 
-  function handleOnResend() {
+  async function handleOnResend() {
     if (getEmailData == null) return Promise.reject();
 
-    return getEmail(getEmailData);
+    await getEmail(getEmailData);
   }
 
   return (
@@ -43,10 +43,15 @@ function PasswordRecoveryRecoverForm() {
       onResend={handleOnResend}
     >
       <InputField controllerName="verificationCode" label="کد تایید" />
-      <InputField controllerName="newPassword" label="رمز عبور جدید" />
+      <InputField
+        controllerName="newPassword"
+        label="رمز عبور جدید"
+        fieldProps={{ type: "password" }}
+      />
       <InputField
         controllerName="newPasswordConfirmation"
         label="تایید رمز عبور جدید"
+        fieldProps={{ type: "password" }}
       />
     </IdentityVerificationForm>
   );

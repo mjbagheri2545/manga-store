@@ -15,8 +15,8 @@ function RegistrationForm() {
   });
   const { register } = useAuth();
 
-  function handleOnSubmit(data: RegistrationData) {
-    register(data);
+  async function handleOnSubmit(data: RegistrationData) {
+    await register(data);
   }
 
   return (

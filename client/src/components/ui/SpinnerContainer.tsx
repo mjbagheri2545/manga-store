@@ -16,7 +16,7 @@ export function SpinnerContainer({
     <div
       {...containerProps}
       className={twMerge(
-        "flex justify-center items-center w-full",
+        "flex flex-1 justify-center items-center",
         containerProps?.className
       )}
     >

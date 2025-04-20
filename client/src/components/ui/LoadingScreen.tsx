@@ -4,7 +4,7 @@ function LoadingScreen() {
   return (
     <SpinnerContainer
       containerProps={{
-        className: "fixed inset-0 z-[999]  bg-slate-950/50",
+        className: "flex-1 flex items-center justify-center",
       }}
       spinnerProps={{ className: "size-32" }}
     />

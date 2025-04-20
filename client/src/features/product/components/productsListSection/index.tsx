@@ -42,7 +42,7 @@ function ProductsListSection({
     onSuccess: (data) => setProducts(data.products),
   });
 
-  if (status !== "idle" && status !== "error" && products.length === 0) {
+  if (status === "success" && products.length === 0) {
     return (
       <>
         <Alert type="info" containerProps={{ className: "text-lg" }}>

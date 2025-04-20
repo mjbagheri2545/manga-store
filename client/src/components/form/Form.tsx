@@ -25,7 +25,9 @@ export type FormProps<T extends FieldValues> = PropsWithChildren &
 export function Form<T extends FieldValues>({
   formMethods,
   handleOnSubmit: onSubmit,
-  handleOnFailure: onFailure = console.log,
+  handleOnFailure: onFailure = (error) => {
+    console.log(error);
+  },
   children,
   containerProps,
   submitButton,

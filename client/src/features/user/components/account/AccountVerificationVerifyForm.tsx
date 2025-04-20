@@ -19,8 +19,8 @@ function AccountVerificationVerifyForm() {
 
   const { verify, getEmail } = useUserAccount().verification;
 
-  function handleOnSubmit(data: VerificationData) {
-    return verify(data);
+  async function handleOnSubmit(data: VerificationData) {
+    await verify(data);
   }
 
   return (

@@ -123,7 +123,13 @@ class Email<TemplateVariables = EmptyObject> {
         (user) => !this.recipients.accepted.includes(user)
       );
 
-      return this.sendEmail(recipientsToSend);
+      return this.tryingTime < 3
+        ? this.sendEmail(recipientsToSend)
+        : {
+            isSuccessful: false,
+            accepted: this.recipients.accepted,
+            rejected: this.recipients.rejected,
+          };
     }
 
     this.recipients.accepted = this.recipients.accepted.concat(
@@ -198,6 +204,7 @@ export function sendEmail<T>({
       users: [finalEmail],
       ...restOptions,
     });
+
     const { isSuccessful } = await emailSender.send();
 
     if (!isSuccessful && isSendResponseNeed) {

@@ -17,8 +17,8 @@ function PasswordRecoveryGetEmailForm() {
 
   const { getEmail } = useUserAccount().password.recovery;
 
-  function handleOnSubmit(data: GetEmailData) {
-    return getEmail(data);
+  async function handleOnSubmit(data: GetEmailData) {
+    await getEmail(data);
   }
 
   return (

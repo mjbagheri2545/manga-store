@@ -15,8 +15,8 @@ function LoginForm() {
   });
   const { login } = useAuth();
 
-  function handleOnSubmit(data: LoginData) {
-    login(data);
+  async function handleOnSubmit(data: LoginData) {
+    await login(data);
   }
 
   return (
