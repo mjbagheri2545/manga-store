@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import PATH from "@/constants/path";
 import AdminLayout from "@/pages/admin/components/Layout";
@@ -14,6 +14,10 @@ function AdminRouter() {
     <>
       <Routes>
         <Route element={<AdminLayout />}>
+          <Route
+            index
+            element={<Navigate to={PATH.admin.index("product")} replace />}
+          />
           <Route
             path={`${PATH.getPathForRoute(PATH.base.category)}/*`}
             element={<CategoryRoutes />}
