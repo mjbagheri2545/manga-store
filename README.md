@@ -19,6 +19,16 @@ Mistakes included.
 
 ---
 
+## 🧪 Live Demo
+
+Check out the live demo of this project here:  
+👉 [Manga Store Demo](https://manga-store-1.onrender.com/)
+
+> ⚠️ This is a training project and not optimized for production.  
+Some features or flows might be intentionally incomplete or simplified.
+
+---
+
 ## 🚀 Key Features and Architecture
 
 > All of the following were either built from scratch or heavily customized:
@@ -38,6 +48,10 @@ Implements **Attribute-Based Access Control** to define dynamic user permissions
 Reusable CLI scripts for repetitive tasks like:
 - Seeding
 - Feature generation
+
+### ✅ VS Code Tasks Integration
+Zero-setup development:  
+Just run `npm run` and everything boots up in the terminal automatically — including server, client.
 
 ### ✅ Advanced Team-Ready Dev Config  
 Strictly configured for scalable teamwork — enforced on both **client** and **server**:
